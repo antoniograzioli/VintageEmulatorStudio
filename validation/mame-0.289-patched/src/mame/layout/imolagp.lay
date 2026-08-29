@@ -1,0 +1,507 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.1" blue="0.1" />
+		</led7seg>
+	</element>
+
+	<element name="static_black">
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="static_gray">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+
+	<element name="static_white">
+		<rect><color red="0.95" green="0.95" blue="0.95" /></rect>
+	</element>
+	<element name="disk_white">
+		<disk><color red="0.95" green="0.95" blue="0.95" /></disk>
+	</element>
+
+	<element name="static_red">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+	</element>
+	<element name="disk_red">
+		<disk><color red="0.8" green="0.1" blue="0.0" /></disk>
+	</element>
+
+	<element name="static_green">
+		<rect><color red="0.15" green="0.8" blue="0.1" /></rect>
+	</element>
+	<element name="disk_green">
+		<disk><color red="0.15" green="0.8" blue="0.1" /></disk>
+	</element>
+
+	<element name="static_yellow">
+		<rect><color red="0.8" green="0.75" blue="0.1" /></rect>
+	</element>
+	<element name="disk_yellow">
+		<disk><color red="0.8" green="0.75" blue="0.1" /></disk>
+	</element>
+
+
+<!-- define text -->
+
+	<element name="text_result">
+		<text string="result" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_credits">
+		<text string="credits" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_time">
+		<text string="TIME">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_s">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="S">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_c">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="C">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_o">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="O">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_r">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="R">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_e">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="E">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_i">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="I">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_n">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="N">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_f">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="F">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_h">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="H">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_g">
+		<rect><color red="0.8" green="0.1" blue="0.0" /></rect>
+		<text string="G">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_1">
+		<text string="1" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_2">
+		<text string="2" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_3">
+		<text string="3" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_4">
+		<text string="4" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_5">
+		<text string="5" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_st">
+		<text string="st" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_nd">
+		<text string="nd" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_rd">
+		<text string="rd" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_th">
+		<text string="th" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+
+
+	<view name="Simple LEDs">
+		<bounds left="0" top="-124" right="300" bottom="325" />
+
+		<!-- NOTE: visible screen is not 3:4, partially cut from view horizontally (see imolagp.cpp) -->
+		<!-- It would be better to output the full screen area and cut it off in the layout -->
+		<screen index="0">
+			<bounds left="0" top="0" right="300" bottom="325" />
+		</screen>
+
+		<!-- color bars -->
+		<element ref="static_green">
+			<bounds x="0" y="-120" width="8" height="116" />
+		</element>
+		<element ref="disk_green">
+			<bounds x="0" y="-124" width="8" height="8" />
+		</element>
+
+		<element ref="static_red">
+			<bounds x="10" y="-120" width="8" height="116" />
+		</element>
+		<element ref="disk_red">
+			<bounds x="10" y="-124" width="8" height="8" />
+		</element>
+
+		<element ref="static_red">
+			<bounds x="26" y="-60" width="8" height="56" />
+		</element>
+		<element ref="disk_red">
+			<bounds x="26" y="-64" width="8" height="8" />
+		</element>
+
+		<element ref="static_green">
+			<bounds x="95" y="-60" width="8" height="56" />
+		</element>
+		<element ref="disk_green">
+			<bounds x="95" y="-64" width="8" height="8" />
+		</element>
+
+		<element ref="static_yellow">
+			<bounds x="105" y="-60" width="8" height="56" />
+		</element>
+		<element ref="disk_yellow">
+			<bounds x="105" y="-64" width="8" height="8" />
+		</element>
+
+		<element ref="static_red">
+			<bounds x="115" y="-60" width="8" height="56" />
+		</element>
+		<element ref="disk_red">
+			<bounds x="115" y="-64" width="8" height="8" />
+		</element>
+
+		<element ref="static_white">
+			<bounds x="177" y="-60" width="8" height="56" />
+		</element>
+		<element ref="disk_white">
+			<bounds x="177" y="-64" width="8" height="8" />
+		</element>
+
+		<element ref="static_green">
+			<bounds x="187" y="-60" width="8" height="56" />
+		</element>
+		<element ref="disk_green">
+			<bounds x="187" y="-64" width="8" height="8" />
+		</element>
+
+		<element ref="static_yellow">
+			<bounds x="282" y="-120" width="8" height="116" />
+		</element>
+		<element ref="disk_yellow">
+			<bounds x="282" y="-124" width="8" height="8" />
+		</element>
+
+		<element ref="static_green">
+			<bounds x="292" y="-120" width="8" height="116" />
+		</element>
+		<element ref="disk_green">
+			<bounds x="292" y="-124" width="8" height="8" />
+		</element>
+
+		<!-- score -->
+		<element ref="text_s">
+			<bounds x="10" y="-122" width="8" height="9" />
+		</element>
+		<element ref="text_c">
+			<bounds x="10" y="-112.5" width="8" height="9" />
+		</element>
+		<element ref="text_o">
+			<bounds x="10" y="-103" width="8" height="9" />
+		</element>
+		<element ref="text_r">
+			<bounds x="10" y="-93.5" width="8" height="9" />
+		</element>
+		<element ref="text_e">
+			<bounds x="10" y="-84" width="8" height="9" />
+		</element>
+
+		<element ref="static_gray">
+			<bounds x="20" y="-117" width="73" height="31" />
+		</element>
+		<element ref="static_black">
+			<bounds x="22" y="-115" width="69" height="27" />
+		</element>
+
+		<element name="digit00" ref="digit">
+			<bounds x="26.5" y="-113" width="15" height="23" />
+		</element>
+		<element name="digit01" ref="digit">
+			<bounds x="41.5" y="-113" width="15" height="23" />
+		</element>
+		<element name="digit02" ref="digit">
+			<bounds x="56.5" y="-113" width="15" height="23" />
+		</element>
+		<element name="digit03" ref="digit">
+			<bounds x="71.5" y="-113" width="15" height="23" />
+		</element>
+
+		<!-- result/credits -->
+		<element ref="text_i">
+			<bounds x="26" y="-54" width="8" height="9" />
+		</element>
+		<element ref="text_n">
+			<bounds x="26" y="-44.5" width="8" height="9" />
+		</element>
+		<element ref="text_f">
+			<bounds x="26" y="-35" width="8" height="9" />
+		</element>
+		<element ref="text_o">
+			<bounds x="26" y="-25.5" width="8" height="9" />
+		</element>
+
+		<element ref="static_gray">
+			<bounds x="36" y="-57" width="57" height="43" />
+		</element>
+		<element ref="static_black">
+			<bounds x="38" y="-55" width="53" height="39" />
+		</element>
+
+		<element name="digit12" ref="digit">
+			<bounds x="42" y="-53" width="10" height="15" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds x="52" y="-53" width="10" height="15" />
+		</element>
+
+		<element name="digit14" ref="digit">
+			<bounds x="42" y="-33" width="10" height="15" />
+		</element>
+		<element name="digit15" ref="digit">
+			<bounds x="52" y="-33" width="10" height="15" />
+		</element>
+
+		<element ref="text_result">
+			<bounds x="65" y="-54" width="24" height="10" />
+		</element>
+		<element ref="text_credits">
+			<bounds x="65" y="-34" width="24" height="10" />
+		</element>
+
+		<!-- time -->
+		<!-- (the area above TIME has a racecar drawn on the cab) -->
+		<element ref="static_green">
+			<bounds x="125" y="-64" width="50" height="55" />
+		</element>
+		<element ref="static_black">
+			<bounds x="129" y="-59" width="42" height="30" />
+		</element>
+		<element ref="static_gray">
+			<bounds x="129" y="-45" width="42" height="31" />
+		</element>
+		<element ref="static_black">
+			<bounds x="131" y="-43" width="38" height="27" />
+		</element>
+
+		<element ref="text_time">
+			<bounds x="131" y="-60" width="38" height="15" />
+		</element>
+
+		<element name="digit04" ref="digit">
+			<bounds x="135" y="-41" width="15" height="23" />
+		</element>
+		<element name="digit05" ref="digit">
+			<bounds x="150" y="-41" width="15" height="23" />
+		</element>
+
+		<!-- highscores -->
+		<element ref="static_gray">
+			<bounds x="197" y="-117" width="83" height="103" />
+		</element>
+		<element ref="static_black">
+			<bounds x="199" y="-115" width="79" height="99" />
+		</element>
+
+		<element ref="text_1">
+			<bounds x="212" y="-114" width="10" height="15" />
+		</element>
+		<element ref="text_st">
+			<bounds x="222.5" y="-114" width="10" height="10" />
+		</element>
+		<element name="digit40" ref="digit">
+			<bounds x="234" y="-113" width="10" height="15" />
+		</element>
+		<element name="digit41" ref="digit">
+			<bounds x="244" y="-113" width="10" height="15" />
+		</element>
+		<element name="digit42" ref="digit">
+			<bounds x="254" y="-113" width="10" height="15" />
+		</element>
+		<element name="digit43" ref="digit">
+			<bounds x="264" y="-113" width="10" height="15" />
+		</element>
+
+		<element ref="text_2">
+			<bounds x="212" y="-94" width="10" height="15" />
+		</element>
+		<element ref="text_nd">
+			<bounds x="222.5" y="-94" width="10" height="10" />
+		</element>
+		<element name="digit44" ref="digit">
+			<bounds x="234" y="-93" width="10" height="15" />
+		</element>
+		<element name="digit45" ref="digit">
+			<bounds x="244" y="-93" width="10" height="15" />
+		</element>
+		<element name="digit30" ref="digit">
+			<bounds x="254" y="-93" width="10" height="15" />
+		</element>
+		<element name="digit31" ref="digit">
+			<bounds x="264" y="-93" width="10" height="15" />
+		</element>
+
+		<element ref="text_3">
+			<bounds x="212" y="-74" width="10" height="15" />
+		</element>
+		<element ref="text_rd">
+			<bounds x="222.5" y="-74" width="10" height="10" />
+		</element>
+		<element name="digit32" ref="digit">
+			<bounds x="234" y="-73" width="10" height="15" />
+		</element>
+		<element name="digit33" ref="digit">
+			<bounds x="244" y="-73" width="10" height="15" />
+		</element>
+		<element name="digit34" ref="digit">
+			<bounds x="254" y="-73" width="10" height="15" />
+		</element>
+		<element name="digit35" ref="digit">
+			<bounds x="264" y="-73" width="10" height="15" />
+		</element>
+
+		<element ref="text_4">
+			<bounds x="212" y="-54" width="10" height="15" />
+		</element>
+		<element ref="text_th">
+			<bounds x="222.5" y="-54" width="10" height="10" />
+		</element>
+		<element name="digit20" ref="digit">
+			<bounds x="234" y="-53" width="10" height="15" />
+		</element>
+		<element name="digit21" ref="digit">
+			<bounds x="244" y="-53" width="10" height="15" />
+		</element>
+		<element name="digit22" ref="digit">
+			<bounds x="254" y="-53" width="10" height="15" />
+		</element>
+		<element name="digit23" ref="digit">
+			<bounds x="264" y="-53" width="10" height="15" />
+		</element>
+
+		<element ref="text_5">
+			<bounds x="212" y="-34" width="10" height="15" />
+		</element>
+		<element ref="text_th">
+			<bounds x="222.5" y="-34" width="10" height="10" />
+		</element>
+		<element name="digit24" ref="digit">
+			<bounds x="234" y="-33" width="10" height="15" />
+		</element>
+		<element name="digit25" ref="digit">
+			<bounds x="244" y="-33" width="10" height="15" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="254" y="-33" width="10" height="15" />
+		</element>
+		<element name="digit11" ref="digit">
+			<bounds x="264" y="-33" width="10" height="15" />
+		</element>
+
+		<element ref="static_red">
+			<bounds x="199" y="-115" width="14" height="99" />
+		</element>
+		<element ref="text_h">
+			<bounds x="200" y="-113" width="12" height="9" />
+		</element>
+		<element ref="text_i">
+			<bounds x="200" y="-103.5" width="12" height="9" />
+		</element>
+		<element ref="text_g">
+			<bounds x="200" y="-94" width="12" height="9" />
+		</element>
+		<element ref="text_h">
+			<bounds x="200" y="-84.5" width="12" height="9" />
+		</element>
+		<element ref="text_s">
+			<bounds x="200" y="-75" width="12" height="9" />
+		</element>
+		<element ref="text_c">
+			<bounds x="200" y="-65.5" width="12" height="9" />
+		</element>
+		<element ref="text_o">
+			<bounds x="200" y="-56" width="12" height="9" />
+		</element>
+		<element ref="text_r">
+			<bounds x="200" y="-46.5" width="12" height="9" />
+		</element>
+		<element ref="text_e">
+			<bounds x="200" y="-37" width="12" height="9" />
+		</element>
+		<element ref="text_s">
+			<bounds x="200" y="-27.5" width="12" height="9" />
+		</element>
+
+	</view>
+</mamelayout>

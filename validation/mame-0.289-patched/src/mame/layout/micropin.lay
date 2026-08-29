@@ -1,0 +1,272 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Robbbert
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="red_led">
+		<disk state="0"><color red="1.0" green="0.0" blue="0.0" /></disk>
+	</element>
+
+	<element name="P0"><text string="BALL"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P1"><text string="CREDIT"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P2"><text string="BONUS"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P3"><text string="PLAYER 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P4"><text string="PLAYER 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P5"><text string="PLAYER 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P6"><text string="PLAYER 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P7"><text string="HIGH PLAYER TODAY"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P8"><text string="HIGH TEAM TODAY"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P9"><text string="TEAM 1&amp;3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P10"><text string="TEAM 2&amp;4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P11"><text string="SAME PLAYER"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P12"><text string="TILT"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P13"><text string="PAY ATTENDANT"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P14"><text string="GAME OVER"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<view name="Default Layout">
+		<bounds left="0" top="20" right="1200" bottom="305" />
+
+		<!-- Text -->
+		<element ref="P0"><bounds left="128" right="198" top="86" bottom="120" /></element>
+		<element ref="P1"><bounds left="5" right="100" top="86" bottom="120" /></element>
+		<element ref="P2"><bounds left="368" right="500" top="86" bottom="120" /></element>
+		<element ref="P3"><bounds left="620" right="790" top="86" bottom="120" /></element>
+		<element ref="P4"><bounds left="940" right="1110" top="86" bottom="120" /></element>
+		<element ref="P5"><bounds left="620" right="790" top="171" bottom="205" /></element>
+		<element ref="P6"><bounds left="940" right="1110" top="171" bottom="205" /></element>
+		<element ref="P7"><bounds left="256" right="560" top="171" bottom="205" /></element>
+		<element ref="P8"><bounds left="256" right="560" top="256" bottom="290" /></element>
+		<element ref="P9"><bounds left="620" right="790" top="256" bottom="290" /></element>
+		<element ref="P10"><bounds left="940" right="1110" top="256" bottom="290" /></element>
+		<element ref="P11"><bounds left="50" right="180" top="132" bottom="158" /></element>
+		<element ref="P12"><bounds left="50" right="100" top="173" bottom="199" /></element>
+		<element ref="P13"><bounds left="50" right="200" top="214" bottom="240" /></element>
+		<element ref="P14"><bounds left="50" right="170" top="255" bottom="281" /></element>
+
+		<!-- LEDs -->
+		<element name="led0" ref="red_led">
+			<bounds left="600" right="620" top="93" bottom="113" /></element>
+		<element name="led1" ref="red_led">
+			<bounds left="920" right="940" top="93" bottom="113" /></element>
+		<element name="led2" ref="red_led">
+			<bounds left="600" right="620" top="178" bottom="198" /></element>
+		<element name="led3" ref="red_led">
+			<bounds left="920" right="940" top="178" bottom="198" /></element>
+		<element name="led4" ref="red_led">
+			<bounds left="15" right="35" top="176" bottom="196" /></element>
+		<element name="led5" ref="red_led">
+			<bounds left="15" right="35" top="217" bottom="237" /></element>
+		<element name="led6" ref="red_led">
+			<bounds left="15" right="35" top="258" bottom="278" /></element>
+		<element name="led7" ref="red_led">
+			<bounds left="15" right="35" top="135" bottom="155" /></element>
+
+		<!-- Credits -->
+		<element name="digit54" ref="digit">
+			<bounds x="14" y="45" width="35" height="40" />
+		</element>
+		<element name="digit53" ref="digit">
+			<bounds x="58" y="45" width="35" height="40" />
+		</element>
+
+		<!-- Match / Balls Left -->
+		<element name="digit52" ref="digit">
+			<bounds x="148" y="45" width="35" height="40" />
+		</element>
+
+		<!-- Bonus -->
+		<element name="digit34" ref="digit">
+			<bounds x="300" y="45" width="35" height="40" />
+		</element>
+		<element name="digit33" ref="digit">
+			<bounds x="344" y="45" width="35" height="40" />
+		</element>
+		<element name="digit32" ref="digit">
+			<bounds x="388" y="45" width="35" height="40" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds x="432" y="45" width="35" height="40" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds x="476" y="45" width="35" height="40" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds x="520" y="45" width="35" height="40" />
+		</element>
+
+		<!-- Player 1 Score -->
+		<element name="digit11" ref="digit">
+			<bounds x="620" y="45" width="35" height="40" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="664" y="45" width="35" height="40" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds x="708" y="45" width="35" height="40" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="752" y="45" width="35" height="40" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds x="796" y="45" width="35" height="40" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds x="840" y="45" width="35" height="40" />
+		</element>
+
+		<!-- Player 2 Score -->
+		<element name="digit5" ref="digit">
+			<bounds x="940" y="45" width="35" height="40" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="984" y="45" width="35" height="40" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="1028" y="45" width="35" height="40" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="1072" y="45" width="35" height="40" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="1116" y="45" width="35" height="40" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds x="1160" y="45" width="35" height="40" />
+		</element>
+
+		<!-- High Player Today -->
+		<element name="digit66" ref="digit">
+			<bounds x="256" y="130" width="35" height="40" />
+		</element>
+		<element name="digit65" ref="digit">
+			<bounds x="300" y="130" width="35" height="40" />
+		</element>
+		<element name="digit64" ref="digit">
+			<bounds x="344" y="130" width="35" height="40" />
+		</element>
+		<element name="digit63" ref="digit">
+			<bounds x="388" y="130" width="35" height="40" />
+		</element>
+		<element name="digit62" ref="digit">
+			<bounds x="432" y="130" width="35" height="40" />
+		</element>
+		<element name="digit61" ref="digit">
+			<bounds x="476" y="130" width="35" height="40" />
+		</element>
+		<element name="digit60" ref="digit">
+			<bounds x="520" y="130" width="35" height="40" />
+		</element>
+
+		<!-- Player 3 Score -->
+		<element name="digit31" ref="digit">
+			<bounds x="620" y="130" width="35" height="40" />
+		</element>
+		<element name="digit30" ref="digit">
+			<bounds x="664" y="130" width="35" height="40" />
+		</element>
+		<element name="digit29" ref="digit">
+			<bounds x="708" y="130" width="35" height="40" />
+		</element>
+		<element name="digit28" ref="digit">
+			<bounds x="752" y="130" width="35" height="40" />
+		</element>
+		<element name="digit27" ref="digit">
+			<bounds x="796" y="130" width="35" height="40" />
+		</element>
+		<element name="digit26" ref="digit">
+			<bounds x="840" y="130" width="35" height="40" />
+		</element>
+
+		<!-- Player 4 Score -->
+		<element name="digit25" ref="digit">
+			<bounds x="940" y="130" width="35" height="40" />
+		</element>
+		<element name="digit24" ref="digit">
+			<bounds x="984" y="130" width="35" height="40" />
+		</element>
+		<element name="digit23" ref="digit">
+			<bounds x="1028" y="130" width="35" height="40" />
+		</element>
+		<element name="digit22" ref="digit">
+			<bounds x="1072" y="130" width="35" height="40" />
+		</element>
+		<element name="digit21" ref="digit">
+			<bounds x="1116" y="130" width="35" height="40" />
+		</element>
+		<element name="digit20" ref="digit">
+			<bounds x="1160" y="130" width="35" height="40" />
+		</element>
+
+		<!-- High Team Today -->
+		<element name="digit73" ref="digit">
+			<bounds x="256" y="215" width="35" height="40" />
+		</element>
+		<element name="digit72" ref="digit">
+			<bounds x="300" y="215" width="35" height="40" />
+		</element>
+		<element name="digit71" ref="digit">
+			<bounds x="344" y="215" width="35" height="40" />
+		</element>
+		<element name="digit70" ref="digit">
+			<bounds x="388" y="215" width="35" height="40" />
+		</element>
+		<element name="digit69" ref="digit">
+			<bounds x="432" y="215" width="35" height="40" />
+		</element>
+		<element name="digit68" ref="digit">
+			<bounds x="476" y="215" width="35" height="40" />
+		</element>
+		<element name="digit67" ref="digit">
+			<bounds x="520" y="215" width="35" height="40" />
+		</element>
+
+		<!-- Team 1&3 -->
+		<element name="digit45" ref="digit">
+			<bounds x="620" y="215" width="35" height="40" />
+		</element>
+		<element name="digit44" ref="digit">
+			<bounds x="664" y="215" width="35" height="40" />
+		</element>
+		<element name="digit43" ref="digit">
+			<bounds x="708" y="215" width="35" height="40" />
+		</element>
+		<element name="digit42" ref="digit">
+			<bounds x="752" y="215" width="35" height="40" />
+		</element>
+		<element name="digit41" ref="digit">
+			<bounds x="796" y="215" width="35" height="40" />
+		</element>
+		<element name="digit40" ref="digit">
+			<bounds x="840" y="215" width="35" height="40" />
+		</element>
+
+		<!-- Team 2&4 -->
+		<element name="digit51" ref="digit">
+			<bounds x="940" y="215" width="35" height="40" />
+		</element>
+		<element name="digit50" ref="digit">
+			<bounds x="984" y="215" width="35" height="40" />
+		</element>
+		<element name="digit49" ref="digit">
+			<bounds x="1028" y="215" width="35" height="40" />
+		</element>
+		<element name="digit48" ref="digit">
+			<bounds x="1072" y="215" width="35" height="40" />
+		</element>
+		<element name="digit47" ref="digit">
+			<bounds x="1116" y="215" width="35" height="40" />
+		</element>
+		<element name="digit46" ref="digit">
+			<bounds x="1160" y="215" width="35" height="40" />
+		</element>
+	</view>
+</mamelayout>

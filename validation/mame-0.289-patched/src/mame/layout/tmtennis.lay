@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap, Vas Crabb
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="court">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="700" height="249" viewBox="0 0 700 249">
+				<g fill="none" stroke="#00ff00" stroke-width="3" stroke-linecap="butt" stroke-linejoin="round" stroke-opacity="1">
+					<path d="m 1.5,247.5 h 697 l -95,-208 h -507 z" />
+					<path d="M 88,58.5 H 612" />
+					<path d="M 12,224.5 H 688" />
+					<path d="m 138.5,224.5 47,-166" />
+					<path d="m 561.5,224.5 -47,-166" />
+					<path d="M 163,136.5 H 537" />
+					<path d="M 350,247.5 V 38.5" />
+				</g>
+				<g fill="#00ff00">
+					<rect width="12" height="39" x="344" y="0" />
+					<rect width="12" height="42" x="344" y="206" />
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<screen index="0" blend="add"><bounds x="3" y="7.6" width="64" height="13.9" /></screen>
+
+		<!-- draw the tennis court -->
+		<element ref="court"><bounds width="70" height="24.9" /><color alpha="0.5" /></element>
+
+	</view>
+</mamelayout>

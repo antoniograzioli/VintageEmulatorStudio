@@ -1,0 +1,848 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Vas Crabb
+
+Westinghouse Test Console Serial #5 layout
+-->
+<mamelayout version="2">
+
+	<element name="char" defstate="0">
+		<led16seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led16seg>
+	</element>
+
+	<element name="btn00">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="MODE">
+			<bounds left="0.1" top="0.35" right="0.9" bottom="0.65" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn01">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
+		</rect>
+		<text string="TRAP">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="HEX">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn02">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
+		</rect>
+		<text string="ARM">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="DEC">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn03">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
+		</rect>
+		<text string="RESET">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="CLR">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn10">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
+		</rect>
+		<text string="MNE">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="+">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn11">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
+		</rect>
+		<text string="HARD">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="−">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn12">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
+		</rect>
+		<text string="TRACE">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="×">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn13">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
+		</rect>
+		<text string="REL">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="÷">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn20">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
+		</rect>
+		<text string="REC">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="BCC">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn21">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
+		</rect>
+		<text string="SOFT">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="LIST">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn22">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
+		</rect>
+		<text string="DISP">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="VER">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn23">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
+		</rect>
+		<text string="STEP">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="PROG">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn30">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="←">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="↑">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn31">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="→">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="↓">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn32">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="1.0" green="1.0" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
+		</rect>
+		<text string="X">
+			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="TRAN">
+			<bounds left="0.1" top="0.575" right="0.9" bottom="0.875" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn33">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="ENTER">
+			<bounds left="0.1" top="0.35" right="0.9" bottom="0.65" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn04">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="C">
+			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="MW">
+			<bounds left="0.5" top="0.0" right="1.0" bottom="0.25" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn05">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="D">
+			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="IW">
+			<bounds left="0.5" top="0.0" right="1.0" bottom="0.25" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn06">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="E">
+			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="OF">
+			<bounds left="0.5" top="0.0" right="1.0" bottom="0.25" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn07">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="F">
+			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="IA">
+			<bounds left="0.5" top="0.0" right="1.0" bottom="0.25" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn14">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="8">
+			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="XX">
+			<bounds left="0.5" top="0.0" right="1.0" bottom="0.25" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn15">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="9">
+			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="HT">
+			<bounds left="0.5" top="0.0" right="1.0" bottom="0.25" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn16">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="A">
+			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="MR">
+			<bounds left="0.5" top="0.0" right="1.0" bottom="0.25" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn17">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="B">
+			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="IR">
+			<bounds left="0.5" top="0.0" right="1.0" bottom="0.25" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn24">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="4">
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn25">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="5">
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn26">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="6">
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn27">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="7">
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn34">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="0">
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn35">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="1">
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn36">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="2">
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="btn37">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<text string="3">
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="backdrop">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+
+		<element ref="backdrop">
+			<bounds left="0" top="0" right="960" bottom="520" />
+		</element>
+
+		<repeat count="16">
+			<param name="digitno" start="15" increment="-1" />
+			<param name="x" start="10" increment="60" />
+			<element name="digit~digitno~" ref="char">
+				<bounds x="~x~" y="10" width="40" height="60" />
+			</element>
+		</repeat>
+
+		<repeat count="2">
+			<param name="group" start="0" increment="4" />
+			<param name="padx" start="10" increment="530" />
+			<param name="mask" start="0x01" lshift="4" />
+			<repeat count="4">
+				<param name="row" start="0" increment="1" />
+				<param name="y" start="100" increment="110" />
+				<repeat count="4">
+					<param name="col" start="~group~" increment="1" />
+					<param name="btnx" start="~padx~" increment="110" />
+					<param name="mask" start="~mask~" lshift="1" />
+					<element ref="btn~row~~col~" inputtag="row~row~" inputmask="~mask~">
+						<bounds x="~btnx~" y="~y~" width="80" height="80" />
+					</element>
+				</repeat>
+			</repeat>
+		</repeat>
+
+	</view>
+</mamelayout>

@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="ledred" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="ledgreen" defstate="0">
+		<disk state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led14segsc>
+			<color red="0.0" green="1.0" blue="1.0" />
+		</led14segsc>
+	</element>
+
+	<element name="dot" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<view name="Default Layout">
+		<element name="led0" ref="ledgreen">
+			<bounds x="400" y="5" width="5" height="5" />
+		</element>
+		<element name="led1" ref="ledred">
+			<bounds x="400" y="20" width="5" height="5" />
+		</element>
+
+		<element name="digit0" ref="digit">
+			<bounds x="0" y="0" width="20" height="30" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="20" y="0" width="20" height="30" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="40" y="0" width="20" height="30" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="60" y="0" width="20" height="30" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="80" y="0" width="20" height="30" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="100" y="0" width="20" height="30" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds x="120" y="0" width="20" height="30" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds x="140" y="0" width="20" height="30" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="160" y="0" width="20" height="30" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds x="180" y="0" width="20" height="30" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="200" y="0" width="20" height="30" />
+		</element>
+		<element name="digit11" ref="digit">
+			<bounds x="220" y="0" width="20" height="30" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds x="240" y="0" width="20" height="30" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds x="260" y="0" width="20" height="30" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds x="280" y="0" width="20" height="30" />
+		</element>
+		<element name="digit15" ref="digit">
+			<bounds x="300" y="0" width="20" height="30" />
+		</element>
+		<element name="digit16" ref="digit">
+			<bounds x="320" y="0" width="20" height="30" />
+		</element>
+		<element name="digit17" ref="digit">
+			<bounds x="340" y="0" width="20" height="30" />
+		</element>
+		<element name="digit18" ref="digit">
+			<bounds x="360" y="0" width="20" height="30" />
+		</element>
+		<element name="digit19" ref="digit">
+			<bounds x="380" y="0" width="20" height="30" />
+		</element>
+	</view>
+</mamelayout>

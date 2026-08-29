@@ -1,0 +1,61 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Carl
+/***************************************************************************
+
+    ui/pluginopt.h
+
+    Internal menu for the plugin interface.
+
+***************************************************************************/
+#ifndef MAME_FRONTEND_UI_PLUGINOPT_H
+#define MAME_FRONTEND_UI_PLUGINOPT_H
+
+#pragma once
+
+#include "ui/menu.h"
+#include "ui/ui.h"
+
+#include <string>
+#include <string_view>
+#include <vector>
+
+
+namespace ui {
+
+class menu_plugin : public menu
+{
+public:
+	menu_plugin(mame_ui_manager &mui, render_target &target);
+
+	static void show_menu(mame_ui_manager &mui, std::string_view menu);
+
+	virtual ~menu_plugin();
+
+private:
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
+
+	std::vector<std::string> const &m_plugins;
+};
+
+
+class menu_plugin_opt : public menu
+{
+public:
+	menu_plugin_opt(mame_ui_manager &mui, render_target &target, std::string_view menu, bool one_shot);
+	virtual ~menu_plugin_opt();
+
+protected:
+	virtual bool custom_ui_back() override { return true; }
+
+private:
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
+
+	std::string const m_menu;
+	bool m_need_idle;
+};
+
+} // namespace ui
+
+#endif // MAME_FRONTEND_UI_PLUGINOPT_H

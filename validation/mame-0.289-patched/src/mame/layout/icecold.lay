@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="lamp" defstate="0">
+		<disk state="0">
+			<color red="0.4" green="0.4" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.9" green="0.9" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="str_holes">
+		<text string="Playfield Holes"/>
+	</element>
+	<element name="str_play">
+		<text string="Play" align="2"/>
+	</element>
+	<element name="str_good_game">
+		<text string="Good Game" align="2"/>
+	</element>
+	<element name="str_game_over">
+		<text string="Game Over" align="2"/>
+	</element>
+	<element name="str_tilt">
+		<text string="Tilt" align="2"/>
+	</element>
+	<element name="str_start">
+		<text string="Start" align="2"/>
+	</element>
+
+	<view name="Simple">
+
+	<!-- Display line -->
+		<element name="digit0" ref="digit">
+			<bounds x="10" y="190"  width="50" height="80" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="70" y="190"  width="50" height="80" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="130" y="190"  width="50" height="80" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="190" y="190"  width="50" height="80" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="10" y="100"  width="50" height="80" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="70" y="100"  width="50" height="80" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds x="130" y="100"  width="50" height="80" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds x="10" y="10"  width="50" height="80" />
+		</element>
+
+	<!-- Playfield Holes lamps -->
+		<element name="lbl_holes" ref="str_holes">
+			<bounds x="100" y="27" width="100" height="10" />
+		</element>
+		<element name="lamp1" ref="lamp">
+			<bounds x="100" y="40"  width="8" height="8" />
+		</element>
+		<element name="lamp2" ref="lamp">
+			<bounds x="110" y="40"  width="8" height="8" />
+		</element>
+		<element name="lamp3" ref="lamp">
+			<bounds x="120" y="40"  width="8" height="8" />
+		</element>
+		<element name="lamp4" ref="lamp">
+			<bounds x="130" y="40"  width="8" height="8" />
+		</element>
+		<element name="lamp5" ref="lamp">
+			<bounds x="140" y="40"  width="8" height="8" />
+		</element>
+		<element name="lamp6" ref="lamp">
+			<bounds x="150" y="40"  width="8" height="8" />
+		</element>
+		<element name="lamp7" ref="lamp">
+			<bounds x="160" y="40"  width="8" height="8" />
+		</element>
+		<element name="lamp8" ref="lamp">
+			<bounds x="170" y="40"  width="8" height="8" />
+		</element>
+		<element name="lamp9" ref="lamp">
+			<bounds x="180" y="40"  width="8" height="8" />
+		</element>
+		<element name="lamp10" ref="lamp">
+			<bounds x="190" y="40"  width="8" height="8" />
+		</element>
+
+	<!-- Panels -->
+		<element name="lbl_play" ref="str_play">
+			<bounds x="235" y="40" width="13" height="10" />
+		</element>
+		<element name="in_play" ref="lamp">
+			<bounds x="250" y="40"  width="8" height="8" />
+		</element>
+		<element name="lbl_good_game" ref="str_good_game">
+			<bounds x="218" y="50" width="30" height="10" />
+		</element>
+		<element name="good_game" ref="lamp">
+			<bounds x="250" y="50"  width="8" height="8" />
+		</element>
+		<element name="lbl_game_over" ref="str_game_over">
+			<bounds x="218" y="60" width="30" height="10" />
+		</element>
+		<element name="game_over" ref="lamp">
+			<bounds x="250" y="60"  width="8" height="8" />
+		</element>
+		<element name="lbl_tilt" ref="str_tilt">
+			<bounds x="237" y="70" width="11" height="10" />
+		</element>
+		<element name="tilt" ref="lamp">
+			<bounds x="250" y="70"  width="8" height="8" />
+		</element>
+		<element name="lbl_start" ref="str_start">
+			<bounds x="232" y="80" width="16" height="10" />
+		</element>
+		<element name="start" ref="lamp">
+			<bounds x="250" y="80"  width="8" height="8" />
+		</element>
+	</view>
+</mamelayout>

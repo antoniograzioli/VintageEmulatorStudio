@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="plate" defstate="0">
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><color red="0.4" green="1.0" blue="0.95" /></rect>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-0.5" right="14" top="-0.2" bottom="9" />
+
+		<repeat count="10">
+			<param name="y" start="0" increment="0.9" />
+			<param name="i2" start="9" increment="-1" />
+
+			<repeat count="14">
+				<param name="x" start="0" increment="1" />
+				<param name="i1" start="13" increment="-1" />
+				<element name="~i1~.~i2~" ref="plate"><bounds x="~x~" y="~y~" width="0.5" height="0.7" /></element>
+			</repeat>
+		</repeat>
+
+	</view>
+</mamelayout>

@@ -1,0 +1,26 @@
+Subject: [PATCH] vesembedded: add experimental Akai S2000 and S3000
+
+S2000 and S3000 are already compiled in the selected upstream akai/s3000.cpp
+translation unit and use the same floppy image-device path as the selected
+S3000XL/CD3000 models.  Add their lexically sorted embedded registry entries.
+
+diff --git a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+--- a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
++++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+@@ -65,6 +65,8 @@ GAME_EXTERN(pss31);
+ GAME_EXTERN(prophet5r30);
+ GAME_EXTERN(rz1);
++GAME_EXTERN(s2000);
++GAME_EXTERN(s3000);
+ GAME_EXTERN(s3000xl);
+ GAME_EXTERN(sd132);
+ GAME_EXTERN(sixtrak);
+@@ -110,6 +112,8 @@ const game_driver *const driver_list::s_drivers_sorted[] =
+ 	&GAME_NAME(pss31),
+ 	&GAME_NAME(pss6),
+ 	&GAME_NAME(rz1),
++	&GAME_NAME(s2000),
++	&GAME_NAME(s3000),
+ 	&GAME_NAME(s3000xl),
+ 	&GAME_NAME(sd132),
+ 	&GAME_NAME(sixtrak),

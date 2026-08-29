@@ -1,0 +1,24 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
+# 6509 opcodes
+
+lda_9_idy
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_Y)) {
+		read_9(set_l(m_TMP, m_TMP+m_Y));
+	}
+	m_A = read_9(m_TMP+m_Y);
+	set_nz(m_A);
+	prefetch();
+
+sta_9_idy
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	read_9(set_l(m_TMP, m_TMP+m_Y));
+	write_9(m_TMP+m_Y, m_A);
+	prefetch();

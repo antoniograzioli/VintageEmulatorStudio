@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>
+	</element>
+
+<!-- add our own for DP(display point) and the custom triangle accent mark segments -->
+
+	<element name="lamp_dp" defstate="0">
+		<disk state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></disk>
+		<disk state="1"><color red="0.2" green="1.0" blue="0.85" /></disk>
+	</element>
+	<element name="triangle_mark" defstate="0">
+		<text state="0" string="&#x25bc;"><color red="0.0235" green="0.1255" blue="0.1059" /></text>
+		<text state="1" string="&#x25bc;"><color red="0.2" green="1.0" blue="0.85" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="88.5" top="0" bottom="19" />
+
+		<!-- 8 digits with accent mark and dp -->
+		<element name="digit0" ref="digit"><bounds x="0" y="4" width="10" height="15" /></element>
+		<element name="digit1" ref="digit"><bounds x="11" y="4" width="10" height="15" /></element>
+		<element name="digit2" ref="digit"><bounds x="22" y="4" width="10" height="15" /></element>
+		<element name="digit3" ref="digit"><bounds x="33" y="4" width="10" height="15" /></element>
+		<element name="digit4" ref="digit"><bounds x="44" y="4" width="10" height="15" /></element>
+		<element name="digit5" ref="digit"><bounds x="55" y="4" width="10" height="15" /></element>
+		<element name="digit6" ref="digit"><bounds x="66" y="4" width="10" height="15" /></element>
+		<element name="digit7" ref="digit"><bounds x="77" y="4" width="10" height="15" /></element>
+
+		<element name="0.14" ref="triangle_mark"><bounds x="4" y="0" width="4" height="3" /></element>
+		<element name="1.14" ref="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></element>
+		<element name="2.14" ref="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></element>
+		<element name="3.14" ref="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></element>
+		<element name="4.14" ref="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></element>
+		<element name="5.14" ref="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></element>
+		<element name="6.14" ref="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></element>
+		<element name="7.14" ref="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></element>
+
+		<element name="0.15" ref="lamp_dp"><bounds x="9" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="1.15" ref="lamp_dp"><bounds x="20" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="2.15" ref="lamp_dp"><bounds x="31" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="3.15" ref="lamp_dp"><bounds x="42" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="4.15" ref="lamp_dp"><bounds x="53" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="5.15" ref="lamp_dp"><bounds x="64" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="6.15" ref="lamp_dp"><bounds x="75" y="17.5" width="1.5" height="1.5" /></element>
+		<element name="7.15" ref="lamp_dp"><bounds x="86" y="17.5" width="1.5" height="1.5" /></element>
+
+	</view>
+</mamelayout>

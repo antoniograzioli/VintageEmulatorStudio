@@ -1,0 +1,283 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+	<element name="Bet" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.2" green="0.2" blue="0.0" /></rect>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="Start" defstate="0">
+		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.2" blue="0.0" /></rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="Dup" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.2" green="0.0" blue="0.0" /></rect>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="Take" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.2" green="0.0" blue="0.0" /></rect>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="Info" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<text string="INFO">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+
+	<element name="Bet_B" defstate="0">
+		<rect state="1"><color red="0.7" green="0.7" blue="0.0" /></rect>
+		<rect state="0"><color red="0.1" green="0.1" blue="0.0" /></rect>
+	</element>
+
+	<element name="Start_B" defstate="0">
+		<rect state="1"><color red="0.0" green="0.7" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.1" blue="0.0" /></rect>
+	</element>
+
+	<element name="Dup_B" defstate="0">
+		<rect state="1"><color red="0.7" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.1" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="Info_B" defstate="0">
+		<rect state="1"><color red="0.7" green="0.7" blue="0.7" /></rect>
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+
+	<element name="cpanel">
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="cpanel1">
+		<rect><color red="0.20" green="0.20" blue="0.20" /></rect>
+	</element>
+
+	<element name="cpanel2">
+		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
+	</element>
+
+	<element name="cpanel3">
+		<rect><color red="0.10" green="0.10" blue="0.10" /></rect>
+	</element>
+
+	<element name="cpanel4">
+		<rect><color red="0.05" green="0.05" blue="0.05" /></rect>
+	</element>
+
+
+	<view name="Button Lamps">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+
+		<element ref="cpanel"><bounds left="0" right="4" top="3" bottom="3.80" /></element>
+
+		<element ref="cpanel1"><bounds left="0" right="4" top="3.01" bottom="3.39" /></element>
+		<element ref="cpanel2"><bounds left="0" right="4" top="3.02" bottom="3.38" /></element>
+		<element ref="cpanel3"><bounds left="0" right="4" top="3.03" bottom="3.37" /></element>
+		<element ref="cpanel4"><bounds left="0" right="4" top="3.04" bottom="3.36" /></element>
+		<element ref="cpanel"><bounds left="0" right="4" top="3.05" bottom="3.35" /></element>
+
+		<element ref="cpanel1"><bounds left="0" right="4" top="3.41" bottom="3.79" /></element>
+		<element ref="cpanel2"><bounds left="0" right="4" top="3.42" bottom="3.78" /></element>
+		<element ref="cpanel3"><bounds left="0" right="4" top="3.43" bottom="3.77" /></element>
+		<element ref="cpanel4"><bounds left="0" right="4" top="3.44" bottom="3.76" /></element>
+		<element ref="cpanel"><bounds left="0" right="4" top="3.45" bottom="3.75" /></element>
+
+
+		<element name="lamp3" ref="Bet_B" inputtag="IN0" inputmask="0x20">
+			<bounds x="0.05" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp3" ref="Bet" inputtag="IN0" inputmask="0x20">
+			<bounds x="0.07" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp5" ref="Start_B" inputtag="IN0" inputmask="0x80">
+			<bounds x="0.90" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp5" ref="Start" inputtag="IN0" inputmask="0x80">
+			<bounds x="0.92" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp1" ref="Dup_B" inputtag="IN0" inputmask="0x08">
+			<bounds x="1.75" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp1" ref="Dup" inputtag="IN0" inputmask="0x08">
+			<bounds x="1.77" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp2" ref="Dup_B" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.40" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp2" ref="Take" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.42" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp4" ref="Info_B" inputtag="IN0" inputmask="0x40">
+			<bounds x="3.45" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp4" ref="Info" inputtag="IN0" inputmask="0x40">
+			<bounds x="3.47" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+
+		<element name="lamp11" ref="Bet_B" inputtag="IN1" inputmask="0x20">
+			<bounds x="0.05" y="3.48" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp11" ref="Bet" inputtag="IN1" inputmask="0x20">
+			<bounds x="0.07" y="3.50" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp13" ref="Start_B" inputtag="IN1" inputmask="0x80">
+			<bounds x="0.90" y="3.48" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp13" ref="Start" inputtag="IN1" inputmask="0x80">
+			<bounds x="0.92" y="3.50" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp9" ref="Dup_B" inputtag="IN1" inputmask="0x08">
+			<bounds x="1.75" y="3.48" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp9" ref="Dup" inputtag="IN1" inputmask="0x08">
+			<bounds x="1.77" y="3.50" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp10" ref="Dup_B" inputtag="IN1" inputmask="0x10">
+			<bounds x="2.40" y="3.48" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp10" ref="Take" inputtag="IN1" inputmask="0x10">
+			<bounds x="2.42" y="3.50" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp12" ref="Info_B" inputtag="IN1" inputmask="0x40">
+			<bounds x="3.45" y="3.48" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp12" ref="Info" inputtag="IN1" inputmask="0x40">
+			<bounds x="3.47" y="3.50" width="0.46" height="0.20" />
+		</element>
+	</view>
+
+
+	<view name="P1 Button Lamps">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+
+		<element ref="cpanel"><bounds left="0" right="4" top="3" bottom="3.40" /></element>
+
+		<element ref="cpanel1"><bounds left="0" right="4" top="3.01" bottom="3.39" /></element>
+		<element ref="cpanel2"><bounds left="0" right="4" top="3.02" bottom="3.38" /></element>
+		<element ref="cpanel3"><bounds left="0" right="4" top="3.03" bottom="3.37" /></element>
+		<element ref="cpanel4"><bounds left="0" right="4" top="3.04" bottom="3.36" /></element>
+		<element ref="cpanel"><bounds left="0" right="4" top="3.05" bottom="3.35" /></element>
+
+
+		<element name="lamp3" ref="Bet_B" inputtag="IN0" inputmask="0x20">
+			<bounds x="0.05" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp3" ref="Bet" inputtag="IN0" inputmask="0x20">
+			<bounds x="0.07" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp5" ref="Start_B" inputtag="IN0" inputmask="0x80">
+			<bounds x="0.90" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp5" ref="Start" inputtag="IN0" inputmask="0x80">
+			<bounds x="0.92" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp1" ref="Dup_B" inputtag="IN0" inputmask="0x08">
+			<bounds x="1.75" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp1" ref="Dup" inputtag="IN0" inputmask="0x08">
+			<bounds x="1.77" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp2" ref="Dup_B" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.40" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp2" ref="Take" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.42" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp4" ref="Info_B" inputtag="IN0" inputmask="0x40">
+			<bounds x="3.45" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp4" ref="Info" inputtag="IN0" inputmask="0x40">
+			<bounds x="3.47" y="3.10" width="0.46" height="0.20" />
+		</element>
+	</view>
+
+
+	<view name="P2 Button Lamps">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+
+		<element ref="cpanel"><bounds left="0" right="4" top="3" bottom="3.40" /></element>
+
+		<element ref="cpanel1"><bounds left="0" right="4" top="3.01" bottom="3.39" /></element>
+		<element ref="cpanel2"><bounds left="0" right="4" top="3.02" bottom="3.38" /></element>
+		<element ref="cpanel3"><bounds left="0" right="4" top="3.03" bottom="3.37" /></element>
+		<element ref="cpanel4"><bounds left="0" right="4" top="3.04" bottom="3.36" /></element>
+		<element ref="cpanel"><bounds left="0" right="4" top="3.05" bottom="3.35" /></element>
+
+
+		<element name="lamp11" ref="Bet_B" inputtag="IN1" inputmask="0x20">
+			<bounds x="0.05" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp11" ref="Bet" inputtag="IN1" inputmask="0x20">
+			<bounds x="0.07" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp13" ref="Start_B" inputtag="IN1" inputmask="0x80">
+			<bounds x="0.90" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp13" ref="Start" inputtag="IN1" inputmask="0x80">
+			<bounds x="0.92" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp9" ref="Dup_B" inputtag="IN1" inputmask="0x08">
+			<bounds x="1.75" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp9" ref="Dup" inputtag="IN1" inputmask="0x08">
+			<bounds x="1.77" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp10" ref="Dup_B" inputtag="IN1" inputmask="0x10">
+			<bounds x="2.40" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp10" ref="Take" inputtag="IN1" inputmask="0x10">
+			<bounds x="2.42" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element name="lamp12" ref="Info_B" inputtag="IN1" inputmask="0x40">
+			<bounds x="3.45" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element name="lamp12" ref="Info" inputtag="IN1" inputmask="0x40">
+			<bounds x="3.47" y="3.10" width="0.46" height="0.20" />
+		</element>
+	</view>
+
+</mamelayout>

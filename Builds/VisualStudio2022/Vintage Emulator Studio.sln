@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio Version 17
+
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vintage Emulator Studio - Standalone Plugin", "Vintage Emulator Studio_StandalonePlugin.vcxproj", "{67A79992-BB9A-197E-8B70-3D6AF1255227}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7561357D-EF59-33F6-2831-9DFBCFA65585} = {7561357D-EF59-33F6-2831-9DFBCFA65585}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vintage Emulator Studio - VST3", "Vintage Emulator Studio_VST3.vcxproj", "{666E59A8-2945-5228-4D4F-23D0EAB2700F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7561357D-EF59-33F6-2831-9DFBCFA65585} = {7561357D-EF59-33F6-2831-9DFBCFA65585}
+		{EEAB796C-FBD4-15E8-BF94-8AAF132D7989} = {EEAB796C-FBD4-15E8-BF94-8AAF132D7989}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vintage Emulator Studio - Shared Code", "Vintage Emulator Studio_SharedCode.vcxproj", "{7561357D-EF59-33F6-2831-9DFBCFA65585}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vintage Emulator Studio - VST3 Manifest Helper", "Vintage Emulator Studio_VST3ManifestHelper.vcxproj", "{EEAB796C-FBD4-15E8-BF94-8AAF132D7989}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{666E59A8-2945-5228-4D4F-23D0EAB2700F}.Debug|x64.ActiveCfg = Debug|x64
+		{666E59A8-2945-5228-4D4F-23D0EAB2700F}.Debug|x64.Build.0 = Debug|x64
+		{666E59A8-2945-5228-4D4F-23D0EAB2700F}.Release|x64.ActiveCfg = Release|x64
+		{666E59A8-2945-5228-4D4F-23D0EAB2700F}.Release|x64.Build.0 = Release|x64
+		{67A79992-BB9A-197E-8B70-3D6AF1255227}.Debug|x64.ActiveCfg = Debug|x64
+		{67A79992-BB9A-197E-8B70-3D6AF1255227}.Debug|x64.Build.0 = Debug|x64
+		{67A79992-BB9A-197E-8B70-3D6AF1255227}.Release|x64.ActiveCfg = Release|x64
+		{67A79992-BB9A-197E-8B70-3D6AF1255227}.Release|x64.Build.0 = Release|x64
+		{7561357D-EF59-33F6-2831-9DFBCFA65585}.Debug|x64.ActiveCfg = Debug|x64
+		{7561357D-EF59-33F6-2831-9DFBCFA65585}.Debug|x64.Build.0 = Debug|x64
+		{7561357D-EF59-33F6-2831-9DFBCFA65585}.Release|x64.ActiveCfg = Release|x64
+		{7561357D-EF59-33F6-2831-9DFBCFA65585}.Release|x64.Build.0 = Release|x64
+		{EEAB796C-FBD4-15E8-BF94-8AAF132D7989}.Debug|x64.ActiveCfg = Debug|Win32
+		{EEAB796C-FBD4-15E8-BF94-8AAF132D7989}.Debug|x64.Build.0 = Debug|Win32
+		{EEAB796C-FBD4-15E8-BF94-8AAF132D7989}.Release|x64.ActiveCfg = Release|Win32
+		{EEAB796C-FBD4-15E8-BF94-8AAF132D7989}.Release|x64.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

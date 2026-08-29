@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Basic display of LEDs for the MMD-2
+-->
+
+<mamelayout version="2">
+
+	<element name="r_led">
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="g_led">
+		<disk state="0">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="o_led">
+		<disk state="0">
+			<color red="1.0" green="0.50" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="r_digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="PORT0">
+		<text string="PORT 0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="PORT1">
+		<text string="PORT 1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="PORT2">
+		<text string="PORT 2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="HALT">
+		<text string="HALT">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="HOLD">
+		<text string="HOLD">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="INTE">
+		<text string="INTE">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<element ref="background">
+			<bounds left="0" top="20" right="926" bottom="350" />
+		</element>
+
+		<element name="port1" ref="PORT1">
+			<bounds left="140" right="220" top="40" bottom="80" />
+		</element>
+		<element name="p1_7" ref="r_led">
+			<bounds left="40" right="60" top="100" bottom="120" />
+		</element>
+		<element name="p1_6" ref="r_led">
+			<bounds left="80" right="100" top="100" bottom="120" />
+		</element>
+		<element name="p1_5" ref="r_led">
+			<bounds left="120" right="140" top="100" bottom="120" />
+		</element>
+		<element name="p1_4" ref="r_led">
+			<bounds left="160" right="180" top="100" bottom="120" />
+		</element>
+		<element name="p1_3" ref="r_led">
+			<bounds left="200" right="220" top="100" bottom="120" />
+		</element>
+		<element name="p1_2" ref="r_led">
+			<bounds left="240" right="260" top="100" bottom="120" />
+		</element>
+		<element name="p1_1" ref="r_led">
+			<bounds left="280" right="300" top="100" bottom="120" />
+		</element>
+		<element name="p1_0" ref="r_led">
+			<bounds left="320" right="340" top="100" bottom="120" />
+		</element>
+
+		<element name="port0" ref="PORT0">
+			<bounds left="140" right="220" top="140" bottom="180" />
+		</element>
+		<element name="p0_7" ref="r_led">
+			<bounds left="40" right="60" top="200" bottom="220" />
+		</element>
+		<element name="p0_6" ref="r_led">
+			<bounds left="80" right="100" top="200" bottom="220" />
+		</element>
+		<element name="p0_5" ref="r_led">
+			<bounds left="120" right="140" top="200" bottom="220" />
+		</element>
+		<element name="p0_4" ref="r_led">
+			<bounds left="160" right="180" top="200" bottom="220" />
+		</element>
+		<element name="p0_3" ref="r_led">
+			<bounds left="200" right="220" top="200" bottom="220" />
+		</element>
+		<element name="p0_2" ref="r_led">
+			<bounds left="240" right="260" top="200" bottom="220" />
+		</element>
+		<element name="p0_1" ref="r_led">
+			<bounds left="280" right="300" top="200" bottom="220" />
+		</element>
+		<element name="p0_0" ref="r_led">
+			<bounds left="320" right="340" top="200" bottom="220" />
+		</element>
+
+		<element name="port2" ref="PORT2">
+			<bounds left="140" right="220" top="240" bottom="280" />
+		</element>
+		<element name="p2_7" ref="r_led">
+			<bounds left="40" right="60" top="300" bottom="320" />
+		</element>
+		<element name="p2_6" ref="r_led">
+			<bounds left="80" right="100" top="300" bottom="320" />
+		</element>
+		<element name="p2_5" ref="r_led">
+			<bounds left="120" right="140" top="300" bottom="320" />
+		</element>
+		<element name="p2_4" ref="r_led">
+			<bounds left="160" right="180" top="300" bottom="320" />
+		</element>
+		<element name="p2_3" ref="r_led">
+			<bounds left="200" right="220" top="300" bottom="320" />
+		</element>
+		<element name="p2_2" ref="r_led">
+			<bounds left="240" right="260" top="300" bottom="320" />
+		</element>
+		<element name="p2_1" ref="r_led">
+			<bounds left="280" right="300" top="300" bottom="320" />
+		</element>
+		<element name="p2_0" ref="r_led">
+			<bounds left="320" right="340" top="300" bottom="320" />
+		</element>
+
+		<element name="digit0" ref="r_digit">
+			<bounds left="407" top="075" right="454" bottom="146" />
+		</element>
+		<element name="digit1" ref="r_digit">
+			<bounds left="455" top="075" right="502" bottom="146" />
+		</element>
+		<element name="digit2" ref="r_digit">
+			<bounds left="503" top="075" right="550" bottom="146" />
+		</element>
+		<element name="digit3" ref="r_digit">
+			<bounds left="575" top="075" right="622" bottom="146" />
+		</element>
+		<element name="digit4" ref="r_digit">
+			<bounds left="623" top="075" right="670" bottom="146" />
+		</element>
+		<element name="digit5" ref="r_digit">
+			<bounds left="671" top="075" right="718" bottom="146" />
+		</element>
+		<element name="digit6" ref="r_digit">
+			<bounds left="743" top="075" right="790" bottom="146" />
+		</element>
+		<element name="digit7" ref="r_digit">
+			<bounds left="791" top="075" right="838" bottom="146" />
+		</element>
+		<element name="digit8" ref="r_digit">
+			<bounds left="839" top="075" right="886" bottom="146" />
+		</element>
+
+		<element name="txt_halt" ref="HALT">
+			<bounds left="840" right="880" top="220" bottom="240" />
+		</element>
+		<element name="txt_hold" ref="HOLD">
+			<bounds left="840" right="880" top="260" bottom="280" />
+		</element>
+		<element name="txt_inte" ref="INTE">
+			<bounds left="840" right="880" top="300" bottom="320" />
+		</element>
+
+		<element name="led_halt" ref="r_led">
+			<bounds left="800" right="820" top="220" bottom="240" />
+		</element>
+		<element name="led_hold" ref="o_led">
+			<bounds left="800" right="820" top="260" bottom="280" />
+		</element>
+		<element name="led_inte" ref="g_led">
+			<bounds left="800" right="820" top="300" bottom="320" />
+		</element>
+	</view>
+
+</mamelayout>

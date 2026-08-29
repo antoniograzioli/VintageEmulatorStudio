@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="10" y="40" width="128" height="9" />
+		</screen>
+
+		<element name="digit3" ref="digit">
+			<bounds x="25" y="10"  width="15" height="22" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="45" y="10"  width="15" height="22" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="85" y="10"  width="15" height="22" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds x="105" y="10"  width="15" height="22" />
+		</element>
+	</view>
+</mamelayout>

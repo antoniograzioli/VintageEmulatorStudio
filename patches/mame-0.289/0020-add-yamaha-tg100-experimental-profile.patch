@@ -1,0 +1,56 @@
+diff --git a/scripts/target/mame/vesembedded.lua b/scripts/target/mame/vesembedded.lua
+index 47c55e7..96af442 100644
+--- a/scripts/target/mame/vesembedded.lua	
++++ b/scripts/target/mame/vesembedded.lua	
+@@ -5,6 +5,7 @@ STANDALONE = true
+ 
+ CPUS["M6800"] = true
+ CPUS["H8"] = true
++CPUS["H8500"] = true
+ CPUS["DSPV"] = true
+ CPUS["ES5510"] = true
+ CPUS["M6502"] = true
+@@ -24,6 +25,7 @@ MACHINES["ACIA6850"] = true
+ MACHINES["ADC0808"] = true
+ MACHINES["TTL7474"] = true
+ MACHINES["EEPROM28"] = true
++MACHINES["EEPROMDEV"] = true
+ MACHINES["FDC_PLL"] = true
+ MACHINES["GT913"] = true
+ MACHINES["HD63450"] = true
+@@ -56,6 +58,7 @@ SOUNDS["ES5505"] = true
+ SOUNDS["ESQPUMP"] = true
+ SOUNDS["GEW7"] = true
+ SOUNDS["MEG"] = true
++SOUNDS["MULTIPCM"] = true
+ SOUNDS["MM5837"] = true
+ SOUNDS["SWP00"] = true
+ SOUNDS["SWX00"] = true
+@@ -152,6 +155,7 @@ function standalone()
+ 		MAME_DIR .. "src/mame/sequential/prophet5.cpp",
+ 		MAME_DIR .. "src/mame/sequential/sixtrak.cpp",
+ 		MAME_DIR .. "src/mame/yamaha/fb01.cpp",
++		MAME_DIR .. "src/mame/yamaha/tg100.cpp",
+ 		MAME_DIR .. "src/mame/yamaha/mulcd.cpp",
+ 		MAME_DIR .. "src/mame/yamaha/mulcd.h",
+ 		MAME_DIR .. "src/mame/yamaha/ymdx100.cpp",
+diff --git a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+index 7ec0985..142bcb5 100644
+--- a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp	
++++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp	
+@@ -67,6 +67,7 @@ GAME_EXTERN(sd132);
+ GAME_EXTERN(sixtrak);
+ GAME_EXTERN(tr707);
+ GAME_EXTERN(tr727);
++GAME_EXTERN(tg100);
+ GAME_EXTERN(tx81z);
+ GAME_EXTERN(vfx);
+ GAME_EXTERN(vfxsd);
+@@ -107,6 +108,7 @@ const game_driver *const driver_list::s_drivers_sorted[] =
+ 	&GAME_NAME(rz1),
+ 	&GAME_NAME(sd132),
+ 	&GAME_NAME(sixtrak),
++	&GAME_NAME(tg100),
+ 	&GAME_NAME(tr707),
+ 	&GAME_NAME(tr727),
+ 	&GAME_NAME(tx81z),

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="10">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="text_time"><text string="TIME" align="1"><color red="1.0" green="0.87" blue="0.4" /></text></element>
+
+	<view name="Internal Layout">
+		<bounds x="0" y="0" width="4000" height="3362" />
+		<screen index="0">
+			<bounds x="0" y="362" width="4000" height="3000" />
+		</screen>
+
+		<element ref="text_time"><bounds x="2400" y="112" width="800" height="170" /></element>
+		<element name="digit14" ref="digit"><bounds x="1748" y="16" width="236" height="330" /></element>
+		<element name="digit15" ref="digit"><bounds x="2016" y="16" width="236" height="330" /></element>
+	</view>
+</mamelayout>

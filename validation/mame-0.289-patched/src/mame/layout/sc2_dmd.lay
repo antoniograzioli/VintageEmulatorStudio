@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="matrixlamp">
+		<rect state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.7" green="0.7" blue="0.7" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="0.0" blue="1.0" />
+		</rect>
+		<rect state ="2">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="dotmatrixdot">
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
+		</rect>
+		<disk>
+			<color state="1" red="1.0" green="1.0" blue="1.0" />
+			<color state="0" red="0.125" green="0.125" blue="0.125" />
+		</disk>
+	</element>
+	<element name="Steppers" defstate="0">
+		<simplecounter maxstate="999" digits="3">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</simplecounter>
+	</element>
+
+	<group name="dmd">
+		<repeat count="21">
+			<param name="s" start="0" increment="65" />
+			<param name="y" start="0" increment="1" />
+			<repeat count="65">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="0" increment="1" />
+				<element name="dotmatrix~n~" ref="dotmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="0.12" blue="0.12" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<view name="AWP Simulated Video (Reels, Dots and Lamp Matrix)">
+		<group ref="dmd">
+			<bounds x="0" y="0" width="520" height="168" />
+		</group>
+
+		<element name="reel1:pos" ref="Steppers" state="0">
+			<bounds x="10" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel2:pos" ref="Steppers" state="0">
+			<bounds x="60" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel3:pos" ref="Steppers" state="0">
+			<bounds x="110" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel4:pos" ref="Steppers" state="0">
+			<bounds x="160" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel5:pos" ref="Steppers" state="0">
+			<bounds x="220" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel6:pos" ref="Steppers" state="0">
+			<bounds x="280" y="300" width="50" height="50"/>
+		</element>
+
+		<repeat count="16">
+			<param name="s" start="0" increment="16" />
+			<param name="y" start="300" increment="8" />
+			<repeat count="16">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="392" increment="8" />
+				<element name="lamp~n~" ref="matrixlamp" state="0">
+					<bounds x="~x~" y="~y~" width="7" height="7"/>
+				</element>
+			</repeat>
+		</repeat>
+	</view>
+
+	<view name="DMD Only">
+		<group ref="dmd" />
+	</view>
+</mamelayout>

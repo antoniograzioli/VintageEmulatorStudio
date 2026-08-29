@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="msemb1" name="Vintage Emulator Studio" projectType="audioplug"
+              useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
+              pluginFormats="buildAU,buildStandalone,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              companyWebsite="www.autodafe.net" version="0.9.289" companyName="Autodafe"
+              companyEmail="info@autodafe.net" pluginManufacturerCode="AtdF"
+              pluginCode="VES1" bundleIdentifier="net.autodafe.VintageEmulatorStudio"
+              cppLanguageStandard="20">
+  <MAINGROUP id="XVfN77" name="Vintage Emulator Studio">
+    <GROUP id="VESASSET" name="Resources">
+      <FILE id="VESLOGO1" name="ves-logo.png" compile="0" resource="1" file="../../Resources/ves-logo.png"/>
+      <GROUP id="VESMEDIAICONS" name="VES_Media_Icons_SVG">
+        <FILE id="VESROMICON" name="rom.svg" compile="0" resource="1" file="../../Resources/VES_Media_Icons_SVG/rom.svg"/>
+        <FILE id="VESARTICON" name="artwork.svg" compile="0" resource="1" file="../../Resources/VES_Media_Icons_SVG/artwork.svg"/>
+        <FILE id="VESFLOPICON" name="floppy.svg" compile="0" resource="1" file="../../Resources/VES_Media_Icons_SVG/floppy.svg"/>
+        <FILE id="VESCDICON" name="cdrom.svg" compile="0" resource="1" file="../../Resources/VES_Media_Icons_SVG/cdrom.svg"/>
+        <FILE id="VESHDDICON" name="harddisk.svg" compile="0" resource="1"
+              file="../../Resources/VES_Media_Icons_SVG/harddisk.svg"/>
+      </GROUP>
+      <GROUP id="VESFONTS" name="Fonts">
+        <FILE id="VESINTERREG" name="Inter-Regular.ttf" compile="0" resource="1"
+              file="../../Resources/Fonts/Inter-Regular.ttf"/>
+        <FILE id="VESINTERSEMI" name="Inter-SemiBold.ttf" compile="0" resource="1"
+              file="../../Resources/Fonts/Inter-SemiBold.ttf"/>
+        <FILE id="VESINTEROFL" name="OFL.txt" compile="0" resource="1" file="../../Resources/Fonts/OFL.txt"/>
+      </GROUP>
+    </GROUP>
+    <GROUP id="{68FD9205-D341-5E8D-5C70-EF1F5941FC74}" name="Source">
+      <FILE id="EPROC1" name="VintageEmulatorStudioProcessor.cpp" compile="1"
+            resource="0" file="../../Source/VintageEmulatorStudioProcessor.cpp"/>
+      <FILE id="EPROC2" name="VintageEmulatorStudioProcessor.h" compile="0"
+            resource="0" file="../../Source/VintageEmulatorStudioProcessor.h"/>
+      <FILE id="EEDIT1" name="VintageEmulatorStudioEditor.cpp" compile="1"
+            resource="0" file="../../Source/VintageEmulatorStudioEditor.cpp"/>
+      <FILE id="EEDIT2" name="VintageEmulatorStudioEditor.h" compile="0"
+            resource="0" file="../../Source/VintageEmulatorStudioEditor.h"/>
+      <FILE id="EFRSTB" name="EmbeddedEmulatorFrontendStubs.cpp" compile="1"
+            resource="0" file="../../Source/EmbeddedEmulatorFrontendStubs.cpp"/>
+      <FILE id="EENG1" name="EmbeddedEmulatorEngine.cpp" compile="1" resource="0"
+            file="../../validation/mame-0.289-patched/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp"/>
+      <FILE id="EENG2" name="EmbeddedEmulatorEngine.h" compile="0" resource="0"
+            file="../../validation/mame-0.289-patched/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h"/>
+      <FILE id="ELUA01" name="luaengine.cpp" compile="1" resource="0" file="../../validation/mame-0.289-patched/src/frontend/mame/luaengine.cpp"/>
+      <FILE id="ELUA02" name="luaengine_debug.cpp" compile="0" resource="0"
+            file="../../validation/mame-0.289-patched/src/frontend/mame/luaengine_debug.cpp"/>
+      <FILE id="ELUA03" name="luaengine_input.cpp" compile="0" resource="0"
+            file="../../validation/mame-0.289-patched/src/frontend/mame/luaengine_input.cpp"/>
+      <FILE id="ELUA04" name="luaengine_mem.cpp" compile="0" resource="0"
+            file="../../validation/mame-0.289-patched/src/frontend/mame/luaengine_mem.cpp"/>
+      <FILE id="ELUA05" name="luaengine_render.cpp" compile="1" resource="0"
+            file="../../validation/mame-0.289-patched/src/frontend/mame/luaengine_render.cpp"/>
+      <FILE id="EPLUG1" name="pluginopts.cpp" compile="1" resource="0" file="../../validation/mame-0.289-patched/src/frontend/mame/pluginopts.cpp"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <LINUX_MAKE targetFolder="../../Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path=""/>
+        <MODULEPATH id="juce_audio_devices" path=""/>
+        <MODULEPATH id="juce_audio_formats" path=""/>
+        <MODULEPATH id="juce_audio_plugin_client" path=""/>
+        <MODULEPATH id="juce_audio_processors" path=""/>
+        <MODULEPATH id="juce_audio_processors_headless" path=""/>
+        <MODULEPATH id="juce_audio_utils" path=""/>
+        <MODULEPATH id="juce_core" path=""/>
+        <MODULEPATH id="juce_data_structures" path=""/>
+        <MODULEPATH id="juce_events" path=""/>
+        <MODULEPATH id="juce_graphics" path=""/>
+        <MODULEPATH id="juce_gui_basics" path=""/>
+        <MODULEPATH id="juce_gui_extra" path=""/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+  </EXPORTFORMATS>
+</JUCERPROJECT>

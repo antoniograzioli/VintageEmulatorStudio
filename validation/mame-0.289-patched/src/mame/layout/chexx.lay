@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+	<!-- 7segs -->
+	<element name="digit">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0"/>
+	</led7seg>
+	</element>
+
+	<!-- Led -->
+	<element name="led" defstate="0">
+	<rect>
+		<bounds x="0" y="0" width="1.5" height="1.0"/>
+		<color red="1.0" green="0.96" blue="0.94"/>
+	</rect>
+	<rect state="0">
+		<bounds x="0.05" y="0.05" width="1.4" height="0.9"/>
+		<color red="0.5" green="0.0" blue="0.0"/>
+	</rect>
+	<rect state="1">
+		<bounds x="0.05" y="0.05" width="1.4" height="0.9"/>
+		<color red="1.0" green="0.0" blue="0.0"/>
+	</rect>
+	</element>
+
+	<!-- Lamp -->
+	<element name="lamp" defstate="0">
+	<disk state="0">
+		<color red="0.2" green="0.0" blue="0.0"/>
+	</disk>
+	<disk state="1">
+		<color red="1.0" green="0.0" blue="0.0"/>
+	</disk>
+	</element>
+
+	<view name="Score Board (No Artwork)">
+	<!-- P1 score -->
+	<element name="digit0" ref="digit">
+			<bounds x="0" y="0" width="1" height="2"/>
+		</element>
+	<element name="digit1" ref="digit">
+		<bounds x="1" y="0" width="1" height="2"/>
+	</element>
+
+	<!-- P1 goal lamp -->
+	<element name="lamp0" ref="lamp">
+		<bounds x="0.75" y="-0.5" width="0.5" height="0.5"/>
+	</element>
+
+	<!-- Period being played -->
+	<element name="led0" ref="led">
+		<bounds x="3.0" y="-0.33" width="0.5" height="0.33"/>
+	</element>
+	<element name="led1" ref="led">
+		<bounds x="3.5" y="-0.33" width="0.5" height="0.33"/>
+	</element>
+	<element name="led2" ref="led">
+		<bounds x="4.0" y="-0.33" width="0.5" height="0.33"/>
+	</element>
+
+	<!-- P2 score -->
+	<element name="digit2" ref="digit">
+		<bounds x="5.5" y="0" width="1" height="2"/>
+	</element>
+	<element name="digit3" ref="digit">
+		<bounds x="6.5" y="0" width="1" height="2"/>
+	</element>
+
+	<!-- P2 goal lamp -->
+	<element name="lamp1" ref="lamp">
+		<bounds x="6.25" y="-0.5" width="0.5" height="0.5"/>
+	</element>
+	</view>
+</mamelayout>

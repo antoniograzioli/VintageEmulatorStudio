@@ -1,0 +1,564 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Roberto Fresca
+
+Test panel for Note Chance.
+
+4 rows of 8 lines.
+From D7 to D0.
+-->
+<mamelayout version="2">
+
+	<!--
+	    ****** Elements ******
+	-->
+
+	<element name="L0" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 00">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L1" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 01">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L2" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 02">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L3" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 03">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L4" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 04">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L5" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 05">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L6" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 06">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L7" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 07">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+
+
+	<element name="L8" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 08">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L9" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 09">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L10" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 10">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L11" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 11">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L12" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 12">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L13" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 13">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L14" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 14">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L15" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 15">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+
+
+	<element name="L16" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 16">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L17" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 17">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L18" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 18">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L19" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 19">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L20" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 20">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L21" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 21">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L22" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 22">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L23" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 23">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+
+	<element name="L24" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 24">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L25" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 25">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L26" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 26">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L27" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 27">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L28" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 28">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L29" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 29">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L30" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 30">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="L31" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LAMP 31">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+
+	<!--
+	    ****** Screen & Position ******
+	-->
+
+	<view name="Button Lamps">
+			<bounds left="0" top="0" right="4" bottom="4" />
+
+		<!--
+		    ****** 1st row ******
+		-->
+
+		<element name="lamp0" ref="L0">
+			<bounds x="3.5" y="3.02" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp1" ref="L1">
+			<bounds x="3.0" y="3.02" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp2" ref="L2">
+			<bounds x="2.5" y="3.02" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp3" ref="L3">
+			<bounds x="2.0" y="3.02" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp4" ref="L4">
+			<bounds x="1.5" y="3.02" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp5" ref="L5">
+			<bounds x="1.0" y="3.02" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp6" ref="L6">
+			<bounds x="0.5" y="3.02" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp7" ref="L7">
+			<bounds x="0" y="3.02" width="0.40" height="0.24" />
+		</element>
+
+		<!--
+		    ****** 2nd row ******
+		-->
+
+		<element name="lamp8" ref="L8">
+			<bounds x="3.5" y="3.28" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp9" ref="L9">
+			<bounds x="3.0" y="3.28" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp10" ref="L10">
+			<bounds x="2.5" y="3.28" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp11" ref="L11">
+			<bounds x="2.0" y="3.28" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp12" ref="L12">
+			<bounds x="1.5" y="3.28" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp13" ref="L13">
+			<bounds x="1.0" y="3.28" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp14" ref="L14">
+			<bounds x="0.5" y="3.28" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp15" ref="L15">
+			<bounds x="0" y="3.28" width="0.40" height="0.24" />
+		</element>
+
+		<!--
+		    ****** 3rd row ******
+		-->
+
+		<element name="lamp16" ref="L16">
+			<bounds x="3.5" y="3.54" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp17" ref="L17">
+			<bounds x="3.0" y="3.54" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp18" ref="L18">
+			<bounds x="2.5" y="3.54" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp19" ref="L19">
+			<bounds x="2.0" y="3.54" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp20" ref="L20">
+			<bounds x="1.5" y="3.54" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp21" ref="L21">
+			<bounds x="1.0" y="3.54" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp22" ref="L22">
+			<bounds x="0.5" y="3.54" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp23" ref="L23">
+			<bounds x="0" y="3.54" width="0.40" height="0.24" />
+		</element>
+
+		<!--
+		    ****** 4th row ******
+		-->
+
+		<element name="lamp24" ref="L24">
+			<bounds x="3.5" y="3.8" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp25" ref="L25">
+			<bounds x="3.0" y="3.8" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp26" ref="L26">
+			<bounds x="2.5" y="3.8" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp27" ref="L27">
+			<bounds x="2.0" y="3.8" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp28" ref="L28">
+			<bounds x="1.5" y="3.8" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp29" ref="L29">
+			<bounds x="1.0" y="3.8" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp30" ref="L30">
+			<bounds x="0.5" y="3.8" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp31" ref="L31">
+			<bounds x="0" y="3.8" width="0.40" height="0.24" />
+		</element>
+
+	</view>
+
+</mamelayout>

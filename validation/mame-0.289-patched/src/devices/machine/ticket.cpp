@@ -1,0 +1,190 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+/***************************************************************************
+
+    ticket.cpp
+
+    Generic ticket dispensing device.
+
+***************************************************************************/
+
+#include "emu.h"
+#include "ticket.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device, "ticket_dispenser", "Ticket Dispenser")
+DEFINE_DEVICE_TYPE(HOPPER, hopper_device, "coin_hopper", "Coin Hopper")
+
+
+
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
+
+static INPUT_PORTS_START( ticket )
+	PORT_START("TEST")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Sensor Test")
+INPUT_PORTS_END
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  constructor
+//-------------------------------------------------
+
+ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_period(attotime::from_msec(100))
+	, m_hopper_type(false)
+	, m_io_test(*this, "TEST")
+	, m_dispense_handler(*this)
+	, m_output(*this, tag) // TODO: change to "tag:status"
+	, m_timer(nullptr)
+	, m_status(false)
+	, m_power(false)
+{
+}
+
+ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ticket_dispenser_device(mconfig, TICKET_DISPENSER, tag, owner, clock)
+{
+	m_hopper_type = false;
+}
+
+hopper_device::hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ticket_dispenser_device(mconfig, HOPPER, tag, owner, clock)
+{
+	m_hopper_type = true;
+}
+
+
+//-------------------------------------------------
+//  destructor
+//-------------------------------------------------
+
+ticket_dispenser_device::~ticket_dispenser_device()
+{
+}
+
+
+
+//**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  line_r - read the status line
+//-------------------------------------------------
+
+int ticket_dispenser_device::line_r()
+{
+	return (m_status || BIT(m_io_test->read(), 0)) ? 1 : 0;
+}
+
+
+//-------------------------------------------------
+//  motor_w - write the control line
+//-------------------------------------------------
+
+void ticket_dispenser_device::motor_w(int state)
+{
+	// On rising edge, start dispensing!
+	if (state && !m_power)
+	{
+		LOG("%s: Ticket Power On\n", machine().describe_context());
+		m_timer->adjust(m_period);
+		m_power = true;
+		m_status = false;
+	}
+	else if (!state && m_power)
+	{
+		if (!m_hopper_type || !m_status)
+		{
+			LOG("%s: Ticket Power Off\n", machine().describe_context());
+			m_timer->adjust(attotime::never);
+			m_output = 0;
+		}
+		m_power = false;
+	}
+}
+
+
+//**************************************************************************
+//  DEVICE INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_input_ports
+//-------------------------------------------------
+
+ioport_constructor ticket_dispenser_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ticket);
+}
+
+
+//-------------------------------------------------
+//  device_start - handle device startup
+//-------------------------------------------------
+
+void ticket_dispenser_device::device_start()
+{
+	m_timer = timer_alloc(FUNC(ticket_dispenser_device::update_output_state), this);
+
+	m_status = false;
+	m_power = false;
+
+	save_item(NAME(m_status));
+	save_item(NAME(m_power));
+}
+
+
+//-------------------------------------------------
+//  update_output_state -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(ticket_dispenser_device::update_output_state)
+{
+	bool status = m_status;
+
+	// if we still have power, keep toggling ticket states
+	if (m_power)
+	{
+		status = !m_status;
+		LOG("Ticket Status Changed to %u\n", status);
+		m_timer->adjust(m_period);
+	}
+	else if (m_hopper_type)
+	{
+		status = !m_status;
+		LOG("Ticket Power Off\n");
+		m_timer->adjust(attotime::never);
+	}
+
+	// update output status
+	m_output = status;
+
+	if (status != m_status)
+	{
+		m_dispense_handler(m_status = status);
+
+		// if we just dispensed, increment global count
+		if (status)
+		{
+			machine().bookkeeping().increment_dispensed_tickets(1);
+			LOG("Ticket Dispensed\n");
+		}
+	}
+}

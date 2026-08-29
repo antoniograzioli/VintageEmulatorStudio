@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="sysled" defstate="0">
+		<disk state="1">
+			<color red="0.55" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="l1">
+		<text string="A">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="l2">
+		<text string="B">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="l3">
+		<text string="C">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="30" y="0" width="640" height="400" />
+		</screen>
+
+		<element name="led9" ref="sysled">
+			<bounds x="15" y="76" width="10" height="10" />
+		</element>
+		<element name="led16" ref="sysled">
+			<bounds x="15" y="96" width="10" height="10" />
+		</element>
+		<element name="led17" ref="sysled">
+			<bounds x="15" y="116" width="10" height="10" />
+		</element>
+
+		<element name="label1" ref="l1">
+			<bounds x="0" y="73" width="15" height="16" />
+		</element>
+		<element name="label2" ref="l2">
+			<bounds x="0" y="93" width="15" height="16" />
+		</element>
+		<element name="label3" ref="l3">
+			<bounds x="0" y="113" width="15" height="16" />
+		</element>
+	</view>
+</mamelayout>

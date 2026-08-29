@@ -1,0 +1,968 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
+# w65c02s opcodes
+
+adc_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	do_adc(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+adc_s_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	do_adc(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+adc_s_idx
+	m_TMP2 = read_pc();
+	read_pc();
+	m_TMP2 += m_X;
+	m_TMP = read(m_TMP2 & 0xff);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	m_TMP2 = read(m_TMP);
+	do_adc(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+adc_s_idy
+	m_TMP2 = read_pc();
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP2 = read(m_TMP+m_Y);
+	do_adc(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+adc_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_TMP2 = read(uint8_t(m_TMP+m_X));
+	do_adc(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+and_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	m_A &= m_TMP2;
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+and_s_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	m_A &= m_TMP2;
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+and_s_idx
+	m_TMP2 = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 += m_X;
+	m_TMP = read(m_TMP2 & 0xff);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	m_TMP2 = read(m_TMP);
+	m_A &= m_TMP2;
+	set_nz(m_A);
+	prefetch();
+
+and_s_idy
+	m_TMP2 = read_pc();
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP2 = read(m_TMP+m_Y);
+	m_A &= m_TMP2;
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+and_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 = read(uint8_t(m_TMP+m_X));
+	m_A &= m_TMP2;
+	set_nz(m_A);
+	prefetch();
+
+asl_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP+1);
+	m_TMP2 = do_asl(m_TMP2);
+	write(m_TMP, m_TMP2);
+	m_PC++;
+	prefetch();
+
+asl_s_zpg
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2 = do_asl(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+asl_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP = uint8_t(m_TMP+m_X);
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2 = do_asl(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+bit_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	do_bit(m_TMP2);
+	m_PC++;
+	prefetch();
+
+bit_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 = read(uint8_t(m_TMP+m_X));
+	do_bit(m_TMP2);
+	prefetch();
+
+brk_s_imp
+	if(m_irq_taken || m_nmi_pending) {
+		read_pc();
+	} else {
+		read_pc();
+	m_PC++;
+	}
+	write(m_SP, m_PC >> 8);
+	dec_SP();
+	write(m_SP, m_PC);
+	dec_SP();
+	write(m_SP, m_irq_taken || m_nmi_pending ? m_P & ~F_B : m_P);
+	dec_SP();
+	if(m_irq_taken && m_nmi_pending) {
+		standard_irq_callback(NMI_LINE, m_PC);
+		m_PC = read_vector(0xfffa);
+		m_PC = set_h(m_PC, read_vector(0xfffb));
+		m_nmi_pending = false;
+	} else {
+		if(m_irq_taken)
+			standard_irq_callback(IRQ_LINE, m_PC);
+		m_PC = read_vector(0xfffe);
+		m_PC = set_h(m_PC, read_vector(0xffff));
+	}
+	m_irq_taken = false;
+	m_P = (m_P | F_I) & ~F_D; // Do *not* move after the prefetch
+	prefetch();
+	m_inst_state = -1;
+
+cmp_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	do_cmp(m_A, m_TMP2);
+	m_PC++;
+	prefetch();
+
+cmp_s_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	do_cmp(m_A, m_TMP2);
+	m_PC++;
+	prefetch();
+
+cmp_s_idx
+	m_TMP2 = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 += m_X;
+	m_TMP = read(m_TMP2 & 0xff);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	m_TMP2 = read(m_TMP);
+	do_cmp(m_A, m_TMP2);
+	prefetch();
+
+cmp_s_idy
+	m_TMP2 = read_pc();
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP2 = read(m_TMP+m_Y);
+	do_cmp(m_A, m_TMP2);
+	m_PC++;
+	prefetch();
+
+cmp_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP = read(uint8_t(m_TMP+m_X));
+	do_cmp(m_A, m_TMP);
+	prefetch();
+
+dec_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP+1);
+	m_TMP2--;
+	set_nz(m_TMP2);
+	write(m_TMP, m_TMP2);
+	m_PC++;
+	prefetch();
+
+dec_s_zpg
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2--;
+	set_nz(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+dec_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP = uint8_t(m_TMP+m_X);
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2--;
+	set_nz(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+eor_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	m_A ^= m_TMP2;
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+eor_s_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	m_A ^= m_TMP2;
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+eor_s_idx
+	m_TMP2 = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 += m_X;
+	m_TMP = read(m_TMP2 & 0xff);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	m_TMP2 = read(m_TMP);
+	m_A ^= m_TMP2;
+	set_nz(m_A);
+	prefetch();
+
+eor_s_idy
+	m_TMP2 = read_pc();
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP2 = read(m_TMP+m_Y);
+	m_A ^= m_TMP2;
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+eor_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 = read(uint8_t(m_TMP+m_X));
+	m_A ^= m_TMP2;
+	set_nz(m_A);
+	prefetch();
+
+inc_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP+1);
+	m_TMP2++;
+	set_nz(m_TMP2);
+	write(m_TMP, m_TMP2);
+	m_PC++;
+	prefetch();
+
+inc_s_zpg
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2++;
+	set_nz(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+inc_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP = uint8_t(m_TMP+m_X);
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2++;
+	set_nz(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+jmp_s_iax
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	read_pc();
+	m_TMP += m_X;
+	m_PC = read(m_TMP);
+	m_PC = set_h(m_PC, read(m_TMP+1));
+	prefetch();
+
+jmp_s_ind
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	read_pc();
+	m_PC = read(m_TMP);
+	m_PC = set_h(m_PC, read(m_TMP+1));
+	prefetch();
+
+lda_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_A = read(m_TMP + m_X);
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+lda_s_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_A = read(m_TMP + m_Y);
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+lda_s_idx
+	m_TMP2 = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 += m_X;
+	m_TMP = read(m_TMP2 & 0xff);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	m_A = read(m_TMP);
+	set_nz(m_A);
+	prefetch();
+
+lda_s_idy
+	m_TMP2 = read_pc();
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_A = read(m_TMP+m_Y);
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+lda_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_A = read(uint8_t(m_TMP+m_X));
+	set_nz(m_A);
+	prefetch();
+
+ldx_s_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_X = read(m_TMP + m_Y);
+	set_nz(m_X);
+	m_PC++;
+	prefetch();
+
+ldx_s_zpy
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_X = read(uint8_t(m_TMP+m_Y));
+	set_nz(m_X);
+	prefetch();
+
+ldy_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_Y = read(m_TMP);
+	set_nz(m_Y);
+	m_PC++;
+	prefetch();
+
+ldy_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_Y = read(uint8_t(m_TMP+m_X));
+	set_nz(m_Y);
+	prefetch();
+
+lsr_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2 = do_lsr(m_TMP2);
+	write(m_TMP, m_TMP2);
+	m_PC++;
+	prefetch();
+
+lsr_s_zpg
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2 = do_lsr(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+lsr_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP = uint8_t(m_TMP+m_X);
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2 = do_lsr(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+nop_s_abx
+	read_pc();
+	m_PC++;
+	read_pc();
+	read_pc();
+	m_PC++;
+	prefetch();
+
+nop_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	read(uint8_t(m_TMP+m_X));
+	prefetch();
+
+ora_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	m_A |= m_TMP2;
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+ora_s_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	m_A |= m_TMP2;
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+ora_s_idx
+	m_TMP2 = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 += m_X;
+	m_TMP = read(m_TMP2 & 0xff);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	m_TMP2 = read(m_TMP);
+	m_A |= m_TMP2;
+	set_nz(m_A);
+	prefetch();
+
+ora_s_idy
+	m_TMP2 = read_pc();
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP2 = read(m_TMP+m_Y);
+	m_A |= m_TMP2;
+	set_nz(m_A);
+	m_PC++;
+	prefetch();
+
+ora_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 = read(uint8_t(m_TMP+m_X));
+	m_A |= m_TMP2;
+	set_nz(m_A);
+	prefetch();
+
+pla_s_imp
+	read_pc();
+	read_pc();
+	inc_SP();
+	m_A = read(m_SP);
+	set_nz(m_A);
+	prefetch();
+
+plp_s_imp
+	read_pc();
+	read_pc();
+	inc_SP();
+	m_TMP = read(m_SP) | (F_B|F_E);
+	prefetch();
+	m_P = m_TMP; // Do *not* move it before the prefetch
+
+plx_s_imp
+	read_pc();
+	read_pc();
+	inc_SP();
+	m_X = read(m_SP);
+	set_nz(m_X);
+	prefetch();
+
+ply_s_imp
+	read_pc();
+	read_pc();
+	inc_SP();
+	m_Y = read(m_SP);
+	set_nz(m_Y);
+	prefetch();
+
+rol_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP+1);
+	m_TMP2 = do_rol(m_TMP2);
+	write(m_TMP, m_TMP2);
+	m_PC++;
+	prefetch();
+
+rol_s_zpg
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2 = do_rol(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+rol_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP = uint8_t(m_TMP+m_X);
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2 = do_rol(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+ror_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP+1);
+	m_TMP2 = do_ror(m_TMP2);
+	write(m_TMP, m_TMP2);
+	m_PC++;
+	prefetch();
+
+ror_s_zpg
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2 = do_ror(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+ror_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP = uint8_t(m_TMP+m_X);
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	m_TMP2 = do_ror(m_TMP2);
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+rti_s_imp
+	read_pc();
+	inc_SP();
+	m_P = read(m_SP) | (F_B|F_E);
+	inc_SP();
+	m_TMP = read(m_SP);
+	inc_SP();
+	m_TMP = set_h(m_TMP, read(m_SP));
+	read_pc();
+	end_interrupt();
+	m_PC = m_TMP;
+	prefetch();
+
+rts_s_imp
+	read_pc();
+	read_pc();
+	inc_SP();
+	m_TMP = read(m_SP);
+	inc_SP();
+	m_TMP = set_h(m_TMP, read(m_SP));
+	read_pc();
+	m_PC = m_TMP + 1;
+	prefetch();
+
+sbc_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_X)) {
+		read_pc();
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	do_sbc_c(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+sbc_s_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	do_sbc_c(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+sbc_s_idx
+	m_TMP2 = read_pc();
+	read_pc();
+	m_TMP2 += m_X;
+	m_TMP = read(m_TMP2 & 0xff);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	m_TMP2 = read(m_TMP);
+	do_sbc_c(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+sbc_s_idy
+	m_TMP2 = read_pc();
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_Y)) {
+		read_pc();
+	}
+	m_TMP2 = read(m_TMP+m_Y);
+	do_sbc_c(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+sbc_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_TMP2 = read(uint8_t(m_TMP+m_X));
+	do_sbc_c(m_TMP2);
+	if(m_P & F_D) {
+		read_pc();
+		set_nz(m_A);
+	}
+	m_PC++;
+	prefetch();
+
+sta_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	read_pc();
+	m_PC++;
+	write(m_TMP+m_X, m_A);
+	prefetch();
+
+sta_s_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	read_pc();
+	m_PC++;
+	write(m_TMP+m_Y, m_A);
+	prefetch();
+
+sta_s_idx
+	m_TMP2 = read_pc();
+	read_pc();
+	m_PC++;
+	m_TMP2 += m_X;
+	m_TMP = read(m_TMP2 & 0xff);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	write(m_TMP, m_A);
+	prefetch();
+
+sta_s_idy
+	m_TMP2 = read_pc();
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	read_pc();
+	m_PC++;
+	write(m_TMP+m_Y, m_A);
+	prefetch();
+
+sta_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	write(uint8_t(m_TMP+m_X), m_A);
+	prefetch();
+
+stx_s_zpy
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	write(uint8_t(m_TMP+m_Y), m_X);
+	prefetch();
+
+sty_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	write(uint8_t(m_TMP+m_X), m_Y);
+	prefetch();
+
+stz_s_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	read_pc();
+	m_PC++;
+	write(m_TMP+m_X, 0x00);
+	prefetch();
+
+stz_s_zpx
+	m_TMP = read_pc();
+	read_pc();
+	m_PC++;
+	write(uint8_t(m_TMP+m_X), 0x00);
+	prefetch();
+
+trb_s_zpg
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	if(m_A & m_TMP2)
+		m_P &= ~F_Z;
+	else
+		m_P |= F_Z;
+	m_TMP2 &= ~m_A;
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+tsb_s_zpg
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read((m_TMP+1) & 0xff);
+	if(m_A & m_TMP2)
+		m_P &= ~F_Z;
+	else
+		m_P |= F_Z;
+	m_TMP2 |= m_A;
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+#   exceptions
+reset_s
+	read_arg(0xffff);
+	read_pc();
+	read(m_SP);
+	dec_SP();
+	read(m_SP);
+	dec_SP();
+	read(m_SP);
+	dec_SP();
+	m_P = (m_P | F_I) & ~F_D;
+	m_PC = read_vector(0xfffc);
+	m_PC = set_h(m_PC, read_vector(0xfffd));
+	prefetch();
+	m_inst_state = -1;

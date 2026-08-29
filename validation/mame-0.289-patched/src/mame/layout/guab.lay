@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+
+<mamelayout version="2">
+	<element name="led" defstate="0">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+	<view name="Debugging Lamps">
+		<bounds x="0" y="0" width="800" height="650" />
+
+		<screen index="0">
+			<bounds left="0" top="0" right="800" bottom="600" />
+		</screen>
+		<element name="led_0" ref="led">
+			<bounds x="10" y="610" width="10" height="10" />
+		</element>
+		<element name="led_1" ref="led">
+			<bounds x="30" y="610" width="10" height="10" />
+		</element>
+		<element name="led_2" ref="led">
+			<bounds x="50" y="610" width="10" height="10" />
+		</element>
+		<element name="led_3" ref="led">
+			<bounds x="70" y="610" width="10" height="10" />
+		</element>
+		<element name="led_4" ref="led">
+			<bounds x="90" y="610" width="10" height="10" />
+		</element>
+		<element name="led_5" ref="led">
+			<bounds x="110" y="610" width="10" height="10" />
+		</element>
+		<element name="led_6" ref="led">
+			<bounds x="130" y="610" width="10" height="10" />
+		</element>
+		<element name="led_7" ref="led">
+			<bounds x="150" y="610" width="10" height="10" />
+		</element>
+		<element name="led_8" ref="led">
+			<bounds x="170" y="610" width="10" height="10" />
+		</element>
+		<element name="led_9" ref="led">
+			<bounds x="190" y="610" width="10" height="10" />
+		</element>
+		<element name="led_10" ref="led">
+			<bounds x="210" y="610" width="10" height="10" />
+		</element>
+		<element name="led_11" ref="led">
+			<bounds x="230" y="610" width="10" height="10" />
+		</element>
+		<element name="led_12" ref="led">
+			<bounds x="250" y="610" width="10" height="10" />
+		</element>
+		<element name="led_13" ref="led">
+			<bounds x="270" y="610" width="10" height="10" />
+		</element>
+		<element name="led_14" ref="led">
+			<bounds x="290" y="610" width="10" height="10" />
+		</element>
+		<element name="led_15" ref="led">
+			<bounds x="310" y="610" width="10" height="10" />
+		</element>
+		<element name="led_16" ref="led">
+			<bounds x="330" y="610" width="10" height="10" />
+		</element>
+		<element name="led_17" ref="led">
+			<bounds x="350" y="610" width="10" height="10" />
+		</element>
+		<element name="led_18" ref="led">
+			<bounds x="370" y="610" width="10" height="10" />
+		</element>
+		<element name="led_19" ref="led">
+			<bounds x="390" y="610" width="10" height="10" />
+		</element>
+		<element name="led_20" ref="led">
+			<bounds x="410" y="610" width="10" height="10" />
+		</element>
+		<element name="led_21" ref="led">
+			<bounds x="430" y="610" width="10" height="10" />
+		</element>
+		<element name="led_22" ref="led">
+			<bounds x="450" y="610" width="10" height="10" />
+		</element>
+		<element name="led_23" ref="led">
+			<bounds x="470" y="610" width="10" height="10" />
+		</element>
+		<element name="led_24" ref="led">
+			<bounds x="10" y="630" width="10" height="10" />
+		</element>
+		<element name="led_25" ref="led">
+			<bounds x="30" y="630" width="10" height="10" />
+		</element>
+		<element name="led_26" ref="led">
+			<bounds x="50" y="630" width="10" height="10" />
+		</element>
+		<element name="led_27" ref="led">
+			<bounds x="70" y="630" width="10" height="10" />
+		</element>
+		<element name="led_28" ref="led">
+			<bounds x="90" y="630" width="10" height="10" />
+		</element>
+		<element name="led_29" ref="led">
+			<bounds x="110" y="630" width="10" height="10" />
+		</element>
+		<element name="led_30" ref="led">
+			<bounds x="130" y="630" width="10" height="10" />
+		</element>
+		<element name="led_31" ref="led">
+			<bounds x="150" y="630" width="10" height="10" />
+		</element>
+		<element name="led_32" ref="led">
+			<bounds x="170" y="630" width="10" height="10" />
+		</element>
+		<element name="led_33" ref="led">
+			<bounds x="190" y="630" width="10" height="10" />
+		</element>
+		<element name="led_34" ref="led">
+			<bounds x="210" y="630" width="10" height="10" />
+		</element>
+		<element name="led_35" ref="led">
+			<bounds x="230" y="630" width="10" height="10" />
+		</element>
+		<element name="led_36" ref="led">
+			<bounds x="250" y="630" width="10" height="10" />
+		</element>
+		<element name="led_37" ref="led">
+			<bounds x="270" y="630" width="10" height="10" />
+		</element>
+		<element name="led_38" ref="led">
+			<bounds x="290" y="630" width="10" height="10" />
+		</element>
+		<element name="led_39" ref="led">
+			<bounds x="310" y="630" width="10" height="10" />
+		</element>
+		<element name="led_40" ref="led">
+			<bounds x="330" y="630" width="10" height="10" />
+		</element>
+		<element name="led_41" ref="led">
+			<bounds x="350" y="630" width="10" height="10" />
+		</element>
+		<element name="led_42" ref="led">
+			<bounds x="370" y="630" width="10" height="10" />
+		</element>
+		<element name="led_43" ref="led">
+			<bounds x="390" y="630" width="10" height="10" />
+		</element>
+		<element name="led_44" ref="led">
+			<bounds x="410" y="630" width="10" height="10" />
+		</element>
+		<element name="led_45" ref="led">
+			<bounds x="430" y="630" width="10" height="10" />
+		</element>
+		<element name="led_46" ref="led">
+			<bounds x="450" y="630" width="10" height="10" />
+		</element>
+		<element name="led_47" ref="led">
+			<bounds x="470" y="630" width="10" height="10" />
+		</element>
+	</view>
+</mamelayout>

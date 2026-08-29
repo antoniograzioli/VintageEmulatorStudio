@@ -1,0 +1,65 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles, Vas Crabb
+//============================================================
+//
+//  debugbaseinfo.c - Win32 debug window handling
+//
+//============================================================
+
+#include "emu.h"
+#include "debugbaseinfo.h"
+
+
+namespace osd::debugger::win {
+
+debugbase_info::debugbase_info(debugger_windows_interface &debugger) :
+	m_debugger(debugger),
+	m_machine(debugger.machine()),
+	m_waiting_for_debugger(debugger.waiting_for_debugger())
+{
+}
+
+
+void debugbase_info::smart_set_window_bounds(HWND wnd, HWND parent, RECT const &bounds)
+{
+	// first get the current bounds, relative to the parent
+	RECT curbounds;
+	GetWindowRect(wnd, &curbounds);
+	if (parent)
+	{
+		RECT parentbounds;
+		GetWindowRect(parent, &parentbounds);
+		curbounds.top -= parentbounds.top;
+		curbounds.bottom -= parentbounds.top;
+		curbounds.left -= parentbounds.left;
+		curbounds.right -= parentbounds.left;
+	}
+
+	// if the position matches, don't change it
+	int flags = 0;
+	if (curbounds.top == bounds.top && curbounds.left == bounds.left)
+		flags |= SWP_NOMOVE;
+	if ((curbounds.bottom - curbounds.top) == (bounds.bottom - bounds.top) &&
+		(curbounds.right - curbounds.left) == (bounds.right - bounds.left))
+		flags |= SWP_NOSIZE;
+
+	// if we need to, reposition the window
+	if (flags != (SWP_NOMOVE | SWP_NOSIZE))
+	{
+		SetWindowPos(
+				wnd, nullptr,
+				bounds.left, bounds.top,
+				bounds.right - bounds.left, bounds.bottom - bounds.top,
+				SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | flags);
+	}
+}
+
+
+void debugbase_info::smart_show_window(HWND wnd, bool show)
+{
+	bool const visible = bool(IsWindowVisible(wnd));
+	if (visible != show)
+		ShowWindow(wnd, show ? SW_SHOW : SW_HIDE);
+}
+
+} // namespace osd::debugger::win

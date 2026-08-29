@@ -1,0 +1,700 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.1" blue="0.1" />
+		</led7seg>
+	</element>
+
+	<element name="disk_lamp">
+		<disk state="1">
+			<color red="1.0" green="0.1" blue="0.1" />
+		</disk>
+		<disk state="0">
+			<color red="0.1" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="disk_blue">
+		<disk>
+			<color red="0.1" green="0.35" blue="0.8" />
+		</disk>
+	</element>
+	<element name="disk_red">
+		<disk>
+			<color red="0.8" green="0.1" blue="0.0" />
+		</disk>
+	</element>
+	<element name="disk_yellow">
+		<disk>
+			<color red="0.95" green="0.8" blue="0.1" />
+		</disk>
+	</element>
+
+	<element name="static_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="static_blue">
+		<rect>
+			<color red="0.1" green="0.35" blue="0.8" />
+		</rect>
+	</element>
+	<element name="static_yellow">
+		<rect>
+			<color red="0.95" green="0.8" blue="0.1" />
+		</rect>
+	</element>
+	<element name="static_red">
+		<rect>
+			<color red="0.8" green="0.1" blue="0.0" />
+		</rect>
+	</element>
+
+	<!-- note: cab has a white button underneath, -->
+	<!-- make the border white-ish instead (normally red), -->
+	<!-- implying that it should be clickable -->
+	<element name="led_box" defstate="0">
+		<rect state="0">
+			<color red="0.7" green="0.7" blue="0.8" />
+			<bounds x="0" y="0" width="30" height="25" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="26" height="21" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="26" height="21" />
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.7" blue="0.8" />
+			<bounds x="1" y="1" width="28" height="23" />
+		</rect>
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="3" y="3" width="24" height="19" />
+		</rect>
+	</element>
+
+
+<!-- define text -->
+
+	<element name="text_score">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="SCORE">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_time">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="TIME">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_best">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="BEST">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+
+	<element name="text_1">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="1." align="2">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_2">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="2." align="2">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_3">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="3." align="2">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+
+	<element name="text_rank1">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="great!!" align="1">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_rank2">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="pretty good" align="1">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_rank3">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="not bad" align="1">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_rank4">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="mediocre" align="1">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_rank5">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="pretty bad" align="1">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_rank6">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="awful" align="1">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+
+	<element name="text_gameover">
+		<rect><color red="0.95" green="0.8" blue="0.1" /></rect>
+		<text string="game over" align="1">
+			<color red="0.1" green="0.35" blue="0.8" />
+		</text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" top="0" right="246" bottom="246" />
+		<element ref="static_blue">
+			<bounds left="0" right="246" top="0" bottom="246" />
+		</element>
+
+		<!-- info box -->
+		<element ref="static_red">
+			<bounds x="22" y="5" width="202" height="69" />
+		</element>
+		<element ref="static_red">
+			<bounds x="18" y="9" width="210" height="61" />
+		</element>
+
+		<element ref="disk_red">
+			<bounds x="18" y="5" width="8" height="8" />
+		</element>
+		<element ref="disk_red">
+			<bounds x="18" y="66" width="8" height="8" />
+		</element>
+		<element ref="disk_red">
+			<bounds x="220" y="5" width="8" height="8" />
+		</element>
+		<element ref="disk_red">
+			<bounds x="220" y="66" width="8" height="8" />
+		</element>
+
+		<element ref="static_yellow">
+			<bounds x="22" y="7" width="202" height="65" />
+		</element>
+		<element ref="static_yellow">
+			<bounds x="20" y="9" width="206" height="61" />
+		</element>
+
+		<element ref="disk_yellow">
+			<bounds x="20" y="7" width="4" height="4" />
+		</element>
+		<element ref="disk_yellow">
+			<bounds x="222" y="7" width="4" height="4" />
+		</element>
+		<element ref="disk_yellow">
+			<bounds x="20" y="68" width="4" height="4" />
+		</element>
+		<element ref="disk_yellow">
+			<bounds x="222" y="68" width="4" height="4" />
+		</element>
+
+		<!-- score -->
+		<element ref="text_score">
+			<bounds x="25" y="7" width="37.4" height="7" />
+		</element>
+
+		<element ref="static_blue">
+			<bounds x="25" y="14.3" width="37.4" height="28.9" />
+		</element>
+		<element ref="static_black">
+			<bounds x="25.7" y="15" width="36" height="27.5" />
+		</element>
+
+		<element name="digit70" ref="digit">
+			<bounds x="26.7" y="16" width="17" height="25.5" />
+		</element>
+		<element name="digit71" ref="digit">
+			<bounds x="43.7" y="16" width="17" height="25.5" />
+		</element>
+
+		<!-- time -->
+		<element ref="text_time">
+			<bounds x="22.3" y="43" width="43.4" height="7" />
+		</element>
+
+		<element ref="static_blue">
+			<bounds x="22.3" y="50.3" width="43.4" height="18.4" />
+		</element>
+		<element ref="static_black">
+			<bounds x="23" y="51" width="42" height="17" />
+		</element>
+
+		<element name="digit60" ref="digit">
+			<bounds x="24" y="52" width="10" height="15" />
+		</element>
+
+		<element name="digit61" ref="digit">
+			<bounds x="34" y="52" width="10" height="15" />
+		</element>
+
+		<element name="digit62" ref="digit">
+			<bounds x="44" y="52" width="10" height="15" />
+		</element>
+
+		<element name="digit63" ref="digit">
+			<bounds x="54" y="52" width="10" height="15" />
+		</element>
+
+		<!-- today's highscores -->
+		<element ref="text_best">
+			<bounds x="73.3" y="7" width="23.4" height="7" />
+		</element>
+
+		<element ref="text_1">
+			<bounds x="68" y="25.5" width="5" height="7" />
+		</element>
+		<element ref="text_2">
+			<bounds x="68" y="43.5" width="5" height="7" />
+		</element>
+		<element ref="text_3">
+			<bounds x="68" y="61.5" width="5" height="7" />
+		</element>
+
+		<element ref="static_blue">
+			<bounds x="73.3" y="14.3" width="23.4" height="54.4" />
+		</element>
+
+		<element ref="static_black">
+			<bounds x="74" y="15" width="22" height="17" />
+		</element>
+		<element ref="static_black">
+			<bounds x="74" y="33" width="22" height="17" />
+		</element>
+		<element ref="static_black">
+			<bounds x="74" y="51" width="22" height="17" />
+		</element>
+
+		<element name="digit64" ref="digit">
+			<bounds x="75" y="16" width="10" height="15" />
+		</element>
+		<element name="digit65" ref="digit">
+			<bounds x="85" y="16" width="10" height="15" />
+		</element>
+
+		<element name="digit66" ref="digit">
+			<bounds x="75" y="34" width="10" height="15" />
+		</element>
+		<element name="digit67" ref="digit">
+			<bounds x="85" y="34" width="10" height="15" />
+		</element>
+
+		<element name="digit68" ref="digit">
+			<bounds x="75" y="52" width="10" height="15" />
+		</element>
+		<element name="digit69" ref="digit">
+			<bounds x="85" y="52" width="10" height="15" />
+		</element>
+
+		<!-- ranking -->
+		<element ref="disk_blue">
+			<bounds x="102.75" y="15.75" width="6.25" height="6.25" />
+		</element>
+		<element name="lamp0" ref="disk_lamp">
+			<bounds x="103" y="16" width="5.75" height="5.75" />
+		</element>
+
+		<element ref="disk_blue">
+			<bounds x="102.75" y="22.25" width="6.25" height="6.25" />
+		</element>
+		<element name="lamp1" ref="disk_lamp">
+			<bounds x="103" y="22.5" width="5.75" height="5.75" />
+		</element>
+
+		<element ref="disk_blue">
+			<bounds x="102.75" y="28.75" width="6.25" height="6.25" />
+		</element>
+		<element name="lamp2" ref="disk_lamp">
+			<bounds x="103" y="29" width="5.75" height="5.75" />
+		</element>
+
+		<element ref="disk_blue">
+			<bounds x="102.75" y="35.25" width="6.25" height="6.25" />
+		</element>
+		<element name="lamp3" ref="disk_lamp">
+			<bounds x="103" y="35.5" width="5.75" height="5.75" />
+		</element>
+
+		<element ref="disk_blue">
+			<bounds x="102.75" y="41.75" width="6.25" height="6.25" />
+		</element>
+		<element name="lamp4" ref="disk_lamp">
+			<bounds x="103" y="42" width="5.75" height="5.75" />
+		</element>
+
+		<element ref="disk_blue">
+			<bounds x="102.75" y="48.25" width="6.25" height="6.25" />
+		</element>
+		<element name="lamp5" ref="disk_lamp">
+			<bounds x="103" y="48.5" width="5.75" height="5.75" />
+		</element>
+
+		<element ref="disk_blue">
+			<bounds x="102.75" y="54.75" width="6.25" height="6.25" />
+		</element>
+		<element name="lamp6" ref="disk_lamp">
+			<bounds x="103" y="55" width="5.75" height="5.75" />
+		</element>
+
+		<element ref="text_rank1">
+			<bounds x="111" y="15.25" width="40" height="6.5" />
+		</element>
+		<element ref="text_rank2">
+			<bounds x="111" y="21.75" width="40" height="6.5" />
+		</element>
+		<element ref="text_rank3">
+			<bounds x="111" y="28.25" width="40" height="6.5" />
+		</element>
+		<element ref="text_rank4">
+			<bounds x="111" y="34.75" width="40" height="6.5" />
+		</element>
+		<element ref="text_rank5">
+			<bounds x="111" y="41.25" width="40" height="6.5" />
+		</element>
+		<element ref="text_rank6">
+			<bounds x="111" y="47.75" width="40" height="6.5" />
+		</element>
+
+		<element ref="text_gameover">
+			<bounds x="111" y="54.25" width="40" height="6.5" />
+		</element>
+
+		<!-- the grid -->
+		<!-- row 1 -->
+		<element ref="led_box" inputtag="IN0" inputmask="0x01">
+			<bounds x="18" y="80" width="30" height="25" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds x="23" y="85" width="10" height="15" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="33" y="85" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN0" inputmask="0x02">
+			<bounds x="54" y="80" width="30" height="25" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="59" y="85" width="10" height="15" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="69" y="85" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN0" inputmask="0x04">
+			<bounds x="90" y="80" width="30" height="25" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="95" y="85" width="10" height="15" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="105" y="85" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN0" inputmask="0x08">
+			<bounds x="126" y="80" width="30" height="25" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds x="131" y="85" width="10" height="15" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds x="141" y="85" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN0" inputmask="0x10">
+			<bounds x="162" y="80" width="30" height="25" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="167" y="85" width="10" height="15" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds x="177" y="85" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN0" inputmask="0x20">
+			<bounds x="198" y="80" width="30" height="25" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="203" y="85" width="10" height="15" />
+		</element>
+		<element name="digit11" ref="digit">
+			<bounds x="213" y="85" width="10" height="15" />
+		</element>
+
+		<!-- row 2 -->
+		<element ref="led_box" inputtag="IN0" inputmask="0x40">
+			<bounds x="18" y="114" width="30" height="25" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds x="23" y="119" width="10" height="15" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds x="33" y="119" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN0" inputmask="0x80">
+			<bounds x="54" y="114" width="30" height="25" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds x="59" y="119" width="10" height="15" />
+		</element>
+		<element name="digit15" ref="digit">
+			<bounds x="69" y="119" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN1" inputmask="0x01">
+			<bounds x="90" y="114" width="30" height="25" />
+		</element>
+		<element name="digit16" ref="digit">
+			<bounds x="95" y="119" width="10" height="15" />
+		</element>
+		<element name="digit17" ref="digit">
+			<bounds x="105" y="119" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN1" inputmask="0x02">
+			<bounds x="126" y="114" width="30" height="25" />
+		</element>
+		<element name="digit18" ref="digit">
+			<bounds x="131" y="119" width="10" height="15" />
+		</element>
+		<element name="digit19" ref="digit">
+			<bounds x="141" y="119" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN1" inputmask="0x04">
+			<bounds x="162" y="114" width="30" height="25" />
+		</element>
+		<element name="digit20" ref="digit">
+			<bounds x="167" y="119" width="10" height="15" />
+		</element>
+		<element name="digit21" ref="digit">
+			<bounds x="177" y="119" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN1" inputmask="0x08">
+			<bounds x="198" y="114" width="30" height="25" />
+		</element>
+		<element name="digit22" ref="digit">
+			<bounds x="203" y="119" width="10" height="15" />
+		</element>
+		<element name="digit23" ref="digit">
+			<bounds x="213" y="119" width="10" height="15" />
+		</element>
+
+		<!-- row 3 -->
+		<element ref="led_box" inputtag="IN1" inputmask="0x10">
+			<bounds x="18" y="148" width="30" height="25" />
+		</element>
+		<element name="digit24" ref="digit">
+			<bounds x="23" y="153" width="10" height="15" />
+		</element>
+		<element name="digit25" ref="digit">
+			<bounds x="33" y="153" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN1" inputmask="0x20">
+			<bounds x="54" y="148" width="30" height="25" />
+		</element>
+		<element name="digit26" ref="digit">
+			<bounds x="59" y="153" width="10" height="15" />
+		</element>
+		<element name="digit27" ref="digit">
+			<bounds x="69" y="153" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN1" inputmask="0x40">
+			<bounds x="90" y="148" width="30" height="25" />
+		</element>
+		<element name="digit28" ref="digit">
+			<bounds x="95" y="153" width="10" height="15" />
+		</element>
+		<element name="digit29" ref="digit">
+			<bounds x="105" y="153" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN1" inputmask="0x80">
+			<bounds x="126" y="148" width="30" height="25" />
+		</element>
+		<element name="digit30" ref="digit">
+			<bounds x="131" y="153" width="10" height="15" />
+		</element>
+		<element name="digit31" ref="digit">
+			<bounds x="141" y="153" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN2" inputmask="0x01">
+			<bounds x="162" y="148" width="30" height="25" />
+		</element>
+		<element name="digit32" ref="digit">
+			<bounds x="167" y="153" width="10" height="15" />
+		</element>
+		<element name="digit33" ref="digit">
+			<bounds x="177" y="153" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN2" inputmask="0x02">
+			<bounds x="198" y="148" width="30" height="25" />
+		</element>
+		<element name="digit34" ref="digit">
+			<bounds x="203" y="153" width="10" height="15" />
+		</element>
+		<element name="digit35" ref="digit">
+			<bounds x="213" y="153" width="10" height="15" />
+		</element>
+
+		<!-- row 4 -->
+		<element ref="led_box" inputtag="IN2" inputmask="0x04">
+			<bounds x="18" y="182" width="30" height="25" />
+		</element>
+		<element name="digit36" ref="digit">
+			<bounds x="23" y="187" width="10" height="15" />
+		</element>
+		<element name="digit37" ref="digit">
+			<bounds x="33" y="187" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN2" inputmask="0x08">
+			<bounds x="54" y="182" width="30" height="25" />
+		</element>
+		<element name="digit38" ref="digit">
+			<bounds x="59" y="187" width="10" height="15" />
+		</element>
+		<element name="digit39" ref="digit">
+			<bounds x="69" y="187" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN2" inputmask="0x10">
+			<bounds x="90" y="182" width="30" height="25" />
+		</element>
+		<element name="digit40" ref="digit">
+			<bounds x="95" y="187" width="10" height="15" />
+		</element>
+		<element name="digit41" ref="digit">
+			<bounds x="105" y="187" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN2" inputmask="0x20">
+			<bounds x="126" y="182" width="30" height="25" />
+		</element>
+		<element name="digit42" ref="digit">
+			<bounds x="131" y="187" width="10" height="15" />
+		</element>
+		<element name="digit43" ref="digit">
+			<bounds x="141" y="187" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN2" inputmask="0x40">
+			<bounds x="162" y="182" width="30" height="25" />
+		</element>
+		<element name="digit44" ref="digit">
+			<bounds x="167" y="187" width="10" height="15" />
+		</element>
+		<element name="digit45" ref="digit">
+			<bounds x="177" y="187" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN2" inputmask="0x80">
+			<bounds x="198" y="182" width="30" height="25" />
+		</element>
+		<element name="digit46" ref="digit">
+			<bounds x="203" y="187" width="10" height="15" />
+		</element>
+		<element name="digit47" ref="digit">
+			<bounds x="213" y="187" width="10" height="15" />
+		</element>
+
+		<!-- row 5 -->
+		<element ref="led_box" inputtag="IN3" inputmask="0x01">
+			<bounds x="18" y="214" width="30" height="25" />
+		</element>
+		<element name="digit48" ref="digit">
+			<bounds x="23" y="219" width="10" height="15" />
+		</element>
+		<element name="digit49" ref="digit">
+			<bounds x="33" y="219" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN3" inputmask="0x02">
+			<bounds x="54" y="214" width="30" height="25" />
+		</element>
+		<element name="digit50" ref="digit">
+			<bounds x="59" y="219" width="10" height="15" />
+		</element>
+		<element name="digit51" ref="digit">
+			<bounds x="69" y="219" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN3" inputmask="0x04">
+			<bounds x="90" y="214" width="30" height="25" />
+		</element>
+		<element name="digit52" ref="digit">
+			<bounds x="95" y="219" width="10" height="15" />
+		</element>
+		<element name="digit53" ref="digit">
+			<bounds x="105" y="219" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN3" inputmask="0x08">
+			<bounds x="126" y="214" width="30" height="25" />
+		</element>
+		<element name="digit54" ref="digit">
+			<bounds x="131" y="219" width="10" height="15" />
+		</element>
+		<element name="digit55" ref="digit">
+			<bounds x="141" y="219" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN3" inputmask="0x10">
+			<bounds x="162" y="214" width="30" height="25" />
+		</element>
+		<element name="digit56" ref="digit">
+			<bounds x="167" y="219" width="10" height="15" />
+		</element>
+		<element name="digit57" ref="digit">
+			<bounds x="177" y="219" width="10" height="15" />
+		</element>
+
+		<element ref="led_box" inputtag="IN3" inputmask="0x20">
+			<bounds x="198" y="214" width="30" height="25" />
+		</element>
+		<element name="digit58" ref="digit">
+			<bounds x="203" y="219" width="10" height="15" />
+		</element>
+		<element name="digit59" ref="digit">
+			<bounds x="213" y="219" width="10" height="15" />
+		</element>
+
+	</view>
+</mamelayout>

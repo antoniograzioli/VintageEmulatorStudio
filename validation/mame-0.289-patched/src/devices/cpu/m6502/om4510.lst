@@ -1,0 +1,23 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
+# 4510 opcodes
+
+eom_imp
+	m_inhibit_interrupts = false; // before or after prefetch?
+	prefetch();
+
+map_imp
+	m_inhibit_interrupts = true;
+	m_map_offset[0] = (m_A<<8) | ((m_X & 0xf) << 16);
+	m_map_offset[1] = (m_Y<<8) | ((m_Z & 0xf) << 16);
+	m_map_enable = ((m_X & 0xf0) >> 4) | (m_Z & 0xf0);
+	logerror("MAP execute\n");
+	logerror("0x0000 - 0x1fff = %08x\n",m_map_enable & 1 ? m_map_offset[0]+0x0000 : 0x0000);
+	logerror("0x2000 - 0x3fff = %08x\n",m_map_enable & 2 ? m_map_offset[0]+0x2000 : 0x2000);
+	logerror("0x4000 - 0x5fff = %08x\n",m_map_enable & 4 ? m_map_offset[0]+0x4000 : 0x4000);
+	logerror("0x6000 - 0x7fff = %08x\n",m_map_enable & 8 ? m_map_offset[0]+0x6000 : 0x6000);
+	logerror("0x8000 - 0x9fff = %08x\n",m_map_enable & 16 ? m_map_offset[1]+0x8000 : 0x8000);
+	logerror("0xa000 - 0xbfff = %08x\n",m_map_enable & 32 ? m_map_offset[1]+0xa000 : 0xa000);
+	logerror("0xc000 - 0xdfff = %08x\n",m_map_enable & 64 ? m_map_offset[1]+0xc000 : 0xc000);
+	logerror("0xe000 - 0xffff = %08x\n",m_map_enable & 128 ? m_map_offset[1]+0xe000 : 0xe000);
+	prefetch();

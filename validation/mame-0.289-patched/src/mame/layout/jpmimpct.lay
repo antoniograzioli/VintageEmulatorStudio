@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="matrixlamp">
+		<rect state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.7" green="0.7" blue="0.7" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="0.0" blue="1.0" />
+		</rect>
+		<rect state ="2">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="Steppers" defstate="0">
+		<simplecounter maxstate="999" digits="3">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</simplecounter>
+	</element>
+
+	<element name="vfd0">
+		<led16segsc>
+			<color red="0" green="0.6" blue="1.0" />
+		</led16segsc>
+	</element>
+
+	<view name="AWP Simulated Video (No Artwork)">
+		<repeat count="16">
+			<param name="x" start="10" increment="9" />
+			<param name="i" start="0" increment="1" />
+			<element name="vfdblank~i~" ref="vfd0">
+				<animate name="vfdduty0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="0.0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="1.0" />
+				<bounds x="~x~" y="200" width="9" height="17" />
+			</element>
+			<element name="vfd~i~" ref="vfd0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0" />
+				<bounds x="~x~" y="200" width="9" height="17" />
+			</element>
+		</repeat>
+		<repeat count="6">
+			<param name="x" start="10" increment="52" />
+			<param name="i" start="1" increment="1" />
+			<element name="reel~i~" ref="Steppers" state="0">
+				<bounds x="~x~" y="300" width="50" height="50" />
+			</element>
+		</repeat>
+		<repeat count="16">
+			<param name="y" start="0" increment="8" />
+			<param name="j" start="0" increment="16" />
+			<repeat count="16">
+				<param name="x" start="0" increment="8" />
+				<param name="i" start="~j~" increment="1" />
+				<element name="lamp~i~" ref="matrixlamp" state="0">
+					<bounds x="~x~" y="~y~" width="7" height="7" />
+				</element>
+			</repeat>
+		</repeat>
+	</view>
+
+	<view name="VFD Display Output Only">
+		<repeat count="16">
+			<param name="x" start="10" increment="9" />
+			<param name="i" start="0" increment="1" />
+			<element name="vfdblank~i~" ref="vfd0">
+				<animate name="vfdduty0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="0.0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="1.0" />
+				<bounds x="~x~" y="200" width="9" height="17" />
+			</element>
+			<element name="vfd~i~" ref="vfd0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0" />
+				<bounds x="~x~" y="200" width="9" height="17" />
+			</element>
+		</repeat>
+	</view>
+</mamelayout>
+

@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap, Felipe Sanches
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+	<element name="cpanel"><image file="mu50.png"/></element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.38" green="0.45" blue="0.39" /></disk>
+		<disk state="1"><color red="0.43" green="1.00" blue="0.29" /></disk>
+	</element>
+
+	<element name="ledred" defstate="0">
+		<disk state="0"><color red="0.45" green="0.38" blue="0.39" /></disk>
+		<disk state="1"><color red="1.00" green="0" blue="0.2" /></disk>
+	</element>
+
+	<element name="ledr" defstate="0">
+		<rect state="0"><color red="0.38" green="0.45" blue="0.39" /></rect>
+		<rect state="1"><color red="0.43" green="1.00" blue="0.29" /></rect>
+	</element>
+
+	<element name="round_white_button"></element>
+	<element name="rect_white_button"></element>
+	<element name="rect_yellow_button"></element>
+
+	<element name="lcda" defstate="0">
+		<rect>
+			<color state="0" red="0" green="0" blue="0" />
+			<color state="7" red="0.95" green="0.95" blue="0.95" />
+		</rect>
+	</element>
+
+	<element name="lcdm"><rect><color red="0.7" green="1.0" blue="0.2" /></rect></element>
+
+<!-- build screen -->
+
+	<view name="External Layout">
+		<bounds x="0" y="0" width="1640" height="390" />
+		<element ref="cpanel"><bounds left="0" right="1640" top="0" bottom="390"/></element>
+
+		<screen index="0"><bounds x="425" y="103" width="640" height="193" /></screen>
+		<element name="contrast" ref="lcda" blend="add"><bounds x="425" y="103" width="640" height="193" /></element>
+		<element ref="lcdm" blend="multiply"><bounds x="425" y="103" width="640" height="193" /></element>
+
+		<element name="LED0" ref="led" inputtag="O0" inputmask="0x04"><!-- PLAY --><bounds x="1182" y="117" width="34" height="34" /></element>
+		<element name="LED1" ref="led" inputtag="O0" inputmask="0x08"><!-- EDIT --><bounds x="1252" y="117" width="34" height="34" /></element>
+		<element name="LED2" ref="led" inputtag="O1" inputmask="0x04"><!-- UTIL --><bounds x="1182" y="189" width="34" height="34" /></element>
+		<element name="LED3" ref="led" inputtag="O1" inputmask="0x08"><!-- EFFECT --><bounds x="1252" y="189" width="34" height="34" /></element>
+		<element name="LED4" ref="led" inputtag="O2" inputmask="0x04"><!-- MODE --><bounds x="1182" y="262" width="34" height="34" /></element>
+
+		<element ref="rect_white_button" inputtag="O0" inputmask="0x10"><!-- MUTE/SOLO --><bounds x="1361" y="109" width="44" height="44"/></element>
+		<element ref="rect_white_button" inputtag="O0" inputmask="0x20"><!-- PART - --><bounds x="1434" y="109" width="44" height="44"/></element>
+		<element ref="rect_white_button" inputtag="O0" inputmask="0x40"><!-- PART + --><bounds x="1506" y="109" width="44" height="44"/></element>
+
+		<element ref="rect_white_button" inputtag="O1" inputmask="0x10"><!-- ENTER --><bounds x="1361" y="181" width="44" height="44"/></element>
+		<element ref="rect_white_button" inputtag="O1" inputmask="0x20"><!-- SELECT < --><bounds x="1434" y="181" width="44" height="44"/></element>
+		<element ref="rect_white_button" inputtag="O1" inputmask="0x40"><!-- SELECT > --><bounds x="1506" y="181" width="44" height="44"/></element>
+
+		<element ref="rect_white_button" inputtag="O2" inputmask="0x10"><!-- EXIT --><bounds x="1361" y="255" width="44" height="44"/></element>
+		<element ref="rect_white_button" inputtag="O2" inputmask="0x20"><!-- VALUE - --><bounds x="1434" y="255" width="44" height="44"/></element>
+		<element ref="rect_white_button" inputtag="O2" inputmask="0x40"><!-- VALUE + --><bounds x="1506" y="255" width="44" height="44"/></element>
+	</view>
+
+</mamelayout>

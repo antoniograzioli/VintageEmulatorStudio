@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Robbbert
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<group name="leds">
+		<repeat count="8">
+			<param name="n" start="7" increment="-1" />
+			<param name="x" start="0" increment="44" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="0" width="34" height="49" />
+			</element>
+		</repeat>
+	</group>
+
+	<view name="LED Displays">
+		<bounds left="0" top="0" right="362" bottom="69" />
+
+		<group ref="leds">
+			<bounds left="10" top="10" right="352" bottom="59" />
+		</group>
+	</view>
+
+</mamelayout>

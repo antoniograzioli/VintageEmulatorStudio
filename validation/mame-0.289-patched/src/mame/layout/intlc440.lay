@@ -1,0 +1,411 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Vas Crabb
+
+Intel INTELLEC® 4/MOD 40 layout
+-->
+<mamelayout version="2">
+	<element name="background">
+		<rect><color red="0.20" green="0.16" blue="0.31" /></rect>
+	</element>
+
+	<element name="led" defstate="0">
+		<rect state="0"><color red="0.43" green="0.35" blue="0.39" /></rect>
+		<rect state="1"><color red="1.0" green="0.18" blue="0.20" /></rect>
+	</element>
+
+	<element name="switch" defstate="0">
+		<rect state="0">
+			<color red="1.0" green="0.97" blue="0.87" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="0.15" />
+		</rect>
+		<rect state="0">
+			<color red="0.88" green="0.83" blue="0.66" />
+			<bounds left="0.0" top="0.15" right="1.0" bottom="0.5" />
+		</rect>
+		<rect state="0">
+			<color red="0.94" green="0.90" blue="0.75" />
+			<bounds left="0.0" top="0.5" right="1.0" bottom="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.94" green="0.90" blue="0.75" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="0.5" />
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.97" blue="0.87" />
+			<bounds left="0.0" top="0.5" right="1.0" bottom="0.9" />
+		</rect>
+		<rect state="1">
+			<color red="0.76" green="0.70" blue="0.47" />
+			<bounds left="0.0" top="0.9" right="1.0" bottom="1.0" />
+		</rect>
+	</element>
+
+	<repeat count="12">
+		<param name="labelnum" start="0" increment="1" />
+		<element name="label_~labelnum~">
+			<text string="~labelnum~"><color red="1.0" green="1.0" blue="1.0" /></text>
+		</element>
+	</repeat>
+
+	<element name="label_a1"><text string="A1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_a2"><text string="A2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_a3"><text string="A3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_m1"><text string="M1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_m2"><text string="M2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_x2"><text string="X2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_x3"><text string="X3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_search"><text string="SEARCH"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_complete"><text string="COMPLETE"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_pointer"><text string="POINTER"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_valid"><text string="VALID"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_cm_ram"><text string="CM-RAM"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_mon"><text string="MON"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_ram"><text string="RAM"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_prom"><text string="PROM"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_prgm"><text string="PRGM"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_pwr"><text string="PWR"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_passes"><text string="PASSES"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_run"><text string="RUN"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_next"><text string="NEXT"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_inst"><text string="INST"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_decr"><text string="DECR"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_incr"><text string="INCR"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_load"><text string="LOAD"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_stop"><text string="STOP"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_single"><text string="SINGLE"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_step"><text string="STEP"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_write"><text string="WRITE"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_reset"><text string="RESET"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_reset_mode"><text string="MODE"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="label_address">
+		<text string="ADDRESS" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_status">
+		<text string="STATUS" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_instruction">
+		<text string="INSTRUCTION" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_active_bank">
+		<text string="ACTIVE BANK" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_mode">
+		<text string="MODE" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_execution">
+		<text string="EXECUTION" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_last_ptr">
+		<text string="LAST RAM/ROM POINTER" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+
+	<element name="label_on">
+		<text string="ON" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_off">
+		<text string="OFF" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+
+	<element name="label_enable">
+		<text string="ENABLE" align="2"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_disable">
+		<text string="DISABLE" align="2"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+
+	<element name="label_system">
+		<text string="SYSTEM" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_reset_cpu">
+		<text string="CPU" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+
+	<element name="label_addr_data">
+		<text string="ADDRESS/DATA" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_mode_ctrl">
+		<text string="MODE CONTROL" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_pass_counter">
+		<text string="PASS COUNTER" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_search_ctrl">
+		<text string="SEARCH ADDRESS CONTROL" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_cma">
+		<text string="CMA" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="label_reset_ctrl">
+		<text string="RESET CONTROL" align="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+
+	<group name="panel">
+		<element ref="background"><bounds left="0" top="0" right="1000" bottom="400" /></element>
+
+		<element ref="label_address"><bounds left="72" top="55" right="506" bottom="63" /></element>
+
+		<element ref="label_status"><bounds left="540" top="55" right="662" bottom="63" /></element>
+		<element ref="label_search"><bounds left="561" top="63" right="610" bottom="70" /></element>
+		<element ref="label_complete"><bounds left="561" top="71" right="610" bottom="78" /></element>
+		<element ref="label_pointer"><bounds left="623" top="63" right="672" bottom="70" /></element>
+		<element ref="label_valid"><bounds left="623" top="71" right="672" bottom="78" /></element>
+		<element ref="label_run"><bounds left="611" top="71" right="626" bottom="78" /></element>
+
+		<element ref="label_instruction"><bounds left="72" top="104" right="350" bottom="112" /></element>
+
+		<element ref="label_active_bank"><bounds left="384" top="104" right="506" bottom="112" /></element>
+		<element ref="label_cm_ram"><bounds left="393" top="112" right="497" bottom="119" /></element>
+		<element ref="label_3"><bounds left="393" top="120" right="404" bottom="127" /></element>
+		<element ref="label_2"><bounds left="424" top="120" right="435" bottom="127" /></element>
+		<element ref="label_1"><bounds left="455" top="120" right="466" bottom="127" /></element>
+		<element ref="label_0"><bounds left="486" top="120" right="497" bottom="127" /></element>
+
+		<element ref="label_mode"><bounds left="540" top="104" right="662" bottom="112" /></element>
+		<element ref="label_mon"><bounds left="577" top="120" right="594" bottom="127" /></element>
+		<element ref="label_ram"><bounds left="608" top="120" right="625" bottom="127" /></element>
+		<element ref="label_prom"><bounds left="639" top="120" right="656" bottom="127" /></element>
+
+		<element ref="label_execution"><bounds left="72" top="153" right="350" bottom="161" /></element>
+
+		<element ref="label_last_ptr"><bounds left="384" top="153" right="662" bottom="161" /></element>
+
+		<element ref="label_addr_data"><bounds left="72" top="214" right="506" bottom="222" /></element>
+
+		<element ref="label_mode_ctrl"><bounds left="571" top="214" right="662" bottom="222" /></element>
+		<element ref="label_mon"><bounds left="573" top="230" right="598" bottom="237" /></element>
+		<element ref="label_ram"><bounds left="604" top="230" right="629" bottom="237" /></element>
+		<element ref="label_prom"><bounds left="635" top="230" right="660" bottom="237" /></element>
+
+		<element ref="label_prgm"><bounds left="728" top="214" right="753" bottom="221" /></element>
+		<element ref="label_prom"><bounds left="728" top="222" right="753" bottom="229" /></element>
+		<element ref="label_pwr"><bounds left="728" top="230" right="753" bottom="237" /></element>
+		<element ref="label_on"><bounds left="758" top="239" right="814" bottom="246" /></element>
+		<element ref="label_off"><bounds left="758" top="279" right="814" bottom="287" /></element>
+
+		<element ref="label_pass_counter"><bounds left="72" top="296" right="194" bottom="304" /></element>
+		<element ref="label_passes"><bounds left="74" top="304" right="192" bottom="311" /></element>
+
+		<element ref="label_search_ctrl"><bounds left="228" top="296" right="381" bottom="304" /></element>
+		<element ref="label_run"><bounds left="230" top="312" right="255" bottom="319" /></element>
+		<element ref="label_next"><bounds left="261" top="304" right="286" bottom="311" /></element>
+		<element ref="label_inst"><bounds left="261" top="312" right="286" bottom="319" /></element>
+		<element ref="label_decr"><bounds left="292" top="312" right="317" bottom="319" /></element>
+		<element ref="label_incr"><bounds left="323" top="312" right="348" bottom="319" /></element>
+		<element ref="label_load"><bounds left="354" top="312" right="379" bottom="319" /></element>
+
+		<element ref="label_stop"><bounds left="448" top="312" right="473" bottom="319" /></element>
+		<element ref="label_single"><bounds left="479" top="304" right="504" bottom="311" /></element>
+		<element ref="label_step"><bounds left="479" top="312" right="504" bottom="319" /></element>
+
+		<element ref="label_cma"><bounds left="571" top="296" right="631" bottom="304" /></element>
+		<element ref="label_write"><bounds left="604" top="312" right="629" bottom="319" /></element>
+		<element ref="label_enable"><bounds left="514" top="321" right="570" bottom="328" /></element>
+		<element ref="label_disable"><bounds left="514" top="361" right="570" bottom="368" /></element>
+
+		<element ref="label_reset_ctrl"><bounds left="664" top="296" right="724" bottom="304" /></element>
+		<element ref="label_reset"><bounds left="666" top="312" right="691" bottom="319" /></element>
+		<element ref="label_reset_mode"><bounds left="697" top="312" right="722" bottom="319" /></element>
+		<element ref="label_system"><bounds left="727" top="321" right="783" bottom="328" /></element>
+		<element ref="label_reset_cpu"><bounds left="727" top="361" right="783" bottom="368" /></element>
+
+		<repeat count="3">
+			<param name="groupnum" start="11" increment="-4" />
+			<param name="ledpos" start="81" increment="156" />
+			<param name="nybble" start="3" increment="-1" />
+			<param name="switchpos" start="74" increment="156" />
+			<param name="groupmask" start="0x0800" rshift="4" />
+			<element ref="label_a~nybble~">
+				<bounds x="~ledpos~" y="63" width="104" height="7" />
+			</element>
+			<repeat count="4">
+				<param name="labelnum" start="~groupnum~" increment="-1" />
+				<param name="ledpos" start="~ledpos~" increment="31" />
+				<param name="switchpos" start="~switchpos~" increment="31" />
+				<param name="bit" start="3" increment="-1" />
+				<param name="bitmask" start="~groupmask~" rshift="1" />
+				<element ref="label_~labelnum~">
+					<bounds x="~ledpos~" y="71" width="11" height="7" />
+				</element>
+				<element ref="label_~labelnum~">
+					<bounds x="~switchpos~" y="230" width="25" height="7" />
+				</element>
+				<element name="led_address_a~nybble~_~bit~" ref="led">
+					<bounds x="~ledpos~" y="79" width="11" height="7" />
+				</element>
+				<element ref="switch" inputtag="ADDRDAT" inputmask="~bitmask~">
+					<bounds x="~switchpos~" y="240" width="25" height="46" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<element name="led_status_search" ref="led">
+			<bounds left="580" top="79" right="591" bottom="86" />
+		</element>
+		<element name="led_status_run" ref="led">
+			<bounds left="611" top="79" right="622" bottom="86" />
+		</element>
+		<element name="led_status_ptr_valid" ref="led">
+			<bounds left="642" top="79" right="653" bottom="86" />
+		</element>
+
+		<element name="led_active_bank_3" ref="led">
+			<bounds left="393" top="128" right="404" bottom="135" />
+		</element>
+		<element name="led_active_bank_2" ref="led">
+			<bounds left="424" top="128" right="435" bottom="135" />
+		</element>
+		<element name="led_active_bank_1" ref="led">
+			<bounds left="455" top="128" right="466" bottom="135" />
+		</element>
+		<element name="led_active_bank_0" ref="led">
+			<bounds left="486" top="128" right="497" bottom="135" />
+		</element>
+
+		<element name="led_mode_mon" ref="led">
+			<bounds left="580" top="128" right="591" bottom="135" />
+		</element>
+		<element name="led_mode_ram" ref="led">
+			<bounds left="611" top="128" right="622" bottom="135" />
+		</element>
+		<element name="led_mode_prom" ref="led">
+			<bounds left="642" top="128" right="653" bottom="135" />
+		</element>
+
+		<repeat count="2">
+			<param name="groupx" start="81" increment="156" />
+			<param name="mnybble" start="1" increment="1" />
+			<param name="xnybble" start="2" increment="1" />
+			<param name="groupbit" start="7" increment="-4" />
+			<element ref="label_m~mnybble~">
+				<bounds x="~groupx~" y="112" width="104" height="7" />
+			</element>
+			<element ref="label_x~xnybble~">
+				<bounds x="~groupx~" y="161" width="104" height="7" />
+			</element>
+			<repeat count="4">
+				<param name="xpos" start="~groupx~" increment="31" />
+				<param name="mbit" start="~groupbit~" increment="-1" />
+				<param name="bit" start="3" increment="-1" />
+				<element ref="label_~mbit~">
+					<bounds x="~xpos~" y="120" width="11" height="7" />
+				</element>
+				<element ref="label_~bit~">
+					<bounds x="~xpos~" y="169" width="11" height="7" />
+				</element>
+				<element name="led_instruction_m~mnybble~_~bit~" ref="led">
+					<bounds x="~xpos~" y="128" width="11" height="7" />
+				</element>
+				<element name="led_execution_x~xnybble~_~bit~" ref="led">
+					<bounds x="~xpos~" y="177" width="11" height="7" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<repeat count="2">
+			<param name="groupx" start="393" increment="156" />
+			<param name="nybble" start="2" increment="1" />
+			<element ref="label_x~nybble~">
+				<bounds x="~groupx~" y="161" width="104" height="7" />
+			</element>
+			<repeat count="4">
+				<param name="xpos" start="~groupx~" increment="31" />
+				<param name="bit" start="3" increment="-1" />
+				<element ref="label_~bit~">
+					<bounds x="~xpos~" y="169" width="11" height="7" />
+				</element>
+				<element name="led_last_ptr_x~nybble~_~bit~" ref="led">
+					<bounds x="~xpos~" y="177" width="11" height="7" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<element ref="switch" inputtag="MODE" inputmask="0x0010">
+			<bounds left="573" top="240" right="598" bottom="286" />
+		</element>
+		<element ref="switch" inputtag="MODE" inputmask="0x0020">
+			<bounds left="604" top="240" right="629" bottom="286" />
+		</element>
+		<element ref="switch" inputtag="MODE" inputmask="0x0040">
+			<bounds left="635" top="240" right="660" bottom="286" />
+		</element>
+
+		<element ref="switch" inputtag="PROM" inputmask="0x0001">
+			<bounds left="728" top="240" right="753" bottom="286" />
+		</element>
+
+		<repeat count="4">
+			<param name="xpos" start="74" increment="31" />
+			<param name="mask" start="0x08" rshift="1" />
+			<param name="bit" start="3" increment="-1" />
+			<element ref="label_~bit~">
+				<bounds x="~xpos~" y="312" width="25" height="7" />
+			</element>
+			<element ref="switch" inputtag="PASSES" inputmask="~mask~">
+				<bounds x="~xpos~" y="322" width="25" height="46" />
+			</element>
+		</repeat>
+
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0001">
+			<bounds left="230" top="322" right="255" bottom="368" />
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0002">
+			<bounds left="261" top="322" right="286" bottom="368" />
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0004">
+			<bounds left="292" top="322" right="317" bottom="368" />
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0008">
+			<bounds left="323" top="322" right="348" bottom="368" />
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0010">
+			<bounds left="354" top="322" right="379" bottom="368" />
+		</element>
+
+		<element ref="switch" inputtag="MODE" inputmask="0x0001">
+			<bounds left="448" top="322" right="473" bottom="368" />
+		</element>
+		<element ref="switch" inputtag="MODE" inputmask="0x0002">
+			<bounds left="479" top="322" right="504" bottom="368" />
+		</element>
+
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0020">
+			<bounds left="573" top="322" right="598" bottom="368" />
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0040">
+			<bounds left="604" top="322" right="629" bottom="368" />
+		</element>
+
+		<element ref="switch" inputtag="MODE" inputmask="0x0004">
+			<bounds left="666" top="322" right="691" bottom="368" />
+		</element>
+		<element ref="switch" inputtag="MODE" inputmask="0x0008">
+			<bounds left="697" top="322" right="722" bottom="368" />
+		</element>
+	</group>
+
+	<view name="Terminal Below">
+		<group ref="panel"><bounds left="0" top="0" right="1000" bottom="400" /></group>
+		<screen index="0"><bounds left="0" top="400" right="1000" bottom="1150" /></screen>
+	</view>
+
+	<view name="Terminal Above">
+		<group ref="panel"><bounds left="0" top="750" right="1000" bottom="1150" /></group>
+		<screen index="0"><bounds left="0" top="0" right="1000" bottom="750" /></screen>
+	</view>
+
+	<view name="Front Panel">
+		<group ref="panel"><bounds left="0" top="0" right="1000" bottom="400" /></group>
+	</view>
+</mamelayout>

@@ -1,0 +1,389 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap, Felipe Sanches
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+<element name="panel">
+    <image file="mu2000.png"/>
+</element>
+
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.07" green="0.1" blue="0.02" alpha ="0.0"/></disk>
+		<disk state="1"><color red="0.7" green="1.0" blue="0.2" alpha="0.5"/></disk>
+	</element>
+
+	<element name="ledred" defstate="0">
+		<disk state="0"><color red="0.1" green="0" blue="0.02" alpha ="0.0"/></disk>
+		<disk state="1"><color red="1.0" green="0" blue="0.2" alpha="0.5"/></disk>
+	</element>
+
+	<element name="ledr" defstate="0">
+		<rect state="0"><color red="0.7" green="0.8" blue="0.2" alpha="0.0"/></rect>
+		<rect state="1"><color red="0.7" green="1.0" blue="0.2" alpha="0.5"/></rect>
+	</element>
+
+	<element name="round_white_button">
+		<disk state="0">
+			<color red="0.82" green="0.86" blue="0.86" alpha="0.00"/>
+		</disk>
+
+		<disk state="0">
+			 <color red="0.35" green="0.35" blue="0.35" alpha="0.12"/>
+		</disk>
+	</element>
+
+	<element name="round_gray_highlight">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3" />
+		</disk>
+	</element>
+
+	<element name="rect_white_button">
+		 <!-- Normale: invisibile -->
+    <rect state="0">
+        <color red="0.82" green="0.86" blue="0.86" alpha="0.00"/>
+    </rect>
+
+    <!-- Premuto: leggerissimo grigio -->
+    <rect state="1">
+        <color red="0.35" green="0.35" blue="0.35" alpha="0.12"/>
+    </rect>
+	</element>
+
+	<element name="rect_yellow_button">
+			 <!-- Normale: invisibile -->
+    <rect state="0">
+        <color red="0.82" green="0.86" blue="0.86" alpha="0.00"/>
+    </rect>
+
+    <!-- Premuto: leggerissimo grigio -->
+    <rect state="1">
+        <color red="0.35" green="0.35" blue="0.35" alpha="0.12"/>
+    </rect>
+	</element>
+
+<element name="lcda" defstate="0">
+    <rect>
+        <color state="0"
+               red="0.0"
+               green="0.0"
+               blue="0.0"
+               alpha="0.0" />
+
+        <!-- Highlight molto più delicato -->
+        <color state="7"
+               red="0.60"
+               green="0.66"
+               blue="0.40"
+               alpha="0.06" />
+    </rect>
+</element>
+
+<element name="lcdm">
+    <rect>
+        <!-- Verde oliva più scuro -->
+        <color red="0.46"
+               green="0.54"
+               blue="0.30"
+               alpha="0.82" />
+    </rect>
+</element>
+	
+
+	<element name="1_text"><text string="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="2_text"><text string="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="a_d_input_text"><text string="A/D INPUT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="volume_text"><text string="VOLUME"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="standby_text"><text string="STANDBY"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="on_text"><text string="ON"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="midi_in_a_text"><text string="MIDI IN A"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="phones_text"><text string="PHONES"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="3.3v_text"><text string="3.3V"><color red="0" green="0" blue="0" /></text></element>
+	<element name="card_text"><text string="CARD"><color red="0" green="0" blue="0" /></text></element>
+
+	<element name="part_text"><text string="PART"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="bank_pgm_text"><text string="BANK/PGM#"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="vol_text"><text string="VOL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="exp_text"><text string="EXP"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="pan_text"><text string="PAN"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="rev_text"><text string="REV"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="cho_text"><text string="CHO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="var_text"><text string="VAR"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="key_text"><text string="KEY"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="xg_text"><text string="XG"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="gs_text"><text string="GS"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="perform_text"><text string="PERFORM"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="select_text"><text string="SELECT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="audition_text"><text string="AUDITION"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="play_text"><text string="PLAY"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="edit_text"><text string="EDIT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="util_text"><text string="UTIL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="effect_text"><text string="EFFECT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="sampling_text"><text string="SAMPLING"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="seq_text"><text string="SEQ"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+
+	<element name="mu_text"><text string="MU"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="plg1_text"><text string="PLG-1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="plg2_text"><text string="PLG-2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="plg3_text"><text string="PLG-3"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="all_text"><text string="ALL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="mute_text"><text string="MUTE/"><color red="0.2" green="0.2" blue="0.2" /></text></element>
+	<element name="solo_text"><text string="SOLO"><color red="0.2" green="0.2" blue="0.2" /></text></element>
+	<element name="part_button_text"><text string="PART"><color red="0.2" green="0.2" blue="0.2" /></text></element>
+
+	<element name="enter_text"><text string="ENTER"><color red="0.2" green="0.2" blue="0.2" /></text></element>
+	<element name="select_button_text"><text string="SELECT"><color red="0.2" green="0.2" blue="0.2" /></text></element>
+
+	<element name="exit_text"><text string="EXIT"><color red="0.2" green="0.2" blue="0.2" /></text></element>
+	<element name="value_text"><text string="VALUE"><color red="0.2" green="0.2" blue="0.2" /></text></element>
+
+	<element name="piano_text"><text string="Piano"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="chrom_perc_text"><text string="Chrom. Perc."><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="organ_text"><text string="Organ"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="guitar_text"><text string="Guitar"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="bass_text"><text string="Bass"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="strings_text"><text string="Strings"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="ensemble_text"><text string="Ensemble"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="brass_text"><text string="Brass"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="reed_text"><text string="Reed"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="pipe_text"><text string="Pipe"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="synth_lead_text"><text string="Synth lead"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="synth_pad_text"><text string="Synth pad"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="synth_effects_text"><text string="Synth effects"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="ethnic_text"><text string="Ethnic"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="percussive_text"><text string="Percussive"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="sfx_text"><text string="SFX"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="model_excl_text"><text string="Model excl."><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="drum_text"><text string="Drum"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds x="0" y="0" width="1640" height="680" />
+
+
+
+
+    <bounds x="0" y="0" width="1640" height="790"/>
+
+    <!-- Sfondo -->
+    <element ref="panel">
+        <bounds x="0" y="0" width="1640" height="680"/>
+    </element>
+
+   
+
+
+
+
+
+
+
+    <!-- Display -->
+   
+
+		<screen index="0"><bounds x="412" y="94" width="700" height="212" /></screen>
+
+		<element name="contrast" ref="lcda" blend="add"><bounds x="412" y="94" width="700" height="212" /></element>
+
+		<element ref="lcdm" blend="multiply"><bounds x="412" y="94" width="700" height="212" /></element>
+
+
+
+
+<!-- LEDS -->
+
+
+
+		
+		<element name="LED0" ref="led" inputtag="SWS3" inputmask="0x80"><!-- PLAY --><bounds x="1255" y="108" width="30" height="30" /></element>
+
+		
+		<element name="LED1" ref="led" inputtag="SWS3" inputmask="0x40"><!-- EDIT --><bounds x="1325" y="108" width="30" height="30" /></element>
+
+		
+		<element name="LED2" ref="led" inputtag="SWS3" inputmask="0x20"><!-- UTIL --><bounds x="1255" y="187" width="30" height="30" /></element>
+
+		
+		<element name="LED3" ref="led" inputtag="SWS3" inputmask="0x10"><!-- EFFECT --><bounds x="1325" y="187" width="30" height="30" /></element>
+
+		
+		<element name="LED4" ref="ledred" inputtag="SWS5" inputmask="0x80"><!-- SAMPLING --><bounds x="1255" y="267" width="30" height="30" /></element>
+
+		
+		<element name="LED5" ref="led" inputtag="SWS4" inputmask="0x80"><!-- SEQ --><bounds x="1325" y="267" width="30" height="30" /></element>
+
+
+
+
+
+
+		
+
+		<element ref="1_text"><bounds x="128" y="207" width="9" height="15"/></element>
+		<element ref="2_text"><bounds x="127" y="338" width="9" height="15"/></element>
+		<element ref="a_d_input_text"><bounds x="224" y="207" width="111" height="15"/></element>
+		<element ref="volume_text"><bounds x="237" y="338" width="83" height="15"/></element>
+
+		<element ref="standby_text"><bounds x="54" y="494" width="92" height="15"/></element>
+		<element ref="on_text"><bounds x="68" y="514" width="28" height="15"/></element>
+
+		<element ref="midi_in_a_text"><bounds x="207" y="514" width="97" height="15"/></element>
+		<element ref="phones_text"><bounds x="341" y="514" width="81" height="15"/></element>
+
+		<element ref="part_text"><bounds x="529" y="326" width="45" height="15"/></element>
+		<element ref="bank_pgm_text"><bounds x="613" y="326" width="89" height="15"/></element>
+		<element ref="vol_text"><bounds x="715" y="326" width="35" height="15"/></element>
+		<element ref="exp_text"><bounds x="763" y="326" width="34" height="15"/></element>
+		<element ref="pan_text"><bounds x="810" y="326" width="34" height="15"/></element>
+		<element ref="rev_text"><bounds x="857" y="326" width="36" height="15"/></element>
+		<element ref="cho_text"><bounds x="900" y="326" width="40" height="15"/></element>
+		<element ref="var_text"><bounds x="948" y="326" width="37" height="15"/></element>
+		<element ref="key_text"><bounds x="1001" y="326" width="34" height="15"/></element>
+
+		<!-- BUTTONS ROW 1-->
+		
+		<element ref="rect_yellow_button" inputtag="SWS0" inputmask="0x80"><bounds x="435" y="383" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS0" inputmask="0x40"><bounds x="526" y="383" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS0" inputmask="0x20"><bounds x="618" y="383" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS0" inputmask="0x10"><bounds x="706" y="383" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS0" inputmask="0x08"><bounds x="798" y="383" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS0" inputmask="0x04"><bounds x="890" y="383" width="74" height="28"/></element>
+
+<!-- BUTTONS ROW 2-->
+		
+		<element ref="rect_yellow_button" inputtag="SWS1" inputmask="0x80"><bounds x="435" y="454" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS1" inputmask="0x40"><bounds x="526" y="454" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS1" inputmask="0x20"><bounds x="618" y="454" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS1" inputmask="0x10"><bounds x="706" y="454" width="74" height="28"/></element>
+
+		<element ref="rect_yellow_button" inputtag="SWS1" inputmask="0x08"><bounds x="798" y="454" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS1" inputmask="0x04"><bounds x="890" y="454" width="74" height="28"/></element>
+
+<!-- BUTTONS ROW 3-->
+		
+		<element ref="rect_yellow_button" inputtag="SWS2" inputmask="0x80"><bounds x="435" y="522" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS2" inputmask="0x40"><bounds x="526" y="522" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS2" inputmask="0x20"><bounds x="618" y="522" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS2" inputmask="0x10"><bounds x="706" y="522" width="74" height="28"/></element>
+
+		<element ref="rect_yellow_button" inputtag="SWS2" inputmask="0x08"><bounds x="798" y="522" width="74" height="28"/></element>
+
+		
+		<element ref="rect_yellow_button" inputtag="SWS2" inputmask="0x04"><bounds x="890" y="522" width="74" height="28"/></element>
+
+
+		<element ref="play_text"><bounds x="1182" y="87" width="46" height="15"/></element>
+		<element ref="edit_text"><bounds x="1252" y="87" width="45" height="15"/></element>
+		<element ref="util_text"><bounds x="1184" y="159" width="42" height="15"/></element>
+		<element ref="effect_text"><bounds x="1238" y="159" width="73" height="15"/></element>
+		<element ref="sampling_text"><bounds x="1169" y="231" width="72" height="15"/></element>
+		<element ref="seq_text"><bounds x="1255" y="231" width="39" height="15"/></element>
+
+
+		<element ref="all_text"><bounds x="1490" y="76" width="36" height="15"/></element>
+
+
+
+
+
+
+<!-- GREY BUTTON ROW 1-->
+		<element ref="rect_white_button" inputtag="SWS3" inputmask="0x08"><!-- MUTE/SOLO --><bounds x="1395" y="103" width="55" height="55"/></element>
+		
+		<element ref="rect_white_button" inputtag="SWS3" inputmask="0x04"><!-- PART - --><bounds x="1465" y="103" width="55" height="55"/></element>
+		
+
+		<element ref="rect_white_button" inputtag="SWS3" inputmask="0x02"><!-- PART + --><bounds x="1532" y="103" width="55" height="55"/></element>
+		
+
+<!-- GREY BUTTON ROW 2-->
+		<element ref="rect_white_button" inputtag="SWS4" inputmask="0x40"><!-- ENTER --><bounds x="1395" y="178" width="55" height="55"/></element>
+		
+		<element ref="rect_white_button" inputtag="SWS4" inputmask="0x20"><!-- SELECT < --><bounds x="1465" y="178" width="55" height="55"/></element>
+		
+
+		<element ref="rect_white_button" inputtag="SWS4" inputmask="0x10"><!-- SELECT > --><bounds x="1532" y="178" width="55" height="55"/></element>
+		
+
+<!-- GREY BUTTON ROW 3-->
+
+		<element ref="rect_white_button" inputtag="SWS4" inputmask="0x08"><!-- EXIT --><bounds x="1395" y="253" width="55" height="55"/></element>
+		
+		<element ref="rect_white_button" inputtag="SWS4" inputmask="0x04"><!-- VALUE - --><bounds x="1465" y="253" width="55" height="55"/></element>
+		
+		<element ref="rect_white_button" inputtag="SWS4" inputmask="0x02"><!-- VALUE + --><bounds x="1532" y="253" width="55" height="55"/></element>
+		
+
+		<element ref="mu_text"><bounds x="803" y="580" width="26" height="15"/></element>
+		<element ref="plg1_text"><bounds x="855" y="580" width="51" height="15"/></element>
+		<element ref="plg2_text"><bounds x="920" y="580" width="51" height="15"/></element>
+		<element ref="plg3_text"><bounds x="986" y="580" width="51" height="15"/></element>
+
+
+
+
+		<element ref="select_text"><bounds x="1094" y="410" width="75" height="15"/></element>
+
+		<element ref="round_white_button" inputtag="SWS5" inputmask="0x40"><!-- SELECT --><bounds x="1175" y="441" width="40" height="40"/></element>
+
+		<element ref="audition_text"><bounds x="1191" y="410" width="93" height="15"/></element>
+		<element ref="round_white_button" inputtag="SWS5" inputmask="0x20"><!-- AUDITION --><bounds x="1263" y="441" width="40" height="40"/></element>
+
+
+
+
+		
+
+		
+		
+		<element name="LED6" ref="ledr"><!-- MU --><bounds x="761" y="606" width="37" height="26" /></element>
+		<element name="LED7" ref="ledr"><!-- PLG-1 --><bounds x="832" y="606" width="37" height="26" /></element>
+		<element name="LED8" ref="ledr"><!-- PLG-2 --><bounds x="911" y="606" width="37" height="26" /></element>
+		<element name="LED9" ref="ledr"><!-- PLG-3 --><bounds x="989" y="606" width="37" height="26" /></element>
+	</view>
+
+</mamelayout>

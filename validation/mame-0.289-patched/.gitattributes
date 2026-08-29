@@ -1,0 +1,23 @@
+* text=auto !eol
+
+*.bat   eol=crlf
+*.cmd   eol=crlf
+*.jed   binary
+*.man   eol=crlf
+*.po    eol=lf
+*.rc    eol=crlf
+*.sh    eol=lf
+
+*.gif   -text
+*.ico   -text
+*.jpg   -text
+*.png   -text
+*.ppm   -text
+
+*.bdf   eol=crlf
+
+*.zip   -text
+
+3rdparty/flac/test/cuesheets/*.cue                           -text
+3rdparty/flac/test/flac-to-flac-metadata-test-files/*.meta   -text
+3rdparty/flac/test/metaflac-test-files/*.meta                -text

@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- simplified layout for the leds, play-select leds would be on 1.0 and 1.1 -->
+
+	<element name="sweep" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="SWEEP" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="keeper" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="KEEPER" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="bomb" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BOMB" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="down" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="DOWN &amp; OUT" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<view name="Internal Layout">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+		<element name="0.0" ref="sweep">
+			<bounds x="0" y="-0.2" width="2" height="0.2" />
+		</element>
+		<element name="0.1" ref="keeper">
+			<bounds x="0" y="-0.2" width="2" height="0.2" />
+		</element>
+		<element name="0.2" ref="bomb">
+			<bounds x="0" y="-0.2" width="2" height="0.2" />
+		</element>
+		<element name="0.3" ref="down">
+			<bounds x="0" y="-0.2" width="2" height="0.2" />
+		</element>
+		<element name="2.0" ref="sweep">
+			<bounds x="2" y="-0.2" width="2" height="0.2" />
+		</element>
+		<element name="2.1" ref="keeper">
+			<bounds x="2" y="-0.2" width="2" height="0.2" />
+		</element>
+		<element name="2.2" ref="bomb">
+			<bounds x="2" y="-0.2" width="2" height="0.2" />
+		</element>
+		<element name="2.3" ref="down">
+			<bounds x="2" y="-0.2" width="2" height="0.2" />
+		</element>
+	</view>
+</mamelayout>

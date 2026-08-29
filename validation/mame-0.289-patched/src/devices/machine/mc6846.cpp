@@ -1,0 +1,549 @@
+// license:BSD-3-Clause
+// copyright-holders:Antoine Mine
+/**********************************************************************
+
+  Copyright (C) Antoine Mine' 2006
+
+  Motorola 6846 emulation.
+
+  The MC6846 chip provides ROM (2048 bytes), I/O (8-bit directional data port +
+  2 control lines) and a programmable timer.
+  It may be interfaced with a M6809 cpu.
+  It is used in some Thomson computers.
+
+  Not yet implemented:
+  - external clock (CTC)
+  - latching of port on CP1
+  - gate input (CTG)
+  - timer comparison modes (frequency and pulse width)
+  - CP2 acknowledge modes
+
+**********************************************************************/
+
+#include "emu.h"
+#include "mc6846.h"
+
+//#define VERBOSE 1
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+
+/******************* utility function and macros ********************/
+
+#define PORT                                \
+	((m_pdr & m_ddr) |                  \
+		(m_in_port_cb(0) & ~m_ddr))
+
+#define CTO                             \
+	((MODE == 0x30 || (m_tcr & 0x80)) ? m_cto : 0)
+
+#define MODE (m_tcr & 0x38)
+
+#define FACTOR ((m_tcr & 4) ? 8 : 1)
+
+
+DEFINE_DEVICE_TYPE(MC6846, mc6846_device, "mc6846", "MC6846 Programmable Timer")
+
+mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MC6846, tag, owner, clock),
+	m_out_port_cb(*this),   // 8-bit output
+	m_out_cp2_cb(*this),    // 1-bit output
+	m_in_port_cb(*this, 0), // CPU read from the outside through chip (8-bit input)
+	m_out_cto_cb(*this),    // asynchronous timer output to output world (1-bit output)
+	m_irq_cb(*this)         // timer interrupt
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mc6846_device::device_start()
+{
+	m_interval = timer_alloc(FUNC(mc6846_device::timer_expire), this);
+	m_one_shot = timer_alloc(FUNC(mc6846_device::timer_one_shot), this);
+
+	save_item(NAME(m_csr));
+	save_item(NAME(m_pcr));
+	save_item(NAME(m_ddr));
+	save_item(NAME(m_pdr));
+	save_item(NAME(m_tcr));
+	save_item(NAME(m_cp1));
+	save_item(NAME(m_cp2));
+	save_item(NAME(m_cp2_cpu));
+	save_item(NAME(m_cto));
+	save_item(NAME(m_time_MSB));
+	save_item(NAME(m_csr0_to_be_cleared));
+	save_item(NAME(m_csr1_to_be_cleared));
+	save_item(NAME(m_csr2_to_be_cleared));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_preset));
+	save_item(NAME(m_timer_started));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mc6846_device::device_reset()
+{
+	m_cto   = 0;
+	m_csr   = 0;
+	m_pcr   = 0x80;
+	m_ddr   = 0;
+	m_pdr   = 0;
+	m_tcr   = 1;
+	m_cp1   = 0;
+	m_cp2   = 0;
+	m_cp2_cpu  = 0;
+	m_latch    = 0xffff;
+	m_preset   = 0xffff;
+	m_time_MSB = 0;
+	m_csr0_to_be_cleared = 0;
+	m_csr1_to_be_cleared = 0;
+	m_csr2_to_be_cleared = 0;
+	m_timer_started = 0;
+	m_old_cif = 0;
+	m_old_cto = 0;
+	m_interval->reset();
+	m_one_shot->reset();
+}
+
+
+inline uint16_t mc6846_device::counter()
+{
+	if ( m_timer_started )
+	{
+		attotime delay = m_interval ->remaining( );
+		return attotime_to_clocks(delay) / FACTOR;
+	}
+	else
+		return m_preset;
+}
+
+
+
+inline void mc6846_device::update_irq()
+{
+	int cif = 0;
+	/* composite interrupt flag */
+	if ( ( (m_csr & 1) && (m_tcr & 0x40) ) ||
+			( (m_csr & 2) && (m_pcr & 1) ) ||
+			( (m_csr & 4) && (m_pcr & 8) && ! (m_pcr & 0x20) ) )
+		cif = 1;
+	if ( m_old_cif != cif )
+	{
+		LOG( "%f: mc6846 interrupt %i (time=%i cp1=%i cp2=%i)\n",
+				machine().time().as_double(), cif,
+				m_csr & 1, (m_csr >> 1 ) & 1, (m_csr >> 2 ) & 1 );
+		m_old_cif = cif;
+	}
+	if ( cif )
+	{
+		m_csr |= 0x80;
+		m_irq_cb( 1 );
+	}
+	else
+	{
+		m_csr &= ~0x80;
+		m_irq_cb( 0 );
+	}
+}
+
+
+
+inline void mc6846_device::update_cto()
+{
+	int cto = CTO;
+	if ( cto != m_old_cto )
+	{
+		LOG( "%f: mc6846 CTO set to %i\n", machine().time().as_double(), cto );
+		m_old_cto = cto;
+	}
+	m_out_cto_cb( cto );
+}
+
+
+
+inline void mc6846_device::timer_launch()
+{
+	int delay = FACTOR * (m_preset+1);
+	LOG( "%f: mc6846 timer launch called, mode=%i, preset=%i (x%i)\n", machine().time().as_double(), MODE, m_preset, FACTOR );
+
+	if ( ! (m_tcr & 2) )
+	{
+		logerror( "mc6846 external clock CTC not implemented\n" );
+	}
+
+	switch( MODE )
+	{
+	case 0x00:
+	case 0x10: /* continuous */
+		m_cto = 0;
+		break;
+
+	case 0x20:  /* cascaded single-shot */
+		break;
+
+	case 0x30: /* single-shot */
+		m_cto = 0;
+		m_one_shot->reset(clocks_to_attotime(FACTOR));
+		break;
+
+	default:
+		logerror( "mc6846 timer mode %i not implemented\n", MODE );
+		m_interval->reset();
+		m_timer_started = 0;
+		return;
+	}
+
+	m_interval->reset(clocks_to_attotime(delay));
+	m_timer_started = 1;
+
+	m_csr &= ~1;
+	update_cto();
+	update_irq();
+}
+
+
+
+/******************* timer callbacks *********************************/
+
+TIMER_CALLBACK_MEMBER( mc6846_device::timer_expire )
+{
+	int delay = FACTOR * (m_latch+1);
+
+	LOG( "%f: mc6846 timer expire called, mode=%i, latch=%i (x%i)\n", machine().time().as_double(), MODE, m_latch, FACTOR );
+
+	/* latch => counter */
+	m_preset = m_latch;
+
+	if ( ! (m_tcr & 2) )
+		logerror( "mc6846 external clock CTC not implemented\n" );
+
+	switch ( MODE )
+	{
+	case 0x00:
+	case 0x10: /* continuous */
+		m_cto = 1 ^ m_cto;
+		break;
+
+	case 0x20:  /* cascaded single-shot */
+		m_cto = ( m_tcr & 0x80 ) ? 1 : 0;
+		break;
+
+	case 0x30: /* single-shot */
+		m_cto = 0;
+		break;
+
+	default:
+		logerror( "mc6846 timer mode %i not implemented\n", MODE );
+		m_interval->reset();
+		m_timer_started = 0;
+		return;
+	}
+
+	m_interval->reset(clocks_to_attotime(delay));
+
+	m_csr |= 1;
+	update_cto();
+	update_irq();
+}
+
+
+
+TIMER_CALLBACK_MEMBER( mc6846_device::timer_one_shot )
+{
+	LOG( "%f: mc6846 timer one shot called\n", machine().time().as_double() );
+
+	/* 1 micro second after one-shot launch, we put cto to high */
+	m_cto = 1;
+	update_cto();
+}
+
+
+
+/************************** CPU interface ****************************/
+
+
+uint8_t mc6846_device::read(offs_t offset)
+{
+	switch ( offset )
+	{
+	case 0:
+	case 4:
+		LOG( "%s %f: mc6846 CSR read $%02X intr=%i (timer=%i, cp1=%i, cp2=%i)\n",
+				machine().describe_context(), machine().time().as_double(),
+				m_csr, (m_csr >> 7) & 1,
+				m_csr & 1, (m_csr >> 1) & 1, (m_csr >> 2) & 1 );
+		m_csr0_to_be_cleared = m_csr & 1;
+		m_csr1_to_be_cleared = m_csr & 2;
+		m_csr2_to_be_cleared = m_csr & 4;
+		return m_csr;
+
+	case 1:
+		LOG( "%s %f: mc6846 PCR read $%02X\n", machine().describe_context(), machine().time().as_double(), m_pcr );
+		return m_pcr;
+
+	case 2:
+		LOG( "%s %f: mc6846 DDR read $%02X\n", machine().describe_context(), machine().time().as_double(), m_ddr );
+		return m_ddr;
+
+	case 3:
+		LOG( "%s %f: mc6846 PORT read $%02X\n", machine().describe_context(), machine().time().as_double(), PORT );
+		if ( ! (m_pcr & 0x80) )
+		{
+			if ( m_csr1_to_be_cleared )
+				m_csr &= ~2;
+			if ( m_csr2_to_be_cleared )
+				m_csr &= ~4;
+			update_irq();
+			m_csr1_to_be_cleared = 0;
+			m_csr2_to_be_cleared = 0;
+		}
+		return PORT;
+
+	case 5:
+		LOG( "%s %f: mc6846 TCR read $%02X\n",machine().describe_context(), machine().time().as_double(), m_tcr );
+		return m_tcr;
+
+	case 6:
+		LOG( "%s %f: mc6846 COUNTER hi read $%02X\n", machine().describe_context(), machine().time().as_double(), counter() >> 8 );
+		if ( m_csr0_to_be_cleared )
+		{
+			m_csr &= ~1;
+			update_irq();
+		}
+		m_csr0_to_be_cleared = 0;
+		return counter() >> 8;
+
+	case 7:
+		LOG( "%s %f: mc6846 COUNTER low read $%02X\n", machine().describe_context(), machine().time().as_double(), counter() & 0xff );
+		if ( m_csr0_to_be_cleared )
+		{
+			m_csr &= ~1;
+			update_irq();
+		}
+		m_csr0_to_be_cleared = 0;
+		return counter() & 0xff;
+
+	default:
+		logerror( "%s mc6846 invalid read offset %i\n", machine().describe_context(), offset );
+	}
+	return 0;
+}
+
+
+
+void mc6846_device::write(offs_t offset, uint8_t data)
+{
+
+	switch ( offset )
+	{
+	case 0:
+	case 4:
+		/* CSR is read-only */
+		break;
+
+	case 1:
+	{
+		static const char *const cp2[8] =
+		{
+			"in,neg-edge", "in,neg-edge,intr", "in,pos-edge", "in,pos-edge,intr",
+			"out,intr-ack", "out,i/o-ack", "out,0", "out,1"
+		};
+		static const char *const cp1[8] =
+		{
+			"neg-edge", "neg-edge,intr", "pos-edge", "pos-edge,intr",
+			"latched,neg-edge", "latched,neg-edge,intr",
+			"latcged,pos-edge", "latcged,pos-edge,intr"
+		};
+		LOG( "%s %f: mc6846 PCR write $%02X reset=%i cp2=%s cp1=%s\n",
+				machine().describe_context(), machine().time().as_double(), data,
+				(data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] );
+
+	}
+	m_pcr = data;
+	if ( data & 0x80 )
+	{      /* data reset */
+		m_pdr = 0;
+		m_ddr = 0;
+		m_csr &= ~6;
+		update_irq();
+	}
+	if ( data & 4 )
+		logerror( "%s mc6846 CP1 latching not implemented\n", machine().describe_context() );
+	if (data & 0x20)
+	{
+		if (data & 0x10)
+		{
+			m_cp2_cpu = (data >> 3) & 1;
+			m_out_cp2_cb( m_cp2_cpu );
+		}
+		else
+			logerror( "%s mc6846 acknowledge not implemented\n", machine().describe_context() );
+	}
+	break;
+
+	case 2:
+		LOG( "%s %f: mc6846 DDR write $%02X\n", machine().describe_context(), machine().time().as_double(), data );
+		if ( ! (m_pcr & 0x80) )
+		{
+			m_ddr = data;
+			m_out_port_cb( (offs_t) 0, m_pdr & m_ddr );
+		}
+		break;
+
+	case 3:
+		LOG( "%s %f: mc6846 PORT write $%02X (mask=$%02X)\n", machine().describe_context(), machine().time().as_double(), data,m_ddr );
+		if ( ! (m_pcr & 0x80) )
+		{
+			m_pdr = data;
+			m_out_port_cb( (offs_t) 0, m_pdr & m_ddr );
+			if ( m_csr1_to_be_cleared && (m_csr & 2) )
+			{
+				m_csr &= ~2;
+				LOG( "%s %f: mc6846 CP1 intr reset\n", machine().describe_context(), machine().time().as_double() );
+			}
+			if ( m_csr2_to_be_cleared && (m_csr & 4) )
+			{
+				m_csr &= ~4;
+				LOG( "%s %f: mc6846 CP2 intr reset\n", machine().describe_context(), machine().time().as_double() );
+			}
+			m_csr1_to_be_cleared = 0;
+			m_csr2_to_be_cleared = 0;
+			update_irq();
+		}
+		break;
+
+	case 5:
+	{
+		static const char *const mode[8] =
+			{
+				"continuous", "freq-cmp", "continuous", "pulse-cmp",
+				"cascaded", "freq-cmp", "one-shot", "pulse-cmp"
+			};
+		LOG( "%s %f: mc6846 TCR write $%02X reset=%i clock=%s scale=%i mode=%s out=%s\n",
+				machine().describe_context(), machine().time().as_double(), data,
+				data & 1, (data & 2) ? "sys" : "extern",
+				(data & 4) ? 8 : 1, mode[ (data >> 3) & 7 ],
+				(data & 0x80) ? "enabled" : "0" );
+
+		m_tcr = data;
+		if ( m_tcr & 1 )
+		{
+			/* timer preset = initialization without launch */
+			m_preset = m_latch;
+			m_csr &= ~1;
+			if ( MODE != 0x20 )
+				m_cto = 0;
+			update_cto();
+			m_interval->reset();
+			m_one_shot->reset();
+			m_timer_started = 0;
+		}
+		else
+		{
+			/* timer launch */
+			if ( ! m_timer_started )
+				timer_launch();
+		}
+		update_irq();
+	}
+	break;
+
+	case 6:
+		m_time_MSB = data;
+		break;
+
+	case 7:
+		m_latch = ( ((uint16_t) m_time_MSB) << 8 ) + data;
+		LOG( "%s %f: mc6846 COUNT write %i\n", machine().describe_context(), machine().time().as_double(), m_latch  );
+		if (!(m_tcr & 0x38))
+		{
+			/* timer initialization */
+			m_preset = m_latch;
+			m_csr &= ~1;
+			update_irq();
+			m_cto = 0;
+			update_cto();
+			/* launch only if started */
+			if (!(m_tcr & 1))
+				timer_launch();
+		}
+		break;
+
+	default:
+		logerror( "%s mc6846 invalid write offset %i\n", machine().describe_context(), offset );
+	}
+}
+
+
+
+/******************** outside world interface ************************/
+
+
+
+void mc6846_device::set_input_cp1(int data)
+{
+	data = (data != 0 );
+	if ( data == m_cp1 )
+		return;
+	m_cp1 = data;
+	LOG( "%f: mc6846 input CP1 set to %i\n",  machine().time().as_double(), data );
+	if (( data &&  (m_pcr & 2)) || (!data && !(m_pcr & 2)))
+	{
+		m_csr |= 2;
+		update_irq();
+	}
+}
+
+void mc6846_device::set_input_cp2(int data)
+{
+	data = (data != 0 );
+	if ( data == m_cp2 )
+		return;
+	m_cp2 = data;
+	LOG( "%f: mc6846 input CP2 set to %i\n", machine().time().as_double(), data );
+	if (m_pcr & 0x20)
+	{
+		if (( data &&  (m_pcr & 0x10)) || (!data && !(m_pcr & 0x10)))
+		{
+			m_csr |= 4;
+			update_irq();
+		}
+	}
+}
+
+
+
+/************************ accessors **********************************/
+
+
+
+uint8_t mc6846_device::get_output_port()
+{
+	return PORT;
+}
+
+
+
+uint8_t mc6846_device::get_output_cto()
+{
+	return CTO;
+}
+
+
+
+uint8_t mc6846_device::get_output_cp2()
+{
+	return m_cp2_cpu;
+}
+
+
+
+uint16_t mc6846_device::get_preset()
+{
+	return m_preset;
+}

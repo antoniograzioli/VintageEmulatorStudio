@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+	<element name="overlay">
+		<rect>
+			<bounds left="0" top="0" right="400" bottom="300" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+
+		<rect>
+			<bounds left="0" top="0" right="85" bottom="300" />
+			<color red="1.0" green="1.0" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds left="0" top="70" right="85" bottom="300" />
+			<color red="0.1" green="1.0" blue="0.7" />
+		</rect>
+		<rect>
+			<bounds left="0" top="150" right="85" bottom="300" />
+			<color red="1.0" green="0.15" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds left="0" top="245" right="85" bottom="300" />
+			<color red="0.15" green="0.7" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+
+	<view name="Color Overlay">
+		<bounds left="0" right="640" top="0" bottom="480" />
+		<screen index="0">
+			<bounds x="0" y="0" width="738.46" height="480" />
+		</screen>
+		<collection name="Overlay">
+			<element ref="overlay" blend="multiply">
+				<bounds x="0" y="0" width="738.46" height="480" />
+			</element>
+		</collection>
+		<collection name="Overscan Mask">
+			<element ref="black">
+				<bounds x="640" y="0" width="100" height="480" />
+			</element>
+		</collection>
+	</view>
+</mamelayout>

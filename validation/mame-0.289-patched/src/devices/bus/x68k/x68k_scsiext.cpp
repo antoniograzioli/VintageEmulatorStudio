@@ -1,0 +1,135 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
+/*
+ * x68k_scsiext.c
+ *
+ * Sharp CZ-6BS1 SCSI-1 controller
+ *
+ *  Created on: 5/06/2012
+ */
+
+#include "emu.h"
+#include "x68k_scsiext.h"
+
+#include "bus/nscsi/hd.h"
+#include "machine/mb87030.h"
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(X68K_SCSIEXT, x68k_scsiext_device, "x68k_cz6bs1", "Sharp CZ-6BS1 SCSI-1")
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+ROM_START( x68k_cz6bs1 )
+	ROM_REGION( 0x10000, "scsiexrom", 0 )
+	ROM_LOAD16_WORD_SWAP( "scsiexrom.bin",   0x0000, 0x2000, CRC(7be488de) SHA1(49616c09a8986ffe6a12ad600febe512f7ba8ae4) )
+ROM_END
+
+const tiny_rom_entry *x68k_scsiext_device::device_rom_region() const
+{
+	return ROM_NAME( x68k_cz6bs1 );
+}
+
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+}
+
+// device machine config
+void x68k_scsiext_device::device_add_mconfig(machine_config &config)
+{
+	auto &scsi(NSCSI_BUS(config, "scsi"));
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
+	MB89352(config, m_spc, 10'000'000 / 2); // 10MHz clock from bus
+	scsi.set_external_device(7, m_spc);
+	m_spc->out_irq_callback().set(DEVICE_SELF, FUNC(x68k_scsiext_device::irq_w));
+	m_spc->out_dreq_callback().set(DEVICE_SELF, FUNC(x68k_scsiext_device::drq_w));
+}
+
+x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, X68K_SCSIEXT, tag, owner, clock)
+	, device_x68k_expansion_card_interface(mconfig, *this)
+	, m_slot(nullptr)
+	, m_spc(*this, "spc")
+	, m_rom(*this, "scsiexrom")
+	, m_drq(false)
+{
+}
+
+void x68k_scsiext_device::device_start()
+{
+	save_item(NAME(m_drq));
+
+	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
+
+	m_slot->space().install_rom(0xea0020,0xea1fff, m_rom.target());
+	m_slot->space().unmap_write(0xea0020,0xea1fff);
+	m_slot->space().install_device(0xea0000, 0xea001f, *m_spc, &mb89352_device::map, 0x00ff00ff);
+
+	// replace data register handlers with DMA-aware glue
+	m_slot->space().install_readwrite_handler(0xea0015, 0xea0015,
+		emu::rw_delegate(*this, FUNC(x68k_scsiext_device::data_r)),
+		emu::rw_delegate(*this, FUNC(x68k_scsiext_device::data_w)));
+}
+
+void x68k_scsiext_device::device_reset()
+{
+}
+
+void x68k_scsiext_device::irq_w(int state)
+{
+	// TODO: jumper-configurable IRQ2/IRQ4
+	m_slot->irq2_w(state);
+}
+
+uint8_t x68k_scsiext_device::iack2()
+{
+	return 0xf6;
+}
+
+void x68k_scsiext_device::drq_w(int state)
+{
+	m_drq = bool(state);
+}
+
+u8 x68k_scsiext_device::data_r()
+{
+	// check for DMA cycle
+	if (m_slot->exown() && !machine().side_effects_disabled())
+	{
+		// negate #DTACK if not requesting a DMA transfer
+		if (!m_drq)
+			m_slot->dtack_w(1);
+
+		return m_spc->dma_r();
+	}
+	else
+		return m_spc->dreg_r();
+
+}
+
+void x68k_scsiext_device::data_w(u8 data)
+{
+	// check for DMA cycle
+	if (m_slot->exown())
+	{
+		// negate #DTACK if not requesting a DMA transfer
+		if (!m_drq)
+			m_slot->dtack_w(1);
+		else
+			m_spc->dma_w(data);
+	}
+	else
+		m_spc->dreg_w(data);
+}

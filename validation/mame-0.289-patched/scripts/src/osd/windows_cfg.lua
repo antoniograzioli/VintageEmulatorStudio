@@ -1,0 +1,60 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
+defines {
+	"OSD_WINDOWS",
+	"UNICODE",
+	"_UNICODE",
+	"WIN32_LEAN_AND_MEAN",
+	"NOMINMAX",
+}
+
+configuration { "vs*" }
+	flags {
+		"Unicode",
+	}
+
+configuration { }
+
+	defines {
+		"WINVER=0x0A00",
+		"_WIN32_WINNT=0x0A00",
+	}
+
+if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" then
+	defines {
+		"USE_NETWORK",
+	}
+	if _OPTIONS["USE_TAPTUN"]=="1" then
+		defines {
+			"OSD_NET_USE_TAPTUN",
+		}
+	end
+	if _OPTIONS["USE_PCAP"]=="1" then
+		defines {
+			"OSD_NET_USE_PCAP",
+		}
+	end
+end
+
+if _OPTIONS["USE_SDL"]=="1" then
+	defines {
+		"SDLMAME_SDL2=1",
+		"USE_XINPUT=0",
+		"USE_SDL=1",
+		"USE_SDL_SOUND",
+		"USE_SDL_JOYSTICK",
+	}
+elseif _OPTIONS["USE_SDL3"]=="1" then
+	defines {
+		"SDLMAME_SDL3=1",
+		"USE_XINPUT=0",
+		"USE_SDL3=1",
+		"USE_SDL_SOUND",
+		"USE_SDL_JOYSTICK",
+	}
+else
+	defines {
+		"USE_SDL=0",
+	}
+end

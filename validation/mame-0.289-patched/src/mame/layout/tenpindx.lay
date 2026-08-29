@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<repeat count="10">
+		<param name="n" start="1" increment="1" />
+		<element name="pin~n~" defstate="0">
+			<disk state="1">
+				<color red="0.7" green="0.7" blue="0.7" />
+			</disk>
+			<text string="~n~" state="1">
+				<color red="0.0" green="0.0" blue="0.0" />
+				<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			</text>
+		</element>
+	</repeat>
+
+	<element name="flash" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.4" blue="0.4" />
+		</disk>
+	</element>
+
+	<view name="Lamps">
+		<bounds left="-2" top="0" right="2" bottom="3.4" />
+
+		<screen index="0">
+			<bounds left="-2" top="0" right="2" bottom="3" />
+		</screen>
+
+		<element name="lamp0" ref="pin1" blend="add">
+			<bounds x="-0.15" y="2.25" width="0.3" height="0.3" />
+		</element>
+		<element name="lamp1" ref="pin2" blend="add">
+			<bounds x="-0.50" y="1.75" width="0.3" height="0.3" />
+		</element>
+		<element name="lamp2" ref="pin3" blend="add">
+			<bounds x="0.20" y="1.75" width="0.3" height="0.3" />
+		</element>
+		<element name="lamp3" ref="pin4" blend="add">
+			<bounds x="-0.85" y="1.25" width="0.3" height="0.3" />
+		</element>
+		<element name="lamp4" ref="pin5" blend="add">
+			<bounds x="-0.15" y="1.25" width="0.3" height="0.3" />
+		</element>
+		<element name="lamp5" ref="pin6" blend="add">
+			<bounds x="0.55" y="1.25" width="0.3" height="0.3" />
+		</element>
+		<element name="lamp6" ref="pin7" blend="add">
+			<bounds x="-1.20" y="0.75" width="0.3" height="0.3" />
+		</element>
+		<element name="lamp7" ref="pin8" blend="add">
+			<bounds x="-0.50" y="0.75" width="0.3" height="0.3" />
+		</element>
+		<element name="lamp8" ref="pin9" blend="add">
+			<bounds x="0.20" y="0.75" width="0.3" height="0.3" />
+		</element>
+		<element name="lamp9" ref="pin10" blend="add">
+			<bounds x="0.90" y="0.75" width="0.3" height="0.3" />
+		</element>
+
+		<element name="lamp10" ref="flash" blend="add">
+			<bounds x="-1.72" y="3.25" width="0.1" height="0.1" />
+		</element>
+		<element name="lamp11" ref="flash" blend="add">
+			<bounds x="-1.38" y="3.25" width="0.1" height="0.1" />
+		</element>
+		<element name="lamp12" ref="flash" blend="add">
+			<bounds x="-1.05" y="3.25" width="0.1" height="0.1" />
+		</element>
+		<element name="lamp13" ref="flash" blend="add">
+			<bounds x="-0.72" y="3.25" width="0.1" height="0.1" />
+		</element>
+		<element name="lamp14" ref="flash" blend="add">
+			<bounds x="-0.38" y="3.25" width="0.1" height="0.1" />
+		</element>
+		<element name="lamp14" ref="flash" blend="add">
+			<bounds x="0.28" y="3.25" width="0.1" height="0.1" />
+		</element>
+		<element name="lamp15" ref="flash" blend="add">
+			<bounds x="0.62" y="3.25" width="0.1" height="0.1" />
+		</element>
+		<element name="lamp16" ref="flash" blend="add">
+			<bounds x="0.95" y="3.25" width="0.1" height="0.1" />
+		</element>
+		<element name="lamp17" ref="flash" blend="add">
+			<bounds x="1.28" y="3.25" width="0.1" height="0.1" />
+		</element>
+		<element name="lamp18" ref="flash" blend="add">
+			<bounds x="1.62" y="3.25" width="0.1" height="0.1" />
+		</element>
+	</view>
+</mamelayout>

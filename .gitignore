@@ -1,0 +1,43 @@
+# Canonical generated MAME outputs
+/validation/mame-0.289-patched/build/
+/validation/mame-0.289-patched/build-macos-x86_64/
+/validation/mame-0.289-patched/mamevesembedded
+/validation/mame-0.289-patched/mamevesembedded.exe
+/validation/mame-0.289-patched/mamevesembedded.pdb
+/validation/mame-0.289-patched/mamevesembedded.exp
+/validation/mame-0.289-patched/mamevesembedded.lib
+/validation/mame-0.289-patched/3rdparty/genie/bin/
+/validation/mame-0.289-patched/3rdparty/genie/build/gmake.windows/
+/validation/mame-0.289-patched/scripts/build/__pycache__/
+
+# VES generated platform build outputs
+/Builds/VisualStudio2022/x64/
+/Builds/VisualStudio2022/Win32/
+/Builds/MacOSX/build/
+/Builds/MacOSX/release-validation/
+/Builds/MacOSX/validation-derived/
+/Builds/MacOSX-Intel/release-validation_x86_64/
+/Builds/MacOSX-Intel/release-validation-x86_64/
+/Builds/LinuxMakefile/build/
+
+# Distribution products
+/Dist/
+
+# Local/cache/metadata
+*.log
+*.dmp
+*.crash
+*.ips
+.DS_Store
+._*
+**/xcuserdata/
+**/*.xcuserstate
+*.xcworkspace/xcuserdata/
+
+# Local ROM, firmware, and machine-state workspaces (never distribute)
+.local/
+roms/
+**/roms/
+Support/nvram/
+nvram/
+**/nvram/

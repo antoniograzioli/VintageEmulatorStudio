@@ -1,0 +1,49 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
+#ifndef MAME_BUS_M5_ROM_H
+#define MAME_BUS_M5_ROM_H
+
+#pragma once
+
+#include "slot.h"
+
+
+// ======================> m5_rom_device
+
+class m5_rom_device : public device_t,
+						public device_m5_cart_interface
+{
+public:
+	// construction/destruction
+	m5_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+
+protected:
+	m5_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
+	virtual void device_start() override {}
+};
+
+// ======================> m5_ram_device
+
+class m5_ram_device : public m5_rom_device
+{
+public:
+	// construction/destruction
+	m5_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+};
+
+
+
+// device type declaration
+DECLARE_DEVICE_TYPE(M5_ROM_STD, m5_rom_device)
+DECLARE_DEVICE_TYPE(M5_ROM_RAM, m5_ram_device)
+
+#endif // MAME_BUS_M5_ROM_H

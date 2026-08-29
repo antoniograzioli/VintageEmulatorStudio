@@ -1,0 +1,271 @@
+diff --git a/src/mame/oberheim/dmx.cpp b/src/mame/oberheim/dmx.cpp
+index 78a9f7a..7b147d5 100644
+--- a/src/mame/oberheim/dmx.cpp
++++ b/src/mame/oberheim/dmx.cpp
+@@ -72,6 +72,11 @@ Usage notes:
+ 
+ #include "emu.h"
+ #include "cpu/z80/z80.h"
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++#include "bus/midi/midi.h"
++#include "machine/clock.h"
++#include "machine/i8251.h"
++#endif
+ #include "machine/nvram.h"
+ #include "machine/output_latch.h"
+ #include "machine/rescap.h"
+@@ -100,6 +105,45 @@ Usage notes:
+ 
+ #include "logmacro.h"
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++// VES Virtual MIDI Retrofit: these mappings drive only the original
++// active-low DMX audition buttons read by the Z80 firmware.
++constexpr int kPadPulseMs = 10;
++struct virtual_midi_pad
++{
++	u8 midi_note;
++	u8 button_group;
++	u8 mask;
++};
++
++constexpr std::array<virtual_midi_pad, 24> VIRTUAL_MIDI_PADS = {{
++	{ 60, 5, 0x01 }, // Bass 1
++	{ 62, 4, 0x01 }, // Bass 2
++	{ 64, 3, 0x01 }, // Bass 3
++	{ 65, 5, 0x02 }, // Snare 1
++	{ 67, 4, 0x02 }, // Snare 2
++	{ 69, 3, 0x02 }, // Snare 3
++	{ 71, 3, 0x40 }, // Rimshot
++	{ 72, 3, 0x80 }, // Claps
++	{ 74, 5, 0x04 }, // Hi-hat closed
++	{ 76, 4, 0x04 }, // Hi-hat accent
++	{ 77, 3, 0x04 }, // Hi-hat open
++	{ 79, 5, 0x08 }, // Tom 1
++	{ 81, 4, 0x08 }, // Tom 2
++	{ 83, 3, 0x08 }, // Tom 3
++	{ 84, 5, 0x10 }, // Tom 4
++	{ 86, 4, 0x10 }, // Tom 5
++	{ 88, 3, 0x10 }, // Tom 6
++	{ 89, 5, 0x40 }, // Tamb 1
++	{ 91, 4, 0x40 }, // Tamp 2
++	{ 93, 5, 0x80 }, // Shake 1
++	{ 95, 4, 0x80 }, // Shake 2
++	{ 96, 5, 0x20 }, // Cymb 1
++	{ 98, 4, 0x20 }, // Cymb 2
++	{100, 3, 0x20 }  // Cymb 3
++}};
++#endif
++
+ static constexpr const float VCC = 5;
+ 
+ // Voice card configuration. Captures jumper configuration and component values.
+@@ -772,6 +816,9 @@ public:
+ 		, m_metronome(*this, "metronome_sound")
+ 		, m_metronome_out(*this, "METRONOME_OUT")
+ 		, m_metronome_timer(*this, "metronome_timer")
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++		, m_virtual_midi_uart(*this, "ves_virtual_midi_uart")
++#endif
+ 		, m_buttons(*this, "buttons_%d", 0)
+ 		, m_faders(*this, "fader_p%d", 1)
+ 		, m_pitch_trimmers(*this, "pitch_adj_%d", 1)
+@@ -823,6 +870,18 @@ private:
+ 	u8 cassette_and_switch_r();
+ 	template<int GROUP> void gen_trigger_w(u8 data);
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	// VES Virtual MIDI Retrofit: non-historical MIDI input that pulses
++	// only the DMX's existing scanned audition buttons.
++	void virtual_midi_rxrdy_w(int state);
++	void virtual_midi_byte_w(u8 data);
++	void virtual_midi_note_w(u8 note);
++	void clear_virtual_midi_pads();
++	void clear_virtual_midi_state();
++	void virtual_midi_machine_stop();
++	TIMER_CALLBACK_MEMBER(virtual_midi_pad_release);
++#endif
++
+ 	void update_output();
+ 	void update_mix_level(int voice);
+ 	void update_master_volume();
+@@ -837,6 +896,9 @@ private:
+ 	required_device<speaker_sound_device> m_metronome;
+ 	output_finder<> m_metronome_out;
+ 	required_device<timer_device> m_metronome_timer;
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	required_device<i8251_device> m_virtual_midi_uart;
++#endif
+ 	required_ioport_array<6> m_buttons;
+ 	required_ioport_array<9> m_faders;
+ 	required_ioport_array<8> m_pitch_trimmers;
+@@ -867,6 +929,15 @@ private:
+ 	bool m_metronome_mix = false;
+ 	bool m_metronome_level_high = false;
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	std::array<u8, 6> m_virtual_midi_buttons{};  // Active-high pressed bits.
++	std::array<bool, VIRTUAL_MIDI_PADS.size()> m_virtual_midi_pad_active{};
++	std::array<emu_timer *, VIRTUAL_MIDI_PADS.size()> m_virtual_midi_pad_timers{};
++	u8 m_virtual_midi_running_status = 0;
++	u8 m_virtual_midi_data[2]{};
++	u8 m_virtual_midi_data_count = 0;
++#endif
++
+ 	// The service manual states that the crystal is 4.912MHz, in the section
+ 	// that describes the clock circuitry. However, the parts list specifies
+ 	// this as a 4.9152 MHz crystal. The parts list value is likely the correct
+@@ -1100,9 +1171,107 @@ u8 dmx_state::buttons_r(offs_t offset)
+ {
+ 	// Switches are inverted and buffered by 2 x 80C98 (inverting 3-state
+ 	// buffers), U7 and U8 on Switch Board.
+-	return ~m_buttons[offset]->read();
++	u8 buttons = m_buttons[offset]->read();
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	// The panel switches are active-low.  Merge virtual pressed bits before the
++	// existing inverting switch-board buffers so the firmware sees the same path.
++	buttons &= ~m_virtual_midi_buttons[offset];
++#endif
++	return ~buttons;
++}
++
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++void dmx_state::virtual_midi_rxrdy_w(int state)
++{
++	if (state)
++		virtual_midi_byte_w(m_virtual_midi_uart->data_r());
++}
++
++void dmx_state::virtual_midi_note_w(u8 note)
++{
++	for (std::size_t i = 0; i < VIRTUAL_MIDI_PADS.size(); ++i)
++	{
++		const virtual_midi_pad &pad = VIRTUAL_MIDI_PADS[i];
++		if (pad.midi_note != note)
++			continue;
++
++		m_virtual_midi_buttons[pad.button_group] |= pad.mask;
++		m_virtual_midi_pad_active[i] = true;
++		// Restart an active pulse so repeated Note On events remain visible to the
++		// original firmware without bypassing its button/debounce handling.
++		m_virtual_midi_pad_timers[i]->adjust(attotime::from_msec(kPadPulseMs), i);
++		return;
++	}
++}
++
++TIMER_CALLBACK_MEMBER(dmx_state::virtual_midi_pad_release)
++{
++	const std::size_t index = u32(param);
++	if (index >= VIRTUAL_MIDI_PADS.size())
++		return;
++
++	const virtual_midi_pad &pad = VIRTUAL_MIDI_PADS[index];
++	m_virtual_midi_buttons[pad.button_group] &= ~pad.mask;
++	m_virtual_midi_pad_active[index] = false;
++}
++
++void dmx_state::clear_virtual_midi_pads()
++{
++	m_virtual_midi_buttons.fill(0);
++	m_virtual_midi_pad_active.fill(false);
++	for (emu_timer *timer : m_virtual_midi_pad_timers)
++		if (timer)
++			timer->adjust(attotime::never);
++}
++
++void dmx_state::clear_virtual_midi_state()
++{
++	clear_virtual_midi_pads();
++	m_virtual_midi_running_status = 0;
++	m_virtual_midi_data[0] = 0;
++	m_virtual_midi_data[1] = 0;
++	m_virtual_midi_data_count = 0;
++}
++
++void dmx_state::virtual_midi_byte_w(u8 data)
++{
++	// System real-time messages may occur anywhere and do not cancel running status.
++	if (data >= 0xf8)
++		return;
++
++	if (data & 0x80)
++	{
++		// Omni channel-voice parser. System-common/SysEx safely discards its payload.
++		m_virtual_midi_running_status = data < 0xf0 ? data : 0;
++		m_virtual_midi_data_count = 0;
++		return;
++	}
++
++	if (!m_virtual_midi_running_status)
++		return;
++
++	const u8 message_type = m_virtual_midi_running_status & 0xf0;
++	const u8 data_size = (message_type == 0xc0 || message_type == 0xd0) ? 1 : 2;
++	m_virtual_midi_data[m_virtual_midi_data_count++] = data;
++	if (m_virtual_midi_data_count != data_size)
++		return;
++
++	if (message_type == 0x90 && m_virtual_midi_data[1] != 0)
++		virtual_midi_note_w(m_virtual_midi_data[0]);
++	else if (message_type == 0xb0
++		&& (m_virtual_midi_data[0] == 120 || m_virtual_midi_data[0] == 123))
++		clear_virtual_midi_pads();
++
++	// Retain running status. Note Off and velocity-zero Note On are consumed.
++	m_virtual_midi_data_count = 0;
+ }
+ 
++void dmx_state::virtual_midi_machine_stop()
++{
++	clear_virtual_midi_state();
++}
++#endif
++
+ u8 dmx_state::external_triggers_r()
+ {
+ 	// External triggers are inverted by 2 X CA3086 NPN arrays (U4 for D0-D3 and
+@@ -1296,10 +1465,26 @@ void dmx_state::machine_start()
+ 	save_item(NAME(m_metronome_on));
+ 	save_item(NAME(m_metronome_mix));
+ 	save_item(NAME(m_metronome_level_high));
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	save_item(NAME(m_virtual_midi_buttons));
++	save_item(NAME(m_virtual_midi_pad_active));
++	save_item(NAME(m_virtual_midi_running_status));
++	save_item(NAME(m_virtual_midi_data));
++	save_item(NAME(m_virtual_midi_data_count));
++	for (emu_timer *&timer : m_virtual_midi_pad_timers)
++		timer = timer_alloc(FUNC(dmx_state::virtual_midi_pad_release), this);
++	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&dmx_state::virtual_midi_machine_stop, this));
++#endif
+ }
+ 
+ void dmx_state::machine_reset()
+ {
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	clear_virtual_midi_state();
++	// 31.25 kbit/s MIDI is 8-N-1. The UART receives it at 16x bit rate.
++	m_virtual_midi_uart->control_w(0x4e);
++	m_virtual_midi_uart->control_w(0x04);
++#endif
+ 	update_output();
+ 	update_master_volume();
+ 	for (int i = 0; i < NUM_MIXED_VOICES; ++i)
+@@ -1314,6 +1499,17 @@ void dmx_state::dmx(machine_config &config)
+ 	m_maincpu->set_addrmap(AS_PROGRAM, &dmx_state::memory_map);
+ 	m_maincpu->set_addrmap(AS_IO, &dmx_state::io_map);
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	// VES Virtual MIDI Retrofit. This intentionally non-historical input
++	// pulses only the DMX's pre-existing scanned panel audition buttons.
++	I8251(config, m_virtual_midi_uart, 0);
++	m_virtual_midi_uart->rxrdy_handler().set(FUNC(dmx_state::virtual_midi_rxrdy_w));
++	CLOCK(config, "ves_virtual_midi_clock", 500_kHz_XTAL)
++		.signal_handler().set(m_virtual_midi_uart, FUNC(i8251_device::write_rxc));
++	MIDI_PORT(config, "ves_virtual_midiin", midiin_slot, "midiin")
++		.rxd_handler().set(m_virtual_midi_uart, FUNC(i8251_device::write_rxd));
++#endif
++
+ 	NVRAM(config, NVRAM_TAG, nvram_device::DEFAULT_ALL_0);
+ 
+ 	// 40103 timer (U11 on Processor Board). See refresh_int_flipflop() and

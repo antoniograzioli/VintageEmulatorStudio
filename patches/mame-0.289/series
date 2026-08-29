@@ -1,0 +1,14 @@
+0001-ves-embedded-target-and-build.patch
+0002-ves-embedded-runtime-and-frontend.patch
+0003-ves-layout-plugin-lua-bindings.patch
+0010-virtual-midi-prophet5.patch
+0011-virtual-midi-linndrum.patch
+0012-virtual-midi-obdmx.patch
+0013-virtual-midi-yamaha-psr11.patch
+0014-virtual-midi-yamaha-psr-pss.patch
+0020-add-yamaha-tg100-experimental-profile.patch
+0021-add-akai-s3000xl-experimental-media.patch
+0022-fix-s3000xl-startup-image-options.patch
+0023-add-akai-cd3000xl-experimental-profile.patch
+0024-add-akai-cd3000i-experimental-profile.patch
+0025-add-akai-s2000-s3000-experimental-profiles.patch

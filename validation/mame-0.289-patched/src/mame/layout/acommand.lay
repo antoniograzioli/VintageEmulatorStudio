@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_red"><rect><color red="0.65" green="0.05" blue="0.05" /></rect></element>
+	<element name="static_yellow"><rect><color red="0.8" green="0.75" blue="0.05" /></rect></element>
+	<element name="text_score"><text string="SCORE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<screen index="0">
+			<bounds x="100" y="0" width="40" height="30" />
+		</screen>
+
+		<collection name="Left Score">
+			<element ref="text_score"><bounds x="55" y="0" width="40" height="5" /></element>
+			<element ref="static_yellow"><bounds x="55" y="5" width="40" height="25" /></element>
+			<element ref="static_black"><bounds x="58" y="8" width="34" height="19" /></element>
+			<element name="digit2" ref="digit"><bounds x="60" y="10" width="10" height="15" /></element>
+			<element name="digit1" ref="digit"><bounds x="70" y="10" width="10" height="15" /></element>
+			<element name="digit0" ref="digit"><bounds x="80" y="10" width="10" height="15" /></element>
+		</collection>
+
+		<collection name="Right Score">
+			<element ref="text_score"><bounds x="145" y="0" width="40" height="5" /></element>
+			<element ref="static_red"><bounds x="145" y="5" width="40" height="25" /></element>
+			<element ref="static_black"><bounds x="148" y="8" width="34" height="19" /></element>
+			<element name="digit3" ref="digit"><bounds x="150" y="10" width="10" height="15" /></element>
+			<element name="digit5" ref="digit"><bounds x="160" y="10" width="10" height="15" /></element>
+			<element name="digit4" ref="digit"><bounds x="170" y="10" width="10" height="15" /></element>
+		</collection>
+	</view>
+</mamelayout>

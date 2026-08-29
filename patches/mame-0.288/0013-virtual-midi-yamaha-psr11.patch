@@ -1,0 +1,163 @@
+diff --git a/src/mame/yamaha/ympsr11.cpp b/src/mame/yamaha/ympsr11.cpp
+index 1fdaa46..e0d0dc6 100644
+--- a/src/mame/yamaha/ympsr11.cpp
++++ b/src/mame/yamaha/ympsr11.cpp
+@@ -6,10 +6,30 @@
+ #include "sound/ymopl.h"
+ #include "speaker.h"
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++#include "bus/midi/midi.h"
++#include "machine/clock.h"
++#include "machine/i8251.h"
++#endif
++
+ #include "psr11.lh"
+ 
+ namespace {
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++struct virtual_midi_key { u8 port, mask; };
++constexpr std::array<virtual_midi_key, 49> virtual_midi_key_map = {{
++	{7,0x40},{7,0x20},{7,0x10},{7,0x08},{7,0x04},{7,0x02},{7,0x01},
++	{6,0x20},{6,0x10},{6,0x08},{6,0x04},{6,0x02},{6,0x01},
++	{5,0x20},{5,0x10},{5,0x08},{5,0x04},{5,0x02},{5,0x01},
++	{4,0x20},{4,0x10},{4,0x08},{4,0x04},{4,0x02},{4,0x01},
++	{3,0x20},{3,0x10},{3,0x08},{3,0x04},{3,0x02},{3,0x01},
++	{2,0x20},{2,0x10},{2,0x08},{2,0x04},{2,0x02},{2,0x01},
++	{1,0x20},{1,0x10},{1,0x08},{1,0x04},{1,0x02},{1,0x01},
++	{0,0x20},{0,0x10},{0,0x08},{0,0x04},{0,0x02},{0,0x01}
++}};
++#endif
++
+ class yamaha_psr11_state : public driver_device
+ {
+ public:
+@@ -17,6 +37,9 @@ public:
+ 		: driver_device(mconfig, type, tag)
+ 		, m_maincpu(*this, "maincpu")
+ 		, m_ym3812(*this, "opl2")
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++		, m_virtual_midi_uart(*this, "ves_virtual_midi_uart")
++#endif
+ 		, m_keys(*this, "P%u", 0U)
+ 		, m_tempo_led(*this, "led")
+ 	{
+@@ -26,14 +49,31 @@ public:
+ 
+ protected:
+ 	virtual void machine_start() override ATTR_COLD;
++	virtual void machine_reset() override ATTR_COLD;
+ 
+ private:
+ 	void map(address_map &map) ATTR_COLD;
+ 
+ 	u8 p2_r();
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	void virtual_midi_rxrdy_w(int state);
++	void virtual_midi_byte_w(u8 data);
++	void virtual_midi_note_w(u8 note, bool pressed);
++	void clear_virtual_midi_state();
++	void virtual_midi_machine_stop();
++#endif
++
+ 	required_device<hd6301y0_cpu_device> m_maincpu;
+ 	required_device<ym3812_device> m_ym3812;
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	required_device<i8251_device> m_virtual_midi_uart;
++	std::array<u8, 8> m_virtual_midi_ports{};
++	std::array<u8, 49> m_virtual_midi_note_counts{};
++	u8 m_virtual_midi_running_status = 0;
++	u8 m_virtual_midi_data[2]{};
++	u8 m_virtual_midi_data_count = 0;
++#endif
+ 	required_ioport_array<17> m_keys;
+ 	output_finder<> m_tempo_led;
+ 
+@@ -46,6 +86,23 @@ void yamaha_psr11_state::machine_start()
+ 
+ 	save_item(NAME(m_p5));
+ 	save_item(NAME(m_p6));
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	save_item(NAME(m_virtual_midi_ports));
++	save_item(NAME(m_virtual_midi_note_counts));
++	save_item(NAME(m_virtual_midi_running_status));
++	save_item(NAME(m_virtual_midi_data));
++	save_item(NAME(m_virtual_midi_data_count));
++	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&yamaha_psr11_state::virtual_midi_machine_stop, this));
++#endif
++}
++
++void yamaha_psr11_state::machine_reset()
++{
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	clear_virtual_midi_state();
++	m_virtual_midi_uart->control_w(0x4e);
++	m_virtual_midi_uart->control_w(0x04);
++#endif
+ }
+ 
+ void yamaha_psr11_state::map(address_map &map)
+@@ -86,11 +143,45 @@ u8 yamaha_psr11_state::p2_r()
+ 	if((p6 == 0x20) && (i < 4))
+ 		return m_keys[i + 8]->read();
+ 	else if(!p6 && (i < 8))
+-		return m_keys[i]->read();
++	{
++		u8 physical = m_keys[i]->read();
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++		physical |= m_virtual_midi_ports[i];
++#endif
++		return physical;
++	}
+ 
+ 	return 0;
+ }
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++void yamaha_psr11_state::virtual_midi_rxrdy_w(int state) { if (state) virtual_midi_byte_w(m_virtual_midi_uart->data_r()); }
++void yamaha_psr11_state::virtual_midi_note_w(u8 note, bool pressed)
++{
++	if (note < 36 || note > 84) return;
++	const unsigned index = note - 36; const auto key = virtual_midi_key_map[index]; u8 &count = m_virtual_midi_note_counts[index];
++	if (pressed) { if (count != 0xff) ++count; m_virtual_midi_ports[key.port] |= key.mask; }
++	else if (count && --count == 0) m_virtual_midi_ports[key.port] &= ~key.mask;
++}
++void yamaha_psr11_state::clear_virtual_midi_state()
++{
++	m_virtual_midi_ports.fill(0); m_virtual_midi_note_counts.fill(0); m_virtual_midi_running_status = 0; m_virtual_midi_data[0] = m_virtual_midi_data[1] = m_virtual_midi_data_count = 0;
++}
++void yamaha_psr11_state::virtual_midi_byte_w(u8 data)
++{
++	if (data >= 0xf8) return;
++	if (data & 0x80) { m_virtual_midi_running_status = data < 0xf0 ? data : 0; m_virtual_midi_data_count = 0; return; }
++	if (!m_virtual_midi_running_status) return;
++	const u8 type = m_virtual_midi_running_status & 0xf0, size = (type == 0xc0 || type == 0xd0) ? 1 : 2;
++	m_virtual_midi_data[m_virtual_midi_data_count++] = data; if (m_virtual_midi_data_count != size) return;
++	if (type == 0x80) virtual_midi_note_w(m_virtual_midi_data[0], false);
++	else if (type == 0x90) virtual_midi_note_w(m_virtual_midi_data[0], m_virtual_midi_data[1] != 0);
++	else if (type == 0xb0 && (m_virtual_midi_data[0] == 120 || m_virtual_midi_data[0] == 123)) { m_virtual_midi_ports.fill(0); m_virtual_midi_note_counts.fill(0); }
++	m_virtual_midi_data_count = 0;
++}
++void yamaha_psr11_state::virtual_midi_machine_stop() { clear_virtual_midi_state(); }
++#endif
++
+ static INPUT_PORTS_START(psr11)
+ 	PORT_START("P0")
+ 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C 6")
+@@ -267,6 +358,14 @@ void yamaha_psr11_state::psr11(machine_config &config)
+ 	SPEAKER(config, "mono").front_center();
+ 	YM3812(config, m_ym3812, 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 3.00);
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	// VES Virtual MIDI Retrofit: contributes only to the existing key scan.
++	I8251(config, m_virtual_midi_uart, 0);
++	m_virtual_midi_uart->rxrdy_handler().set(FUNC(yamaha_psr11_state::virtual_midi_rxrdy_w));
++	CLOCK(config, "ves_virtual_midi_clock", 500_kHz_XTAL).signal_handler().set(m_virtual_midi_uart, FUNC(i8251_device::write_rxc));
++	MIDI_PORT(config, "ves_virtual_midiin", midiin_slot, "midiin").rxd_handler().set(m_virtual_midi_uart, FUNC(i8251_device::write_rxd));
++#endif
++
+ 	config.set_default_layout(layout_psr11);
+ }
+ 

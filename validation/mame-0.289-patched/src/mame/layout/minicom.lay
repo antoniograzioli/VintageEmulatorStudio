@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led14seg>
+			<color red="0.0" green="0.75" blue="0.75" />
+		</led14seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.09375" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<!-- Black background -->
+		<element ref="background">
+			<bounds left="00" top="00" right="1380" bottom="130" />
+		</element>
+
+		<!-- 20 digits -->
+		<element name="digit0" ref="digit">
+			<bounds x="0" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit1" ref="digit">
+			<bounds x="70" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit2" ref="digit">
+			<bounds x="140" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit3" ref="digit">
+			<bounds x="210" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit4" ref="digit">
+			<bounds x="280" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit5" ref="digit">
+			<bounds x="350" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit6" ref="digit">
+			<bounds x="420" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit7" ref="digit">
+			<bounds x="490" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit8" ref="digit">
+			<bounds x="560" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit9" ref="digit">
+			<bounds x="630" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit10" ref="digit">
+			<bounds x="700" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit11" ref="digit">
+			<bounds x="770" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit12" ref="digit">
+			<bounds x="840" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit13" ref="digit">
+			<bounds x="910" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit14" ref="digit">
+			<bounds x="980" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit15" ref="digit">
+			<bounds x="1050" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit16" ref="digit">
+			<bounds x="1120" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit17" ref="digit">
+			<bounds x="1190" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit18" ref="digit">
+			<bounds x="1260" y="15" width="50" height="80" />
+		</element>
+
+		<element name="digit19" ref="digit">
+			<bounds x="1330" y="15" width="50" height="80" />
+		</element>
+
+	</view>
+</mamelayout>

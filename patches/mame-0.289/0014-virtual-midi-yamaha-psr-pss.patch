@@ -1,0 +1,296 @@
+diff --git a/src/mame/yamaha/ympsr150.cpp b/src/mame/yamaha/ympsr150.cpp
+index 94ff955..244d6c5 100644
+--- a/src/mame/yamaha/ympsr150.cpp	
++++ b/src/mame/yamaha/ympsr150.cpp	
+@@ -45,6 +45,12 @@
+ #include "screen.h"
+ #include "speaker.h"
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++#include "bus/midi/midi.h"
++#include "machine/clock.h"
++#include "machine/i8251.h"
++#endif
++
+ #include "dd9.lh"
+ #include "psr110.lh"
+ #include "psr150.lh"
+@@ -59,6 +65,82 @@
+ 
+ namespace {
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++struct psr75_virtual_key { u8 port, mask; };
++constexpr std::array<psr75_virtual_key, 49> psr75_virtual_key_map = {{
++	{0,0x01},{1,0x20},{1,0x10},{1,0x08},{1,0x04},{1,0x02},{1,0x01},
++	{2,0x20},{2,0x10},{2,0x08},{2,0x04},{2,0x02},{2,0x01},
++	{3,0x20},{3,0x10},{3,0x08},{3,0x04},{3,0x02},{3,0x01},
++	{4,0x20},{4,0x10},{4,0x08},{4,0x04},{4,0x02},{4,0x01},
++	{5,0x20},{5,0x10},{5,0x08},{5,0x04},{5,0x02},{5,0x01},
++	{6,0x20},{6,0x10},{6,0x08},{6,0x04},{6,0x02},{6,0x01},
++	{7,0x20},{7,0x10},{7,0x08},{7,0x04},{7,0x02},{7,0x01},
++	{8,0x20},{8,0x10},{8,0x08},{8,0x04},{8,0x02},{8,0x01}
++}};
++constexpr std::array<psr75_virtual_key, 49> psr76_virtual_key_map = {{
++	{4,0x20},{6,0x01},{6,0x02},{6,0x04},{6,0x08},{6,0x10},{6,0x20},
++	{8,0x01},{8,0x02},{8,0x04},{8,0x08},{8,0x10},{8,0x20},
++	{3,0x01},{3,0x02},{3,0x04},{3,0x08},{3,0x10},{3,0x20},
++	{2,0x01},{2,0x02},{2,0x04},{2,0x08},{2,0x10},{2,0x20},
++	{5,0x01},{5,0x02},{5,0x04},{5,0x08},{5,0x10},{5,0x20},
++	{0,0x01},{0,0x02},{0,0x04},{0,0x08},{0,0x10},{0,0x20},
++	{7,0x01},{7,0x02},{7,0x04},{7,0x08},{7,0x10},{7,0x20},
++	{1,0x01},{1,0x02},{1,0x04},{1,0x08},{1,0x10},{1,0x20}
++}};
++constexpr std::array<psr75_virtual_key, 49> psr110_virtual_key_map = {{
++	{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},
++	{4,0x01},{4,0x02},{4,0x04},{4,0x08},{4,0x10},{4,0x20},
++	{3,0x01},{3,0x02},{3,0x04},{3,0x08},{3,0x10},{3,0x20},
++	{2,0x01},{2,0x02},{2,0x04},{2,0x08},{2,0x10},{2,0x20},
++	{1,0x01},{1,0x02},{1,0x04},{1,0x08},{1,0x10},{1,0x20},
++	{0,0x01},{0,0x02},{0,0x04},{0,0x08},{0,0x10},{0,0x20},
++	{8,0x01},{8,0x02},{8,0x04},{8,0x08},{8,0x10},{8,0x20},
++	{7,0x01},{7,0x02},{7,0x04},{7,0x08},{7,0x10},{7,0x20}
++}};
++constexpr std::array<psr75_virtual_key, 61> psr150_virtual_key_map = {{
++	{9,1},{4,2},{4,0x20},{4,0x10},{4,8},{4,4},{4,1},{5,2},{5,0x20},{5,0x10},{5,8},{5,4},
++	{5,1},{6,2},{6,0x20},{6,0x10},{6,8},{6,4},{6,1},{10,2},{10,0x20},{10,0x10},{10,8},{10,4},
++	{10,1},{7,2},{7,0x20},{7,0x10},{7,8},{7,4},{7,1},{2,2},{2,0x20},{2,0x10},{2,8},{2,4},
++	{2,1},{1,2},{1,0x20},{1,0x10},{1,8},{1,4},{1,1},{3,2},{3,0x20},{3,0x10},{3,8},{3,4},
++	{3,1},{8,2},{8,0x20},{8,0x10},{8,8},{8,4},{8,1},{0,2},{0,0x20},{0,0x10},{0,8},{0,4},{0,1}
++}};
++constexpr std::array<psr75_virtual_key, 61> psr180_virtual_key_map = {{
++	{1,4},{4,2},{4,0x20},{4,0x10},{4,8},{4,1},{4,4},{3,2},{3,0x20},{3,0x10},{3,8},{3,1},
++	{3,4},{2,2},{2,0x20},{2,0x10},{2,8},{2,1},{2,4},{0,2},{0,0x20},{0,0x10},{0,8},{0,1},
++	{0,4},{6,2},{6,0x20},{6,0x10},{6,8},{6,1},{6,4},{7,2},{7,0x20},{7,0x10},{7,8},{7,1},
++	{7,4},{5,2},{5,0x20},{5,0x10},{5,8},{5,1},{5,4},{8,2},{8,0x20},{8,0x10},{8,8},{8,1},
++	{8,4},{9,2},{9,0x20},{9,0x10},{9,8},{9,1},{9,4},{10,2},{10,0x20},{10,0x10},{10,8},{10,1},{10,4}
++}};
++constexpr std::array<psr75_virtual_key, 61> pss11_virtual_key_map = {{
++	{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},
++	{5,2},{5,1},{4,0x20},{4,0x10},{4,8},{4,4},{4,2},{4,1},{3,0x20},{3,0x10},{3,8},{3,4},{3,2},{3,1},
++	{2,0x20},{2,0x10},{2,8},{2,4},{2,2},{2,1},{1,0x20},{1,0x10},{1,8},{1,4},{1,2},{1,1},
++	{0,0x20},{0,0x10},{0,8},{0,4},{0,2},{0,1}
++}};
++constexpr std::array<psr75_virtual_key, 61> pss6_virtual_key_map = {{
++	{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},
++	{0,0x20},{0,0x10},{0,8},{0,4},{0,2},{0,1},{4,8},{3,8},{2,8},{1,8},{0,8},{4,4},{3,4},{2,4},
++	{1,4},{0,4},{7,2},{6,2},{5,2},{4,2},{3,2},{2,2},{1,2},{0,2},{7,1},{6,1},{5,1},{4,1},{3,1},{2,1},{1,1},{0,1}
++}};
++constexpr std::array<psr75_virtual_key, 49> pss31_virtual_key_map = {{
++	{6,0x20},{5,1},{5,2},{5,4},{5,8},{5,0x10},{5,0x20},{4,1},{4,2},{4,4},{4,8},{4,0x10},{4,0x20},
++	{3,1},{3,2},{3,4},{3,8},{3,0x10},{3,0x20},{2,1},{2,2},{2,4},{2,8},{2,0x10},{2,0x20},
++	{1,1},{1,2},{1,4},{1,8},{1,0x10},{1,0x20},{0,1},{0,2},{0,4},{0,8},{0,0x10},{0,0x20},
++	{8,1},{8,2},{8,4},{8,8},{8,0x10},{8,0x20},{7,1},{7,2},{7,4},{7,8},{7,0x10},{7,0x20}
++}};
++constexpr std::array<psr75_virtual_key, 49> pss21_virtual_key_map = {{
++	{6,0x20},{5,1},{5,2},{5,4},{5,8},{5,0x10},{5,0x20},{4,1},{4,2},{4,4},{4,8},{4,0x10},{4,0x20},
++	{3,1},{3,2},{3,4},{3,8},{3,0x10},{3,0x20},{2,1},{2,2},{2,4},{2,8},{2,0x10},{2,0x20},
++	{1,1},{1,2},{1,4},{1,8},{1,0x10},{1,0x20},{0,1},{0,2},{0,4},{0,8},{0,0x10},{0,0x20}
++}};
++constexpr std::array<psr75_virtual_key, 61> pss12_virtual_key_map = {{
++	{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},
++	{0,0x10},{0,0x20},{1,1},{1,2},{1,4},{1,8},{1,0x10},{1,0x20},{2,1},{2,2},{2,4},{2,8},{2,0x10},{2,0x20},
++	{3,1},{3,2},{3,4},{3,8},{3,0x10},{3,0x20},{4,1},{4,2},{4,4},{4,8},{4,0x10},{4,0x20},
++	{5,1},{5,2},{5,4},{5,8},{5,0x10},{5,0x20}
++}};
++#endif
++
+ class psr150_state : public driver_device
+ {
+ public:
+@@ -81,6 +163,7 @@ public:
+ 	void pss21(machine_config &config);
+ 	void pss31(machine_config &config);
+ 	void psr75(machine_config &config);
++	void psr75_virtual_midi(machine_config &config);
+ 	void pss11(machine_config &config);
+ 	void dd9(machine_config &config);
+ 	void psr180_base(machine_config &config);
+@@ -125,12 +208,20 @@ public:
+ 
+ private:
+ 	virtual void driver_start() override;
++	virtual void machine_reset() override;
++	void virtual_midi_rxrdy_w(int state); void virtual_midi_byte_w(u8 data); void virtual_midi_note_w(u8 note, bool pressed); void clear_virtual_midi_state(); void virtual_midi_machine_stop();
+ 
+ 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+ 
+ 	required_device<gew7_device> m_maincpu;
+ 	optional_device<pwm_display_device> m_pwm;
+ 	optional_device<ks0066_device> m_lcdc;
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	optional_device<i8251_device> m_virtual_midi_uart{*this, "ves_virtual_midi_uart"};
++	std::array<u8, 11> m_virtual_midi_ports{}; std::array<u8, 61> m_virtual_midi_counts{}; u8 m_virtual_midi_status = 0, m_virtual_midi_data[2]{}, m_virtual_midi_count = 0;
++	const psr75_virtual_key *m_virtual_midi_key_map = psr75_virtual_key_map.data();
++	u8 m_virtual_midi_low = 24, m_virtual_midi_high = 72;
++#endif
+ 
+ 	optional_ioport_array<6> m_port;
+ 	optional_ioport_array<19> m_keys;
+@@ -167,7 +258,12 @@ ioport_value psr150_state::keys_r()
+ 	ioport_value result = 0;
+ 	for (unsigned i = 0U; i < m_keys.size(); i++)
+ 		if (BIT(m_key_sel, i))
++		{
+ 			result |= m_keys[i].read_safe(0);
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++			if (m_virtual_midi_uart && i < m_virtual_midi_ports.size()) result |= m_virtual_midi_ports[i];
++#endif
++		}
+ 
+ 	return result >> StartBit;
+ }
+@@ -222,8 +318,19 @@ void psr150_state::driver_start()
+ 
+ 	save_item(NAME(m_key_sel));
+ 	save_item(NAME(m_pwm_col));
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	save_item(NAME(m_virtual_midi_ports)); save_item(NAME(m_virtual_midi_counts)); save_item(NAME(m_virtual_midi_status)); save_item(NAME(m_virtual_midi_data)); save_item(NAME(m_virtual_midi_count)); save_item(NAME(m_virtual_midi_low)); save_item(NAME(m_virtual_midi_high));
++	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&psr150_state::virtual_midi_machine_stop, this));
++#endif
+ }
+ 
++void psr150_state::machine_reset() { clear_virtual_midi_state(); if (m_virtual_midi_uart) { m_virtual_midi_uart->control_w(0x4e); m_virtual_midi_uart->control_w(0x04); } }
++void psr150_state::virtual_midi_rxrdy_w(int state) { if (state) virtual_midi_byte_w(m_virtual_midi_uart->data_r()); }
++void psr150_state::virtual_midi_note_w(u8 note, bool pressed) { if (!m_virtual_midi_uart || note < m_virtual_midi_low || note > m_virtual_midi_high) return; auto const i = note - 24; auto const k = m_virtual_midi_key_map[i]; auto &c = m_virtual_midi_counts[i]; if (pressed) { if (c != 0xff) ++c; m_virtual_midi_ports[k.port] |= k.mask; } else if (c && --c == 0) m_virtual_midi_ports[k.port] &= ~k.mask; }
++void psr150_state::clear_virtual_midi_state() { m_virtual_midi_ports.fill(0); m_virtual_midi_counts.fill(0); m_virtual_midi_status = m_virtual_midi_count = 0; m_virtual_midi_data[0] = m_virtual_midi_data[1] = 0; }
++void psr150_state::virtual_midi_byte_w(u8 d) { if (d >= 0xf8) return; if (d & 0x80) { m_virtual_midi_status = d < 0xf0 ? d : 0; m_virtual_midi_count = 0; return; } if (!m_virtual_midi_status) return; auto const t = m_virtual_midi_status & 0xf0, n = (t == 0xc0 || t == 0xd0) ? 1 : 2; m_virtual_midi_data[m_virtual_midi_count++] = d; if (m_virtual_midi_count != n) return; if (t == 0x80) virtual_midi_note_w(m_virtual_midi_data[0], false); else if (t == 0x90) virtual_midi_note_w(m_virtual_midi_data[0], m_virtual_midi_data[1] != 0); else if (t == 0xb0 && (m_virtual_midi_data[0] == 120 || m_virtual_midi_data[0] == 123)) { m_virtual_midi_ports.fill(0); m_virtual_midi_counts.fill(0); } m_virtual_midi_count = 0; }
++void psr150_state::virtual_midi_machine_stop() { clear_virtual_midi_state(); }
++
+ 
+ void psr150_state::psr150(machine_config &config)
+ {
+@@ -244,18 +351,32 @@ void psr150_state::psr150(machine_config &config)
+ 
+ 	SPEAKER(config, "speaker", 2).front();
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	m_virtual_midi_key_map = psr150_virtual_key_map.data();
++	m_virtual_midi_low = 24; m_virtual_midi_high = 84;
++	psr75_virtual_midi(config);
++#endif
++
+ 	config.set_default_layout(layout_psr150);
+ }
+ 
+ void psr150_state::psr110(machine_config &config)
+ {
+ 	psr150(config);
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	m_virtual_midi_key_map = psr110_virtual_key_map.data();
++	m_virtual_midi_low = 31;
++#endif
+ 	config.set_default_layout(layout_psr110);
+ }
+ 
+ void psr150_state::pss21(machine_config &config)
+ {
+ 	psr150(config);
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	m_virtual_midi_key_map = pss21_virtual_key_map.data();
++	m_virtual_midi_low = 24; m_virtual_midi_high = 60;
++#endif
+ 	// bits 6-7 indicate model (see also pss11, pss31, psr75)
+ 	m_maincpu->port_force_bits(5, 0x40, 0xc0);
+ 
+@@ -265,6 +386,10 @@ void psr150_state::pss21(machine_config &config)
+ void psr150_state::pss31(machine_config &config)
+ {
+ 	psr150(config);
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	m_virtual_midi_key_map = pss31_virtual_key_map.data();
++	m_virtual_midi_low = 24; m_virtual_midi_high = 72;
++#endif
+ 	// bits 6-7 indicate model (see also pss11, pss21, psr75)
+ 	m_maincpu->port_force_bits(5, 0x80, 0xc0);
+ 
+@@ -291,6 +416,16 @@ void psr150_state::psr75(machine_config &config)
+ 	SPEAKER(config, "speaker").front_center();
+ 
+ 	config.set_default_layout(layout_psr75);
++	psr75_virtual_midi(config);
++}
++
++void psr150_state::psr75_virtual_midi(machine_config &config)
++{
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	I8251(config, m_virtual_midi_uart, 0); m_virtual_midi_uart->rxrdy_handler().set(FUNC(psr150_state::virtual_midi_rxrdy_w));
++	CLOCK(config, "ves_virtual_midi_clock", 500_kHz_XTAL).signal_handler().set(m_virtual_midi_uart, FUNC(i8251_device::write_rxc));
++	MIDI_PORT(config, "ves_virtual_midiin", midiin_slot, "midiin").rxd_handler().set(m_virtual_midi_uart, FUNC(i8251_device::write_rxd));
++#endif
+ }
+ 
+ void psr150_state::pss11(machine_config &config)
+@@ -311,6 +446,12 @@ void psr150_state::pss11(machine_config &config)
+ 
+ 	SPEAKER(config, "speaker").front_center();
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	m_virtual_midi_key_map = pss11_virtual_key_map.data();
++	m_virtual_midi_low = 41; m_virtual_midi_high = 72;
++	psr75_virtual_midi(config);
++#endif
++
+ 	config.set_default_layout(layout_pss11);
+ }
+ 
+@@ -350,6 +491,11 @@ void psr150_state::psr180_base(machine_config &config)
+ void psr150_state::psr180(machine_config &config)
+ {
+ 	psr180_base(config);
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	m_virtual_midi_key_map = psr180_virtual_key_map.data();
++	m_virtual_midi_low = 24; m_virtual_midi_high = 84;
++	psr75_virtual_midi(config);
++#endif
+ 	m_maincpu->add_route(0, "lfilter", 1.0);
+ 	m_maincpu->add_route(1, "rfilter", 1.0);
+ 
+@@ -366,6 +512,12 @@ void psr150_state::psr180(machine_config &config)
+ void psr150_state::psr76(machine_config &config)
+ {
+ 	psr180_base(config);
++	// PSR-76 uses its own PORT_GM-derived electrical key map.
++
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	m_virtual_midi_key_map = psr76_virtual_key_map.data();
++	psr75_virtual_midi(config);
++#endif
+ 	m_maincpu->add_route(0, "filter", 1.0);
+ 
+ 	// set up AC filter since the keyboard purposely outputs a DC offset when idle
+@@ -393,6 +545,12 @@ void psr150_state::pss12(machine_config &config)
+ 
+ 	SPEAKER(config, "speaker").front_center();
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	m_virtual_midi_key_map = pss12_virtual_key_map.data();
++	m_virtual_midi_low = 41; m_virtual_midi_high = 72;
++	psr75_virtual_midi(config);
++#endif
++
+ 	config.set_default_layout(layout_pss12);
+ }
+ 
+@@ -409,6 +567,12 @@ void psr150_state::pss6(machine_config &config)
+ 
+ 	SPEAKER(config, "speaker").front_center();
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	m_virtual_midi_key_map = pss6_virtual_key_map.data();
++	m_virtual_midi_low = 41; m_virtual_midi_high = 72;
++	psr75_virtual_midi(config);
++#endif
++
+ 	config.set_default_layout(layout_pss6);
+ }
+ 
+@@ -1142,7 +1306,7 @@ INPUT_PORTS_START( pss12 )
+ 
+ 	PORT_START("KEY5")
+ 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_GM_G4
+-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_GM_GS3
++	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_GM_GS4
+ 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_GM_A4
+ 	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_GM_AS4
+ 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_GM_B4

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<!-- not really black, and not really leds either, but let's just keep the same naming as the other hh test layouts -->
+	<element name="static_black"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.5412" green="0.57255" blue="0.5804" /></disk>
+		<disk state="1"><color red="0.361" green="0.326" blue="0.346" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Test Layout">
+		<bounds left="0" right="10" top="0" bottom="12" />
+		<element ref="static_black">
+			<bounds left="0" right="10" top="0" bottom="12" />
+		</element>
+
+		<!-- max 12*4*2 matrix -->
+		<repeat count="12">
+			<param name="y" start="0" increment="1" />
+
+			<!-- h1 -->
+			<repeat count="4">
+				<param name="x" start="0" increment="1" />
+				<param name="p" start="0" increment="1" />
+				<element name="~y~.~x~.0" ref="led"><bounds x="~p~" y="~y~" width="0.5" height="0.5" /></element>
+			</repeat>
+
+			<!-- h2 -->
+			<repeat count="4">
+				<param name="x" start="0" increment="1" />
+				<param name="p" start="5" increment="1" />
+				<element name="~y~.~x~.1" ref="led"><bounds x="~p~" y="~y~" width="0.5" height="0.5" /></element>
+			</repeat>
+		</repeat>
+
+	</view>
+</mamelayout>

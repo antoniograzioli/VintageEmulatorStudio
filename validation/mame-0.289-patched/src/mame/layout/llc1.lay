@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Robbbert
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<group name="leds">
+		<element name="digit0" ref="digit">
+			<bounds x="0" y="0" width="34" height="38" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="44" y="0" width="34" height="38" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="88" y="0" width="34" height="38" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="132" y="0" width="34" height="38" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="176" y="0" width="34" height="38" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="220" y="0" width="34" height="38" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds x="264" y="0" width="34" height="38" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds x="308" y="0" width="34" height="38" />
+		</element>
+	</group>
+
+	<view name="Default Layout">
+		<bounds left="0" top="0" right="362" bottom="310" />
+
+		<screen index="0">
+			<bounds x="0" y="0" width="362" height="262" />
+		</screen>
+
+		<group ref="leds">
+			<bounds left="10" top="267" right="352" bottom="305" />
+		</group>
+	</view>
+	<view name="LEDs Only">
+		<bounds left="0" top="0" right="362" bottom="69" />
+
+		<group ref="leds">
+			<bounds left="10" top="10" right="352" bottom="59" />
+		</group>
+	</view>
+
+</mamelayout>

@@ -1,0 +1,1154 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="SteppersReel1">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="bell">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7  sym"> <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="single bar"> <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="triple bar"> <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon  sym"> <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="double bar"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+	<element name="SteppersReel2">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="bell">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="sbar   sym"> <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="triple bar"> <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="dbar   sym"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+	<element name="SteppersReel3">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="bell">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="single bar"> <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="triple bar"> <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon  sym"> <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="double bar"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon  sym"> <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+	<element name="SteppersReel4">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="bell">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="single bar"> <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum   sym"> <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="triple bar"> <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blank">      <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="dbar   sym"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+	<element name="SteppersReel5">
+		<rect> <bounds x="0" y="0" width="50" height="204"/> <color alpha="0.0"/> </rect>
+		<text string="num 12"> <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 11"> <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 10"> <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 9">  <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 8">  <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 7">  <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 6">  <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 5">  <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 4">  <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 3">  <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 2">  <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 1">  <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+	<element name="SteppersReel6">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="10p">        <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="20p">        <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="50p">        <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="4PND">       <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1p">         <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="2PND">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="3PND">       <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1PND">       <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="meg streak"> <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1.50PND">    <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="2.50PND">    <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="3.50PND">    <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="5PND">       <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="30p">        <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="40p">        <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="80p">        <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+	<element name="SteppersReel7">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="4PND">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="10p">        <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="20p">        <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="50p">        <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1p">         <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="2PND">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="3PND">       <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1PND">       <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="meg streak"> <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="6PND">       <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="7PND">       <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="8PND">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="10PND">      <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="15PND">      <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="25PND">      <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="5PND">       <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+	<element name="lamplabelel0"><text string="cancel"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel1"><text string="hold1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel2"><text string="hold2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel3"><text string="hold3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel4"><text string="hold4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel5"><text string="chnge stk"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel6"><text string="collect"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel7"><text string="transfer"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel8"><text string="cash bust"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel9"><text string="4 nudges"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel10"><text string="3 nudges"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel11"><text string="2 nudges"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel12"><text string="1 nudge"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel13"><text string="(00:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel14"><text string="(00:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel15"><text string="(00:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel16"><text string="strt exch"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel17"><text string="nudges"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel18"><text string="stake   1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel19"><text string="stake   2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel20"><text string="bot sym 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel21"><text string="bot sym 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel22"><text string="bot sym 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel23"><text string="botsymon1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel24"><text string="botsymon2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel25"><text string="botsymon3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel26"><text string="reel arrw"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel27"><text string="feat 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel28"><text string="feat 1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel29"><text string="cash 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel30"><text string="cash 1 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel31"><text string="(01:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel32"><text string="reel1 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel33"><text string="reel1 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel34"><text string="reel1 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel35"><text string="reel2 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel36"><text string="reel2 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel37"><text string="reel2 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel38"><text string="(02:06)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel39"><text string="acceptor"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel40"><text string="(02:08)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel41"><text string="lose"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel42"><text string="feat 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel43"><text string="feat 2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel44"><text string="cash 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel45"><text string="cash 2 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel46"><text string="(02:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel47"><text string="(02:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel48"><text string="reel3 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel49"><text string="reel3 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel50"><text string="reel3 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel51"><text string="reel4 top"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel52"><text string="reel4 mid"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel53"><text string="reel4 bot"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel54"><text string="feat 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel55"><text string="feat 3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel56"><text string="cash 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel57"><text string="cash 3 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel58"><text string="feat 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel59"><text string="feat 4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel60"><text string="cash 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel61"><text string="cash 4 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel62"><text string="cash 5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel63"><text string="cash 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel64"><text string="feat 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel65"><text string="hilo reel"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel66"><text string="feat 5 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel67"><text string="box red 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel68"><text string="box red 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel69"><text string="box red 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel70"><text string="name 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel71"><text string="name 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel72"><text string="name 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel73"><text string="name 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel74"><text string="name 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel75"><text string="name 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel76"><text string="(04:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel77"><text string="(04:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel78"><text string="(04:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel79"><text string="(04:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel80"><text string="board 14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel81"><text string="board 15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel82"><text string="board 16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel83"><text string="board 17"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel84"><text string="board 18"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel85"><text string="board 19"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel86"><text string="board 20"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel87"><text string="(05:07)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel88"><text string="board 21"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel89"><text string="bord20 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel90"><text string="innrbrd16"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel91"><text string="board 22"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel92"><text string="takeoffer"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel93"><text string="(05:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel94"><text string="(05:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel95"><text string="(05:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel96"><text string="board 13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel97"><text string="board 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel98"><text string="innrbrd11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel99"><text string="innrbrd10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel100"><text string="innrbrd12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel101"><text string="1p"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel102"><text string="innrbrd13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel103"><text string="innrbrd14"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel104"><text string="innrbrd15"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel105"><text string="5 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel106"><text string="innrbrd17"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel107"><text string="board 23"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel108"><text string="cash 14l"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel109"><text string="csh14 rrd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel110"><text string="(06:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel111"><text string="(06:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel112"><text string="board 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel113"><text string="innr brd9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel114"><text string="50p"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel115"><text string="20p"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel116"><text string="10p"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel117"><text string="6 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel118"><text string="7 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel119"><text string="8 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel120"><text string="innrbrd18"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel121"><text string="board 24"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel122"><text string="feat 13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel123"><text string="feat 13rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel124"><text string="cash 13"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel125"><text string="cash 13rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel126"><text string="cash 14r"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel127"><text string="csh14 lrd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel128"><text string="board 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel129"><text string="innr brd8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel130"><text string="3 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel131"><text string="2 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel132"><text string="1 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel133"><text string="10 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel134"><text string="15 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel135"><text string="25 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel136"><text string="innrbrd19"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel137"><text string="board 25"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel138"><text string="feat 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel139"><text string="feat 12rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel140"><text string="cash 12"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel141"><text string="cash 12rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel142"><text string="(08:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel143"><text string="insrt 5pd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel144"><text string="board 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel145"><text string="innr brd7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel146"><text string="deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel147"><text string="4 pnd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel148"><text string="mega strk"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel149"><text string="nodeal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel150"><text string="innrbrd20"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel151"><text string="board 26"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel152"><text string="feat 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel153"><text string="feat 11rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel154"><text string="cash 11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel155"><text string="cash 11rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel156"><text string="(09:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel157"><text string="(09:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel158"><text string="(09:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel159"><text string="insrt10pd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel160"><text string="board 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel161"><text string="innr brd6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel162"><text string="innr brd5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel163"><text string="innr brd4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel164"><text string="innr brd3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel165"><text string="innr brd2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel166"><text string="innr brd1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel167"><text string="board 27"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel168"><text string="feat 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel169"><text string="feat 10rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel170"><text string="cash 10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel171"><text string="cash 10rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel172"><text string="(10:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel173"><text string="(10:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel174"><text string="(10:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel175"><text string="insrt20pd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel176"><text string="board 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel177"><text string="board 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel178"><text string="bord 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel179"><text string="board 5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel180"><text string="board 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel181"><text string="board 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel182"><text string="board 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel183"><text string="board hi"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel184"><text string="board 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel185"><text string="board 28"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel186"><text string="feat 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel187"><text string="feat 9 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel188"><text string="cash 9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel189"><text string="cash 9 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel190"><text string="(11:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel191"><text string="no change"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel192"><text string="bonus 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel193"><text string="bonus 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel194"><text string="bonus 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel195"><text string="bonus 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel196"><text string="mstreak 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel197"><text string="mstreak 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel198"><text string="mstreak 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel199"><text string="mstreak 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel200"><text string="feat 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel201"><text string="feat 8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel202"><text string="cash 8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel203"><text string="cash 8 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel204"><text string="feat 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel205"><text string="feat 7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel206"><text string="cash 7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel207"><text string="cash 7 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel208"><text string="extralif1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel209"><text string="extralif2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel210"><text string="extralif3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel211"><text string="extralif4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel212"><text string="sstreak 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel213"><text string="sstreak 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel214"><text string="sstreak 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel215"><text string="sstreak 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel216"><text string="streak 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel217"><text string="streak 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel218"><text string="streak 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel219"><text string="feat 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel220"><text string="feat 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel221"><text string="cash 6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel222"><text string="cash 6 rd"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel223"><text string="(13:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel224"><text string="top sym 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel225"><text string="topsy r 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel226"><text string="top sym 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel227"><text string="topsy r 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel228"><text string="top sym 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel229"><text string="topsy r 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel230"><text string="top sym 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel231"><text string="board lo"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel232"><text string="no lose"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel233"><text string="streak 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel234"><text string="(14:10)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel235"><text string="(14:11)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel236"><text string="(14:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel237"><text string="(14:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel238"><text string="(14:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel239"><text string="(14:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel240"><text string="(15:00)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel241"><text string="(15:01)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel242"><text string="(15:02)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel243"><text string="(15:03)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel244"><text string="(15:04)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel245"><text string="(15:05)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel246"><text string="(15:06)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel247"><text string="(15:07)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel248"><text string="(15:08)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel249"><text string="(15:09)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel250"><text string="(15:10)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel251"><text string="(15:11)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel252"><text string="(15:12)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel253"><text string="(15:13)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel254"><text string="(15:14)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lamplabelel255"><text string="(15:15)"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+
+	<element name="inputlabel1-0"><text string="cancel"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel1-1"><text string="hold 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel1-2"><text string="hold 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel1-3"><text string="hold 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel1-4"><text string="hold 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel1-5"><text string="hpunit"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel2-0"><text string="cstake"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel2-1"><text string="colect"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel2-2"><text string="transf"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel2-3"><text string="refill"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel2-4"><text string="start"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel2-5"><text string="IN2-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel8-0"><text string="nodeal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel8-1"><text string="deal"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel8-2"><text string="c or b"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel8-3"><text string="IN8-3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel8-4"><text string="IN8-4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel8-5"><text string="IN8-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel9-0"><text string="IN9-0"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel9-1"><text string="IN9-1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel9-2"><text string="IN9-2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel9-3"><text string="IN9-3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel9-4"><text string="IN9-4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel9-5"><text string="IN9-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel10-0"><text string="IN10-0"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel10-1"><text string="IN10-1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel10-2"><text string="IN10-2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel10-3"><text string="IN10-3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel10-4"><text string="IN10-4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel10-5"><text string="IN10-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel20-0"><text string="grnbut"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel20-1"><text string="dorlok"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel20-2"><text string="serdor"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel20-3"><text string="cshdor"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel20-4"><text string="hopdmp"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="inputlabel20-5"><text string="IN20-5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="matrixlamp">
+		<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.7" green="0.7" blue="0.7" /></rect>
+		<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="0.0" blue="1.0" /></rect>
+		<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="1.0" blue="0.0" /></rect>
+	</element>
+	<element name="unusedlamp">
+		<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="0.0" blue="0.5" /></rect>
+		<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="0.5" blue="0.0" /></rect>
+	</element>
+	<element name="reellamp">
+		<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+	<element name="buttonlamp">
+		<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.6" green="0.7" blue="0.6" /></rect>
+		<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="1.0" blue="0.0" /></rect>
+		<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.0" green="0.0" blue="1.0" /></rect>
+	</element>
+	<element name="button">
+		<rect state ="0"><bounds x="0" y="0" width="7" height="7" /><color red="0.2" green="0.8" blue="0.2" /></rect>
+		<rect state ="1"><bounds x="0" y="0" width="7" height="7" /><color red="0.2" green="0.9" blue="0.2" /></rect>
+		<rect state ="2"><bounds x="0" y="0" width="7" height="7" /><color red="0.2" green="1.0" blue="0.2" /></rect>
+	</element>
+	<element name="vfd0">
+		<led14segsc><color red="0" green="0.6" blue="1.0" /></led14segsc>
+	</element>
+	<element name="digit" defstate="10">
+		<led7seg><color red="1.0" green="0.3" blue="0.0" /></led7seg>
+	</element>
+	<element name="Steppers" defstate="0">
+		<simplecounter maxstate="999" digits="3"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></simplecounter>
+	</element>
+
+
+	<view name="AWP Simulated Video (No Artwork)">
+		<element name="lamp0" ref="buttonlamp" state="0" inputtag="IN-1" inputmask="0x01"><bounds x="380" y="0" width="23" height="16" /></element>
+		<element name="lamplabel0" ref="lamplabelel0"><bounds x="380" y="-10" width="23" height="10" /></element>
+		<element name="lamp1" ref="buttonlamp" state="0" inputtag="IN-1" inputmask="0x02"><bounds x="404" y="0" width="23" height="16" /></element>
+		<element name="lamplabel1" ref="lamplabelel1"><bounds x="404" y="-10" width="23" height="10" /></element>
+		<element name="lamp2" ref="buttonlamp" state="0" inputtag="IN-1" inputmask="0x04"><bounds x="428" y="0" width="23" height="16" /></element>
+		<element name="lamplabel2" ref="lamplabelel2"><bounds x="428" y="-10" width="23" height="10" /></element>
+		<element name="lamp3" ref="buttonlamp" state="0" inputtag="IN-1" inputmask="0x08"><bounds x="452" y="0" width="23" height="16" /></element>
+		<element name="lamplabel3" ref="lamplabelel3"><bounds x="452" y="-10" width="23" height="10" /></element>
+		<element name="lamp4" ref="buttonlamp" state="0" inputtag="IN-1" inputmask="0x10"><bounds x="476" y="0" width="23" height="16" /></element>
+		<element name="lamplabel4" ref="lamplabelel4"><bounds x="476" y="-10" width="23" height="10" /></element>
+		<element name="lamp5" ref="buttonlamp" state="0" inputtag="IN-2" inputmask="0x01"><bounds x="500" y="0" width="23" height="16" /></element>
+		<element name="lamplabel5" ref="lamplabelel5"><bounds x="500" y="-10" width="23" height="10" /></element>
+		<element name="lamp6" ref="buttonlamp" state="0" inputtag="IN-2" inputmask="0x02"><bounds x="524" y="0" width="23" height="16" /></element>
+		<element name="lamplabel6" ref="lamplabelel6"><bounds x="524" y="-10" width="23" height="10" /></element>
+		<element name="lamp7" ref="buttonlamp" state="0" inputtag="IN-2" inputmask="0x04"><bounds x="548" y="0" width="23" height="16" /></element>
+		<element name="lamplabel7" ref="lamplabelel7"><bounds x="548" y="-10" width="23" height="10" /></element>
+		<element name="lamp8" ref="buttonlamp" state="0" inputtag="IN-8" inputmask="0x04"><bounds x="572" y="0" width="23" height="16" /></element>
+		<element name="lamplabel8" ref="lamplabelel8"><bounds x="572" y="-10" width="23" height="10" /></element>
+		<element name="lamp9" ref="matrixlamp" state="0"><bounds x="596" y="0" width="23" height="16"/></element>
+		<element name="lamplabel9" ref="lamplabelel9"><bounds x="596" y="-10" width="23" height="10" /></element>
+		<element name="lamp10" ref="matrixlamp" state="0"><bounds x="620" y="0" width="23" height="16"/></element>
+		<element name="lamplabel10" ref="lamplabelel10"><bounds x="620" y="-10" width="23" height="10" /></element>
+		<element name="lamp11" ref="matrixlamp" state="0"><bounds x="644" y="0" width="23" height="16"/></element>
+		<element name="lamplabel11" ref="lamplabelel11"><bounds x="644" y="-10" width="23" height="10" /></element>
+		<element name="lamp12" ref="matrixlamp" state="0"><bounds x="668" y="0" width="23" height="16"/></element>
+		<element name="lamplabel12" ref="lamplabelel12"><bounds x="668" y="-10" width="23" height="10" /></element>
+		<element name="lamp13" ref="unusedlamp" state="0"><bounds x="692" y="0" width="23" height="16"/></element>
+		<element name="lamplabel13" ref="lamplabelel13"><bounds x="692" y="-10" width="23" height="10" /></element>
+		<element name="lamp14" ref="unusedlamp" state="0"><bounds x="716" y="0" width="23" height="16"/></element>
+		<element name="lamplabel14" ref="lamplabelel14"><bounds x="716" y="-10" width="23" height="10" /></element>
+		<element name="lamp15" ref="unusedlamp" state="0"><bounds x="740" y="0" width="23" height="16"/></element>
+		<element name="lamplabel15" ref="lamplabelel15"><bounds x="740" y="-10" width="23" height="10" /></element>
+		<element name="lamp16" ref="buttonlamp" state="0" inputtag="IN-2" inputmask="0x10"><bounds x="380" y="28" width="23" height="16" /></element>
+		<element name="lamplabel16" ref="lamplabelel16"><bounds x="380" y="18" width="23" height="10" /></element>
+		<element name="lamp17" ref="matrixlamp" state="0"><bounds x="404" y="28" width="23" height="16"/></element>
+		<element name="lamplabel17" ref="lamplabelel17"><bounds x="404" y="18" width="23" height="10" /></element>
+		<element name="lamp18" ref="matrixlamp" state="0"><bounds x="428" y="28" width="23" height="16"/></element>
+		<element name="lamplabel18" ref="lamplabelel18"><bounds x="428" y="18" width="23" height="10" /></element>
+		<element name="lamp19" ref="matrixlamp" state="0"><bounds x="452" y="28" width="23" height="16"/></element>
+		<element name="lamplabel19" ref="lamplabelel19"><bounds x="452" y="18" width="23" height="10" /></element>
+		<element name="lamp20" ref="matrixlamp" state="0"><bounds x="476" y="28" width="23" height="16"/></element>
+		<element name="lamplabel20" ref="lamplabelel20"><bounds x="476" y="18" width="23" height="10" /></element>
+		<element name="lamp21" ref="matrixlamp" state="0"><bounds x="500" y="28" width="23" height="16"/></element>
+		<element name="lamplabel21" ref="lamplabelel21"><bounds x="500" y="18" width="23" height="10" /></element>
+		<element name="lamp22" ref="matrixlamp" state="0"><bounds x="524" y="28" width="23" height="16"/></element>
+		<element name="lamplabel22" ref="lamplabelel22"><bounds x="524" y="18" width="23" height="10" /></element>
+		<element name="lamp23" ref="matrixlamp" state="0"><bounds x="548" y="28" width="23" height="16"/></element>
+		<element name="lamplabel23" ref="lamplabelel23"><bounds x="548" y="18" width="23" height="10" /></element>
+		<element name="lamp24" ref="matrixlamp" state="0"><bounds x="572" y="28" width="23" height="16"/></element>
+		<element name="lamplabel24" ref="lamplabelel24"><bounds x="572" y="18" width="23" height="10" /></element>
+		<element name="lamp25" ref="matrixlamp" state="0"><bounds x="596" y="28" width="23" height="16"/></element>
+		<element name="lamplabel25" ref="lamplabelel25"><bounds x="596" y="18" width="23" height="10" /></element>
+		<element name="lamp26" ref="matrixlamp" state="0"><bounds x="620" y="28" width="23" height="16"/></element>
+		<element name="lamplabel26" ref="lamplabelel26"><bounds x="620" y="18" width="23" height="10" /></element>
+		<element name="lamp27" ref="matrixlamp" state="0"><bounds x="644" y="28" width="23" height="16"/></element>
+		<element name="lamplabel27" ref="lamplabelel27"><bounds x="644" y="18" width="23" height="10" /></element>
+		<element name="lamp28" ref="matrixlamp" state="0"><bounds x="668" y="28" width="23" height="16"/></element>
+		<element name="lamplabel28" ref="lamplabelel28"><bounds x="668" y="18" width="23" height="10" /></element>
+		<element name="lamp29" ref="matrixlamp" state="0"><bounds x="692" y="28" width="23" height="16"/></element>
+		<element name="lamplabel29" ref="lamplabelel29"><bounds x="692" y="18" width="23" height="10" /></element>
+		<element name="lamp30" ref="matrixlamp" state="0"><bounds x="716" y="28" width="23" height="16"/></element>
+		<element name="lamplabel30" ref="lamplabelel30"><bounds x="716" y="18" width="23" height="10" /></element>
+		<element name="lamp31" ref="unusedlamp" state="0"><bounds x="740" y="28" width="23" height="16"/></element>
+		<element name="lamplabel31" ref="lamplabelel31"><bounds x="740" y="18" width="23" height="10" /></element>
+		<element name="lamp32" ref="reellamp" state="0"><bounds x="0" y="300" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel32" ref="lamplabelel32"><bounds x="0" y="290" width="50" height="10" /></element>
+		-->
+		<element name="lamp33" ref="reellamp" state="0"><bounds x="0" y="317" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel33" ref="lamplabelel33"><bounds x="0" y="307" width="50" height="10" /></element>
+		-->
+		<element name="lamp34" ref="reellamp" state="0"><bounds x="0" y="334" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel34" ref="lamplabelel34"><bounds x="0" y="324" width="50" height="10" /></element>
+		-->
+		<element name="lamp35" ref="reellamp" state="0"><bounds x="50" y="300" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel35" ref="lamplabelel35"><bounds x="50" y="290" width="50" height="10" /></element>
+		-->
+		<element name="lamp36" ref="reellamp" state="0"><bounds x="50" y="317" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel36" ref="lamplabelel36"><bounds x="50" y="307" width="50" height="10" /></element>
+		-->
+		<element name="lamp37" ref="reellamp" state="0"><bounds x="50" y="334" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel37" ref="lamplabelel37"><bounds x="50" y="324" width="50" height="10" /></element>
+		-->
+		<element name="lamp38" ref="unusedlamp" state="0"><bounds x="524" y="56" width="23" height="16"/></element>
+		<element name="lamplabel38" ref="lamplabelel38"><bounds x="524" y="46" width="23" height="10" /></element>
+		<element name="lamp39" ref="matrixlamp" state="0"><bounds x="548" y="56" width="23" height="16"/></element>
+		<element name="lamplabel39" ref="lamplabelel39"><bounds x="548" y="46" width="23" height="10" /></element>
+		<element name="lamp40" ref="unusedlamp" state="0"><bounds x="572" y="56" width="23" height="16"/></element>
+		<element name="lamplabel40" ref="lamplabelel40"><bounds x="572" y="46" width="23" height="10" /></element>
+		<element name="lamp41" ref="matrixlamp" state="0"><bounds x="596" y="56" width="23" height="16"/></element>
+		<element name="lamplabel41" ref="lamplabelel41"><bounds x="596" y="46" width="23" height="10" /></element>
+		<element name="lamp42" ref="matrixlamp" state="0"><bounds x="620" y="56" width="23" height="16"/></element>
+		<element name="lamplabel42" ref="lamplabelel42"><bounds x="620" y="46" width="23" height="10" /></element>
+		<element name="lamp43" ref="matrixlamp" state="0"><bounds x="644" y="56" width="23" height="16"/></element>
+		<element name="lamplabel43" ref="lamplabelel43"><bounds x="644" y="46" width="23" height="10" /></element>
+		<element name="lamp44" ref="matrixlamp" state="0"><bounds x="668" y="56" width="23" height="16"/></element>
+		<element name="lamplabel44" ref="lamplabelel44"><bounds x="668" y="46" width="23" height="10" /></element>
+		<element name="lamp45" ref="matrixlamp" state="0"><bounds x="692" y="56" width="23" height="16"/></element>
+		<element name="lamplabel45" ref="lamplabelel45"><bounds x="692" y="46" width="23" height="10" /></element>
+		<element name="lamp46" ref="unusedlamp" state="0"><bounds x="716" y="56" width="23" height="16"/></element>
+		<element name="lamplabel46" ref="lamplabelel46"><bounds x="716" y="46" width="23" height="10" /></element>
+		<element name="lamp47" ref="unusedlamp" state="0"><bounds x="740" y="56" width="23" height="16"/></element>
+		<element name="lamplabel47" ref="lamplabelel47"><bounds x="740" y="46" width="23" height="10" /></element>
+		<element name="lamp48" ref="reellamp" state="0"><bounds x="100" y="300" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel48" ref="lamplabelel48"><bounds x="100" y="290" width="50" height="10" /></element>
+		-->
+		<element name="lamp49" ref="reellamp" state="0"><bounds x="100" y="317" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel49" ref="lamplabelel49"><bounds x="100" y="307" width="50" height="10" /></element>
+		-->
+		<element name="lamp50" ref="reellamp" state="0"><bounds x="100" y="334" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel50" ref="lamplabelel50"><bounds x="100" y="324" width="50" height="10" /></element>
+		-->
+		<element name="lamp51" ref="reellamp" state="0"><bounds x="150" y="300" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel51" ref="lamplabelel51"><bounds x="150" y="290" width="50" height="10" /></element>
+		-->
+		<element name="lamp52" ref="reellamp" state="0"><bounds x="150" y="317" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel52" ref="lamplabelel52"><bounds x="150" y="307" width="50" height="10" /></element>
+		-->
+		<element name="lamp53" ref="reellamp" state="0"><bounds x="150" y="334" width="50" height="17"/></element>
+		<!-- Label not drawn
+		<element name="lamplabel53" ref="lamplabelel53"><bounds x="150" y="324" width="50" height="10" /></element>
+		-->
+		<element name="lamp54" ref="matrixlamp" state="0"><bounds x="524" y="84" width="23" height="16"/></element>
+		<element name="lamplabel54" ref="lamplabelel54"><bounds x="524" y="74" width="23" height="10" /></element>
+		<element name="lamp55" ref="matrixlamp" state="0"><bounds x="548" y="84" width="23" height="16"/></element>
+		<element name="lamplabel55" ref="lamplabelel55"><bounds x="548" y="74" width="23" height="10" /></element>
+		<element name="lamp56" ref="matrixlamp" state="0"><bounds x="572" y="84" width="23" height="16"/></element>
+		<element name="lamplabel56" ref="lamplabelel56"><bounds x="572" y="74" width="23" height="10" /></element>
+		<element name="lamp57" ref="matrixlamp" state="0"><bounds x="596" y="84" width="23" height="16"/></element>
+		<element name="lamplabel57" ref="lamplabelel57"><bounds x="596" y="74" width="23" height="10" /></element>
+		<element name="lamp58" ref="matrixlamp" state="0"><bounds x="620" y="84" width="23" height="16"/></element>
+		<element name="lamplabel58" ref="lamplabelel58"><bounds x="620" y="74" width="23" height="10" /></element>
+		<element name="lamp59" ref="matrixlamp" state="0"><bounds x="644" y="84" width="23" height="16"/></element>
+		<element name="lamplabel59" ref="lamplabelel59"><bounds x="644" y="74" width="23" height="10" /></element>
+		<element name="lamp60" ref="matrixlamp" state="0"><bounds x="668" y="84" width="23" height="16"/></element>
+		<element name="lamplabel60" ref="lamplabelel60"><bounds x="668" y="74" width="23" height="10" /></element>
+		<element name="lamp61" ref="matrixlamp" state="0"><bounds x="692" y="84" width="23" height="16"/></element>
+		<element name="lamplabel61" ref="lamplabelel61"><bounds x="692" y="74" width="23" height="10" /></element>
+		<element name="lamp62" ref="matrixlamp" state="0"><bounds x="716" y="84" width="23" height="16"/></element>
+		<element name="lamplabel62" ref="lamplabelel62"><bounds x="716" y="74" width="23" height="10" /></element>
+		<element name="lamp63" ref="matrixlamp" state="0"><bounds x="740" y="84" width="23" height="16"/></element>
+		<element name="lamplabel63" ref="lamplabelel63"><bounds x="740" y="74" width="23" height="10" /></element>
+		<element name="lamp64" ref="matrixlamp" state="0"><bounds x="380" y="112" width="23" height="16"/></element>
+		<element name="lamplabel64" ref="lamplabelel64"><bounds x="380" y="102" width="23" height="10" /></element>
+		<element name="lamp65" ref="matrixlamp" state="0"><bounds x="404" y="112" width="23" height="16"/></element>
+		<element name="lamplabel65" ref="lamplabelel65"><bounds x="404" y="102" width="23" height="10" /></element>
+		<element name="lamp66" ref="matrixlamp" state="0"><bounds x="428" y="112" width="23" height="16"/></element>
+		<element name="lamplabel66" ref="lamplabelel66"><bounds x="428" y="102" width="23" height="10" /></element>
+		<element name="lamp67" ref="matrixlamp" state="0"><bounds x="452" y="112" width="23" height="16"/></element>
+		<element name="lamplabel67" ref="lamplabelel67"><bounds x="452" y="102" width="23" height="10" /></element>
+		<element name="lamp68" ref="matrixlamp" state="0"><bounds x="476" y="112" width="23" height="16"/></element>
+		<element name="lamplabel68" ref="lamplabelel68"><bounds x="476" y="102" width="23" height="10" /></element>
+		<element name="lamp69" ref="matrixlamp" state="0"><bounds x="500" y="112" width="23" height="16"/></element>
+		<element name="lamplabel69" ref="lamplabelel69"><bounds x="500" y="102" width="23" height="10" /></element>
+		<element name="lamp70" ref="matrixlamp" state="0"><bounds x="524" y="112" width="23" height="16"/></element>
+		<element name="lamplabel70" ref="lamplabelel70"><bounds x="524" y="102" width="23" height="10" /></element>
+		<element name="lamp71" ref="matrixlamp" state="0"><bounds x="548" y="112" width="23" height="16"/></element>
+		<element name="lamplabel71" ref="lamplabelel71"><bounds x="548" y="102" width="23" height="10" /></element>
+		<element name="lamp72" ref="matrixlamp" state="0"><bounds x="572" y="112" width="23" height="16"/></element>
+		<element name="lamplabel72" ref="lamplabelel72"><bounds x="572" y="102" width="23" height="10" /></element>
+		<element name="lamp73" ref="matrixlamp" state="0"><bounds x="596" y="112" width="23" height="16"/></element>
+		<element name="lamplabel73" ref="lamplabelel73"><bounds x="596" y="102" width="23" height="10" /></element>
+		<element name="lamp74" ref="matrixlamp" state="0"><bounds x="620" y="112" width="23" height="16"/></element>
+		<element name="lamplabel74" ref="lamplabelel74"><bounds x="620" y="102" width="23" height="10" /></element>
+		<element name="lamp75" ref="matrixlamp" state="0"><bounds x="644" y="112" width="23" height="16"/></element>
+		<element name="lamplabel75" ref="lamplabelel75"><bounds x="644" y="102" width="23" height="10" /></element>
+		<element name="lamp76" ref="unusedlamp" state="0"><bounds x="668" y="112" width="23" height="16"/></element>
+		<element name="lamplabel76" ref="lamplabelel76"><bounds x="668" y="102" width="23" height="10" /></element>
+		<element name="lamp77" ref="unusedlamp" state="0"><bounds x="692" y="112" width="23" height="16"/></element>
+		<element name="lamplabel77" ref="lamplabelel77"><bounds x="692" y="102" width="23" height="10" /></element>
+		<element name="lamp78" ref="unusedlamp" state="0"><bounds x="716" y="112" width="23" height="16"/></element>
+		<element name="lamplabel78" ref="lamplabelel78"><bounds x="716" y="102" width="23" height="10" /></element>
+		<element name="lamp79" ref="unusedlamp" state="0"><bounds x="740" y="112" width="23" height="16"/></element>
+		<element name="lamplabel79" ref="lamplabelel79"><bounds x="740" y="102" width="23" height="10" /></element>
+		<element name="lamp80" ref="matrixlamp" state="0"><bounds x="380" y="140" width="23" height="16"/></element>
+		<element name="lamplabel80" ref="lamplabelel80"><bounds x="380" y="130" width="23" height="10" /></element>
+		<element name="lamp81" ref="matrixlamp" state="0"><bounds x="404" y="140" width="23" height="16"/></element>
+		<element name="lamplabel81" ref="lamplabelel81"><bounds x="404" y="130" width="23" height="10" /></element>
+		<element name="lamp82" ref="matrixlamp" state="0"><bounds x="428" y="140" width="23" height="16"/></element>
+		<element name="lamplabel82" ref="lamplabelel82"><bounds x="428" y="130" width="23" height="10" /></element>
+		<element name="lamp83" ref="matrixlamp" state="0"><bounds x="452" y="140" width="23" height="16"/></element>
+		<element name="lamplabel83" ref="lamplabelel83"><bounds x="452" y="130" width="23" height="10" /></element>
+		<element name="lamp84" ref="matrixlamp" state="0"><bounds x="476" y="140" width="23" height="16"/></element>
+		<element name="lamplabel84" ref="lamplabelel84"><bounds x="476" y="130" width="23" height="10" /></element>
+		<element name="lamp85" ref="matrixlamp" state="0"><bounds x="500" y="140" width="23" height="16"/></element>
+		<element name="lamplabel85" ref="lamplabelel85"><bounds x="500" y="130" width="23" height="10" /></element>
+		<element name="lamp86" ref="matrixlamp" state="0"><bounds x="524" y="140" width="23" height="16"/></element>
+		<element name="lamplabel86" ref="lamplabelel86"><bounds x="524" y="130" width="23" height="10" /></element>
+		<element name="lamp87" ref="unusedlamp" state="0"><bounds x="548" y="140" width="23" height="16"/></element>
+		<element name="lamplabel87" ref="lamplabelel87"><bounds x="548" y="130" width="23" height="10" /></element>
+		<element name="lamp88" ref="matrixlamp" state="0"><bounds x="572" y="140" width="23" height="16"/></element>
+		<element name="lamplabel88" ref="lamplabelel88"><bounds x="572" y="130" width="23" height="10" /></element>
+		<element name="lamp89" ref="matrixlamp" state="0"><bounds x="596" y="140" width="23" height="16"/></element>
+		<element name="lamplabel89" ref="lamplabelel89"><bounds x="596" y="130" width="23" height="10" /></element>
+		<element name="lamp90" ref="matrixlamp" state="0"><bounds x="620" y="140" width="23" height="16"/></element>
+		<element name="lamplabel90" ref="lamplabelel90"><bounds x="620" y="130" width="23" height="10" /></element>
+		<element name="lamp91" ref="matrixlamp" state="0"><bounds x="644" y="140" width="23" height="16"/></element>
+		<element name="lamplabel91" ref="lamplabelel91"><bounds x="644" y="130" width="23" height="10" /></element>
+		<element name="lamp92" ref="matrixlamp" state="0"><bounds x="668" y="140" width="23" height="16"/></element>
+		<element name="lamplabel92" ref="lamplabelel92"><bounds x="668" y="130" width="23" height="10" /></element>
+		<element name="lamp93" ref="unusedlamp" state="0"><bounds x="692" y="140" width="23" height="16"/></element>
+		<element name="lamplabel93" ref="lamplabelel93"><bounds x="692" y="130" width="23" height="10" /></element>
+		<element name="lamp94" ref="unusedlamp" state="0"><bounds x="716" y="140" width="23" height="16"/></element>
+		<element name="lamplabel94" ref="lamplabelel94"><bounds x="716" y="130" width="23" height="10" /></element>
+		<element name="lamp95" ref="unusedlamp" state="0"><bounds x="740" y="140" width="23" height="16"/></element>
+		<element name="lamplabel95" ref="lamplabelel95"><bounds x="740" y="130" width="23" height="10" /></element>
+		<element name="lamp96" ref="matrixlamp" state="0"><bounds x="380" y="168" width="23" height="16"/></element>
+		<element name="lamplabel96" ref="lamplabelel96"><bounds x="380" y="158" width="23" height="10" /></element>
+		<element name="lamp97" ref="matrixlamp" state="0"><bounds x="404" y="168" width="23" height="16"/></element>
+		<element name="lamplabel97" ref="lamplabelel97"><bounds x="404" y="158" width="23" height="10" /></element>
+		<element name="lamp98" ref="matrixlamp" state="0"><bounds x="428" y="168" width="23" height="16"/></element>
+		<element name="lamplabel98" ref="lamplabelel98"><bounds x="428" y="158" width="23" height="10" /></element>
+		<element name="lamp99" ref="matrixlamp" state="0"><bounds x="452" y="168" width="23" height="16"/></element>
+		<element name="lamplabel99" ref="lamplabelel99"><bounds x="452" y="158" width="23" height="10" /></element>
+		<element name="lamp100" ref="matrixlamp" state="0"><bounds x="476" y="168" width="23" height="16"/></element>
+		<element name="lamplabel100" ref="lamplabelel100"><bounds x="476" y="158" width="23" height="10" /></element>
+		<element name="lamp101" ref="matrixlamp" state="0"><bounds x="500" y="168" width="23" height="16"/></element>
+		<element name="lamplabel101" ref="lamplabelel101"><bounds x="500" y="158" width="23" height="10" /></element>
+		<element name="lamp102" ref="matrixlamp" state="0"><bounds x="524" y="168" width="23" height="16"/></element>
+		<element name="lamplabel102" ref="lamplabelel102"><bounds x="524" y="158" width="23" height="10" /></element>
+		<element name="lamp103" ref="matrixlamp" state="0"><bounds x="548" y="168" width="23" height="16"/></element>
+		<element name="lamplabel103" ref="lamplabelel103"><bounds x="548" y="158" width="23" height="10" /></element>
+		<element name="lamp104" ref="matrixlamp" state="0"><bounds x="572" y="168" width="23" height="16"/></element>
+		<element name="lamplabel104" ref="lamplabelel104"><bounds x="572" y="158" width="23" height="10" /></element>
+		<element name="lamp105" ref="matrixlamp" state="0"><bounds x="596" y="168" width="23" height="16"/></element>
+		<element name="lamplabel105" ref="lamplabelel105"><bounds x="596" y="158" width="23" height="10" /></element>
+		<element name="lamp106" ref="matrixlamp" state="0"><bounds x="620" y="168" width="23" height="16"/></element>
+		<element name="lamplabel106" ref="lamplabelel106"><bounds x="620" y="158" width="23" height="10" /></element>
+		<element name="lamp107" ref="matrixlamp" state="0"><bounds x="644" y="168" width="23" height="16"/></element>
+		<element name="lamplabel107" ref="lamplabelel107"><bounds x="644" y="158" width="23" height="10" /></element>
+		<element name="lamp108" ref="matrixlamp" state="0"><bounds x="668" y="168" width="23" height="16"/></element>
+		<element name="lamplabel108" ref="lamplabelel108"><bounds x="668" y="158" width="23" height="10" /></element>
+		<element name="lamp109" ref="matrixlamp" state="0"><bounds x="692" y="168" width="23" height="16"/></element>
+		<element name="lamplabel109" ref="lamplabelel109"><bounds x="692" y="158" width="23" height="10" /></element>
+		<element name="lamp110" ref="unusedlamp" state="0"><bounds x="716" y="168" width="23" height="16"/></element>
+		<element name="lamplabel110" ref="lamplabelel110"><bounds x="716" y="158" width="23" height="10" /></element>
+		<element name="lamp111" ref="unusedlamp" state="0"><bounds x="740" y="168" width="23" height="16"/></element>
+		<element name="lamplabel111" ref="lamplabelel111"><bounds x="740" y="158" width="23" height="10" /></element>
+		<element name="lamp112" ref="matrixlamp" state="0"><bounds x="380" y="196" width="23" height="16"/></element>
+		<element name="lamplabel112" ref="lamplabelel112"><bounds x="380" y="186" width="23" height="10" /></element>
+		<element name="lamp113" ref="matrixlamp" state="0"><bounds x="404" y="196" width="23" height="16"/></element>
+		<element name="lamplabel113" ref="lamplabelel113"><bounds x="404" y="186" width="23" height="10" /></element>
+		<element name="lamp114" ref="matrixlamp" state="0"><bounds x="428" y="196" width="23" height="16"/></element>
+		<element name="lamplabel114" ref="lamplabelel114"><bounds x="428" y="186" width="23" height="10" /></element>
+		<element name="lamp115" ref="matrixlamp" state="0"><bounds x="452" y="196" width="23" height="16"/></element>
+		<element name="lamplabel115" ref="lamplabelel115"><bounds x="452" y="186" width="23" height="10" /></element>
+		<element name="lamp116" ref="matrixlamp" state="0"><bounds x="476" y="196" width="23" height="16"/></element>
+		<element name="lamplabel116" ref="lamplabelel116"><bounds x="476" y="186" width="23" height="10" /></element>
+		<element name="lamp117" ref="matrixlamp" state="0"><bounds x="500" y="196" width="23" height="16"/></element>
+		<element name="lamplabel117" ref="lamplabelel117"><bounds x="500" y="186" width="23" height="10" /></element>
+		<element name="lamp118" ref="matrixlamp" state="0"><bounds x="524" y="196" width="23" height="16"/></element>
+		<element name="lamplabel118" ref="lamplabelel118"><bounds x="524" y="186" width="23" height="10" /></element>
+		<element name="lamp119" ref="matrixlamp" state="0"><bounds x="548" y="196" width="23" height="16"/></element>
+		<element name="lamplabel119" ref="lamplabelel119"><bounds x="548" y="186" width="23" height="10" /></element>
+		<element name="lamp120" ref="matrixlamp" state="0"><bounds x="572" y="196" width="23" height="16"/></element>
+		<element name="lamplabel120" ref="lamplabelel120"><bounds x="572" y="186" width="23" height="10" /></element>
+		<element name="lamp121" ref="matrixlamp" state="0"><bounds x="596" y="196" width="23" height="16"/></element>
+		<element name="lamplabel121" ref="lamplabelel121"><bounds x="596" y="186" width="23" height="10" /></element>
+		<element name="lamp122" ref="matrixlamp" state="0"><bounds x="620" y="196" width="23" height="16"/></element>
+		<element name="lamplabel122" ref="lamplabelel122"><bounds x="620" y="186" width="23" height="10" /></element>
+		<element name="lamp123" ref="matrixlamp" state="0"><bounds x="644" y="196" width="23" height="16"/></element>
+		<element name="lamplabel123" ref="lamplabelel123"><bounds x="644" y="186" width="23" height="10" /></element>
+		<element name="lamp124" ref="matrixlamp" state="0"><bounds x="668" y="196" width="23" height="16"/></element>
+		<element name="lamplabel124" ref="lamplabelel124"><bounds x="668" y="186" width="23" height="10" /></element>
+		<element name="lamp125" ref="matrixlamp" state="0"><bounds x="692" y="196" width="23" height="16"/></element>
+		<element name="lamplabel125" ref="lamplabelel125"><bounds x="692" y="186" width="23" height="10" /></element>
+		<element name="lamp126" ref="matrixlamp" state="0"><bounds x="716" y="196" width="23" height="16"/></element>
+		<element name="lamplabel126" ref="lamplabelel126"><bounds x="716" y="186" width="23" height="10" /></element>
+		<element name="lamp127" ref="matrixlamp" state="0"><bounds x="740" y="196" width="23" height="16"/></element>
+		<element name="lamplabel127" ref="lamplabelel127"><bounds x="740" y="186" width="23" height="10" /></element>
+		<element name="lamp128" ref="matrixlamp" state="0"><bounds x="380" y="224" width="23" height="16"/></element>
+		<element name="lamplabel128" ref="lamplabelel128"><bounds x="380" y="214" width="23" height="10" /></element>
+		<element name="lamp129" ref="matrixlamp" state="0"><bounds x="404" y="224" width="23" height="16"/></element>
+		<element name="lamplabel129" ref="lamplabelel129"><bounds x="404" y="214" width="23" height="10" /></element>
+		<element name="lamp130" ref="matrixlamp" state="0"><bounds x="428" y="224" width="23" height="16"/></element>
+		<element name="lamplabel130" ref="lamplabelel130"><bounds x="428" y="214" width="23" height="10" /></element>
+		<element name="lamp131" ref="matrixlamp" state="0"><bounds x="452" y="224" width="23" height="16"/></element>
+		<element name="lamplabel131" ref="lamplabelel131"><bounds x="452" y="214" width="23" height="10" /></element>
+		<element name="lamp132" ref="matrixlamp" state="0"><bounds x="476" y="224" width="23" height="16"/></element>
+		<element name="lamplabel132" ref="lamplabelel132"><bounds x="476" y="214" width="23" height="10" /></element>
+		<element name="lamp133" ref="matrixlamp" state="0"><bounds x="500" y="224" width="23" height="16"/></element>
+		<element name="lamplabel133" ref="lamplabelel133"><bounds x="500" y="214" width="23" height="10" /></element>
+		<element name="lamp134" ref="matrixlamp" state="0"><bounds x="524" y="224" width="23" height="16"/></element>
+		<element name="lamplabel134" ref="lamplabelel134"><bounds x="524" y="214" width="23" height="10" /></element>
+		<element name="lamp135" ref="matrixlamp" state="0"><bounds x="548" y="224" width="23" height="16"/></element>
+		<element name="lamplabel135" ref="lamplabelel135"><bounds x="548" y="214" width="23" height="10" /></element>
+		<element name="lamp136" ref="matrixlamp" state="0"><bounds x="572" y="224" width="23" height="16"/></element>
+		<element name="lamplabel136" ref="lamplabelel136"><bounds x="572" y="214" width="23" height="10" /></element>
+		<element name="lamp137" ref="matrixlamp" state="0"><bounds x="596" y="224" width="23" height="16"/></element>
+		<element name="lamplabel137" ref="lamplabelel137"><bounds x="596" y="214" width="23" height="10" /></element>
+		<element name="lamp138" ref="matrixlamp" state="0"><bounds x="620" y="224" width="23" height="16"/></element>
+		<element name="lamplabel138" ref="lamplabelel138"><bounds x="620" y="214" width="23" height="10" /></element>
+		<element name="lamp139" ref="matrixlamp" state="0"><bounds x="644" y="224" width="23" height="16"/></element>
+		<element name="lamplabel139" ref="lamplabelel139"><bounds x="644" y="214" width="23" height="10" /></element>
+		<element name="lamp140" ref="matrixlamp" state="0"><bounds x="668" y="224" width="23" height="16"/></element>
+		<element name="lamplabel140" ref="lamplabelel140"><bounds x="668" y="214" width="23" height="10" /></element>
+		<element name="lamp141" ref="matrixlamp" state="0"><bounds x="692" y="224" width="23" height="16"/></element>
+		<element name="lamplabel141" ref="lamplabelel141"><bounds x="692" y="214" width="23" height="10" /></element>
+		<element name="lamp142" ref="unusedlamp" state="0"><bounds x="716" y="224" width="23" height="16"/></element>
+		<element name="lamplabel142" ref="lamplabelel142"><bounds x="716" y="214" width="23" height="10" /></element>
+		<element name="lamp143" ref="matrixlamp" state="0"><bounds x="740" y="224" width="23" height="16"/></element>
+		<element name="lamplabel143" ref="lamplabelel143"><bounds x="740" y="214" width="23" height="10" /></element>
+		<element name="lamp144" ref="matrixlamp" state="0"><bounds x="380" y="252" width="23" height="16"/></element>
+		<element name="lamplabel144" ref="lamplabelel144"><bounds x="380" y="242" width="23" height="10" /></element>
+		<element name="lamp145" ref="matrixlamp" state="0"><bounds x="404" y="252" width="23" height="16"/></element>
+		<element name="lamplabel145" ref="lamplabelel145"><bounds x="404" y="242" width="23" height="10" /></element>
+		<element name="lamp146" ref="buttonlamp" state="0" inputtag="IN-8" inputmask="0x02"><bounds x="428" y="252" width="23" height="16" /></element>
+		<element name="lamplabel146" ref="lamplabelel146"><bounds x="428" y="242" width="23" height="10" /></element>
+		<element name="lamp147" ref="matrixlamp" state="0"><bounds x="452" y="252" width="23" height="16"/></element>
+		<element name="lamplabel147" ref="lamplabelel147"><bounds x="452" y="242" width="23" height="10" /></element>
+		<element name="lamp148" ref="matrixlamp" state="0"><bounds x="476" y="252" width="23" height="16"/></element>
+		<element name="lamplabel148" ref="lamplabelel148"><bounds x="476" y="242" width="23" height="10" /></element>
+		<element name="lamp149" ref="buttonlamp" state="0" inputtag="IN-8" inputmask="0x01"><bounds x="500" y="252" width="23" height="16" /></element>
+		<element name="lamplabel149" ref="lamplabelel149"><bounds x="500" y="242" width="23" height="10" /></element>
+		<element name="lamp150" ref="matrixlamp" state="0"><bounds x="524" y="252" width="23" height="16"/></element>
+		<element name="lamplabel150" ref="lamplabelel150"><bounds x="524" y="242" width="23" height="10" /></element>
+		<element name="lamp151" ref="matrixlamp" state="0"><bounds x="548" y="252" width="23" height="16"/></element>
+		<element name="lamplabel151" ref="lamplabelel151"><bounds x="548" y="242" width="23" height="10" /></element>
+		<element name="lamp152" ref="matrixlamp" state="0"><bounds x="572" y="252" width="23" height="16"/></element>
+		<element name="lamplabel152" ref="lamplabelel152"><bounds x="572" y="242" width="23" height="10" /></element>
+		<element name="lamp153" ref="matrixlamp" state="0"><bounds x="596" y="252" width="23" height="16"/></element>
+		<element name="lamplabel153" ref="lamplabelel153"><bounds x="596" y="242" width="23" height="10" /></element>
+		<element name="lamp154" ref="matrixlamp" state="0"><bounds x="620" y="252" width="23" height="16"/></element>
+		<element name="lamplabel154" ref="lamplabelel154"><bounds x="620" y="242" width="23" height="10" /></element>
+		<element name="lamp155" ref="matrixlamp" state="0"><bounds x="644" y="252" width="23" height="16"/></element>
+		<element name="lamplabel155" ref="lamplabelel155"><bounds x="644" y="242" width="23" height="10" /></element>
+		<element name="lamp156" ref="unusedlamp" state="0"><bounds x="668" y="252" width="23" height="16"/></element>
+		<element name="lamplabel156" ref="lamplabelel156"><bounds x="668" y="242" width="23" height="10" /></element>
+		<element name="lamp157" ref="unusedlamp" state="0"><bounds x="692" y="252" width="23" height="16"/></element>
+		<element name="lamplabel157" ref="lamplabelel157"><bounds x="692" y="242" width="23" height="10" /></element>
+		<element name="lamp158" ref="unusedlamp" state="0"><bounds x="716" y="252" width="23" height="16"/></element>
+		<element name="lamplabel158" ref="lamplabelel158"><bounds x="716" y="242" width="23" height="10" /></element>
+		<element name="lamp159" ref="matrixlamp" state="0"><bounds x="740" y="252" width="23" height="16"/></element>
+		<element name="lamplabel159" ref="lamplabelel159"><bounds x="740" y="242" width="23" height="10" /></element>
+		<element name="lamp160" ref="matrixlamp" state="0"><bounds x="380" y="280" width="23" height="16"/></element>
+		<element name="lamplabel160" ref="lamplabelel160"><bounds x="380" y="270" width="23" height="10" /></element>
+		<element name="lamp161" ref="matrixlamp" state="0"><bounds x="404" y="280" width="23" height="16"/></element>
+		<element name="lamplabel161" ref="lamplabelel161"><bounds x="404" y="270" width="23" height="10" /></element>
+		<element name="lamp162" ref="matrixlamp" state="0"><bounds x="428" y="280" width="23" height="16"/></element>
+		<element name="lamplabel162" ref="lamplabelel162"><bounds x="428" y="270" width="23" height="10" /></element>
+		<element name="lamp163" ref="matrixlamp" state="0"><bounds x="452" y="280" width="23" height="16"/></element>
+		<element name="lamplabel163" ref="lamplabelel163"><bounds x="452" y="270" width="23" height="10" /></element>
+		<element name="lamp164" ref="matrixlamp" state="0"><bounds x="476" y="280" width="23" height="16"/></element>
+		<element name="lamplabel164" ref="lamplabelel164"><bounds x="476" y="270" width="23" height="10" /></element>
+		<element name="lamp165" ref="matrixlamp" state="0"><bounds x="500" y="280" width="23" height="16"/></element>
+		<element name="lamplabel165" ref="lamplabelel165"><bounds x="500" y="270" width="23" height="10" /></element>
+		<element name="lamp166" ref="matrixlamp" state="0"><bounds x="524" y="280" width="23" height="16"/></element>
+		<element name="lamplabel166" ref="lamplabelel166"><bounds x="524" y="270" width="23" height="10" /></element>
+		<element name="lamp167" ref="matrixlamp" state="0"><bounds x="548" y="280" width="23" height="16"/></element>
+		<element name="lamplabel167" ref="lamplabelel167"><bounds x="548" y="270" width="23" height="10" /></element>
+		<element name="lamp168" ref="matrixlamp" state="0"><bounds x="572" y="280" width="23" height="16"/></element>
+		<element name="lamplabel168" ref="lamplabelel168"><bounds x="572" y="270" width="23" height="10" /></element>
+		<element name="lamp169" ref="matrixlamp" state="0"><bounds x="596" y="280" width="23" height="16"/></element>
+		<element name="lamplabel169" ref="lamplabelel169"><bounds x="596" y="270" width="23" height="10" /></element>
+		<element name="lamp170" ref="matrixlamp" state="0"><bounds x="620" y="280" width="23" height="16"/></element>
+		<element name="lamplabel170" ref="lamplabelel170"><bounds x="620" y="270" width="23" height="10" /></element>
+		<element name="lamp171" ref="matrixlamp" state="0"><bounds x="644" y="280" width="23" height="16"/></element>
+		<element name="lamplabel171" ref="lamplabelel171"><bounds x="644" y="270" width="23" height="10" /></element>
+		<element name="lamp172" ref="unusedlamp" state="0"><bounds x="668" y="280" width="23" height="16"/></element>
+		<element name="lamplabel172" ref="lamplabelel172"><bounds x="668" y="270" width="23" height="10" /></element>
+		<element name="lamp173" ref="unusedlamp" state="0"><bounds x="692" y="280" width="23" height="16"/></element>
+		<element name="lamplabel173" ref="lamplabelel173"><bounds x="692" y="270" width="23" height="10" /></element>
+		<element name="lamp174" ref="unusedlamp" state="0"><bounds x="716" y="280" width="23" height="16"/></element>
+		<element name="lamplabel174" ref="lamplabelel174"><bounds x="716" y="270" width="23" height="10" /></element>
+		<element name="lamp175" ref="matrixlamp" state="0"><bounds x="740" y="280" width="23" height="16"/></element>
+		<element name="lamplabel175" ref="lamplabelel175"><bounds x="740" y="270" width="23" height="10" /></element>
+		<element name="lamp176" ref="matrixlamp" state="0"><bounds x="380" y="308" width="23" height="16"/></element>
+		<element name="lamplabel176" ref="lamplabelel176"><bounds x="380" y="298" width="23" height="10" /></element>
+		<element name="lamp177" ref="matrixlamp" state="0"><bounds x="404" y="308" width="23" height="16"/></element>
+		<element name="lamplabel177" ref="lamplabelel177"><bounds x="404" y="298" width="23" height="10" /></element>
+		<element name="lamp178" ref="matrixlamp" state="0"><bounds x="428" y="308" width="23" height="16"/></element>
+		<element name="lamplabel178" ref="lamplabelel178"><bounds x="428" y="298" width="23" height="10" /></element>
+		<element name="lamp179" ref="matrixlamp" state="0"><bounds x="452" y="308" width="23" height="16"/></element>
+		<element name="lamplabel179" ref="lamplabelel179"><bounds x="452" y="298" width="23" height="10" /></element>
+		<element name="lamp180" ref="matrixlamp" state="0"><bounds x="476" y="308" width="23" height="16"/></element>
+		<element name="lamplabel180" ref="lamplabelel180"><bounds x="476" y="298" width="23" height="10" /></element>
+		<element name="lamp181" ref="matrixlamp" state="0"><bounds x="500" y="308" width="23" height="16"/></element>
+		<element name="lamplabel181" ref="lamplabelel181"><bounds x="500" y="298" width="23" height="10" /></element>
+		<element name="lamp182" ref="matrixlamp" state="0"><bounds x="524" y="308" width="23" height="16"/></element>
+		<element name="lamplabel182" ref="lamplabelel182"><bounds x="524" y="298" width="23" height="10" /></element>
+		<element name="lamp183" ref="matrixlamp" state="0"><bounds x="548" y="308" width="23" height="16"/></element>
+		<element name="lamplabel183" ref="lamplabelel183"><bounds x="548" y="298" width="23" height="10" /></element>
+		<element name="lamp184" ref="matrixlamp" state="0"><bounds x="572" y="308" width="23" height="16"/></element>
+		<element name="lamplabel184" ref="lamplabelel184"><bounds x="572" y="298" width="23" height="10" /></element>
+		<element name="lamp185" ref="matrixlamp" state="0"><bounds x="596" y="308" width="23" height="16"/></element>
+		<element name="lamplabel185" ref="lamplabelel185"><bounds x="596" y="298" width="23" height="10" /></element>
+		<element name="lamp186" ref="matrixlamp" state="0"><bounds x="620" y="308" width="23" height="16"/></element>
+		<element name="lamplabel186" ref="lamplabelel186"><bounds x="620" y="298" width="23" height="10" /></element>
+		<element name="lamp187" ref="matrixlamp" state="0"><bounds x="644" y="308" width="23" height="16"/></element>
+		<element name="lamplabel187" ref="lamplabelel187"><bounds x="644" y="298" width="23" height="10" /></element>
+		<element name="lamp188" ref="matrixlamp" state="0"><bounds x="668" y="308" width="23" height="16"/></element>
+		<element name="lamplabel188" ref="lamplabelel188"><bounds x="668" y="298" width="23" height="10" /></element>
+		<element name="lamp189" ref="matrixlamp" state="0"><bounds x="692" y="308" width="23" height="16"/></element>
+		<element name="lamplabel189" ref="lamplabelel189"><bounds x="692" y="298" width="23" height="10" /></element>
+		<element name="lamp190" ref="unusedlamp" state="0"><bounds x="716" y="308" width="23" height="16"/></element>
+		<element name="lamplabel190" ref="lamplabelel190"><bounds x="716" y="298" width="23" height="10" /></element>
+		<element name="lamp191" ref="matrixlamp" state="0"><bounds x="740" y="308" width="23" height="16"/></element>
+		<element name="lamplabel191" ref="lamplabelel191"><bounds x="740" y="298" width="23" height="10" /></element>
+		<element name="lamp192" ref="matrixlamp" state="0"><bounds x="380" y="336" width="23" height="16"/></element>
+		<element name="lamplabel192" ref="lamplabelel192"><bounds x="380" y="326" width="23" height="10" /></element>
+		<element name="lamp193" ref="matrixlamp" state="0"><bounds x="404" y="336" width="23" height="16"/></element>
+		<element name="lamplabel193" ref="lamplabelel193"><bounds x="404" y="326" width="23" height="10" /></element>
+		<element name="lamp194" ref="matrixlamp" state="0"><bounds x="428" y="336" width="23" height="16"/></element>
+		<element name="lamplabel194" ref="lamplabelel194"><bounds x="428" y="326" width="23" height="10" /></element>
+		<element name="lamp195" ref="matrixlamp" state="0"><bounds x="452" y="336" width="23" height="16"/></element>
+		<element name="lamplabel195" ref="lamplabelel195"><bounds x="452" y="326" width="23" height="10" /></element>
+		<element name="lamp196" ref="matrixlamp" state="0"><bounds x="476" y="336" width="23" height="16"/></element>
+		<element name="lamplabel196" ref="lamplabelel196"><bounds x="476" y="326" width="23" height="10" /></element>
+		<element name="lamp197" ref="matrixlamp" state="0"><bounds x="500" y="336" width="23" height="16"/></element>
+		<element name="lamplabel197" ref="lamplabelel197"><bounds x="500" y="326" width="23" height="10" /></element>
+		<element name="lamp198" ref="matrixlamp" state="0"><bounds x="524" y="336" width="23" height="16"/></element>
+		<element name="lamplabel198" ref="lamplabelel198"><bounds x="524" y="326" width="23" height="10" /></element>
+		<element name="lamp199" ref="matrixlamp" state="0"><bounds x="548" y="336" width="23" height="16"/></element>
+		<element name="lamplabel199" ref="lamplabelel199"><bounds x="548" y="326" width="23" height="10" /></element>
+		<element name="lamp200" ref="matrixlamp" state="0"><bounds x="572" y="336" width="23" height="16"/></element>
+		<element name="lamplabel200" ref="lamplabelel200"><bounds x="572" y="326" width="23" height="10" /></element>
+		<element name="lamp201" ref="matrixlamp" state="0"><bounds x="596" y="336" width="23" height="16"/></element>
+		<element name="lamplabel201" ref="lamplabelel201"><bounds x="596" y="326" width="23" height="10" /></element>
+		<element name="lamp202" ref="matrixlamp" state="0"><bounds x="620" y="336" width="23" height="16"/></element>
+		<element name="lamplabel202" ref="lamplabelel202"><bounds x="620" y="326" width="23" height="10" /></element>
+		<element name="lamp203" ref="matrixlamp" state="0"><bounds x="644" y="336" width="23" height="16"/></element>
+		<element name="lamplabel203" ref="lamplabelel203"><bounds x="644" y="326" width="23" height="10" /></element>
+		<element name="lamp204" ref="matrixlamp" state="0"><bounds x="668" y="336" width="23" height="16"/></element>
+		<element name="lamplabel204" ref="lamplabelel204"><bounds x="668" y="326" width="23" height="10" /></element>
+		<element name="lamp205" ref="matrixlamp" state="0"><bounds x="692" y="336" width="23" height="16"/></element>
+		<element name="lamplabel205" ref="lamplabelel205"><bounds x="692" y="326" width="23" height="10" /></element>
+		<element name="lamp206" ref="matrixlamp" state="0"><bounds x="716" y="336" width="23" height="16"/></element>
+		<element name="lamplabel206" ref="lamplabelel206"><bounds x="716" y="326" width="23" height="10" /></element>
+		<element name="lamp207" ref="matrixlamp" state="0"><bounds x="740" y="336" width="23" height="16"/></element>
+		<element name="lamplabel207" ref="lamplabelel207"><bounds x="740" y="326" width="23" height="10" /></element>
+		<element name="lamp208" ref="matrixlamp" state="0"><bounds x="380" y="364" width="23" height="16"/></element>
+		<element name="lamplabel208" ref="lamplabelel208"><bounds x="380" y="354" width="23" height="10" /></element>
+		<element name="lamp209" ref="matrixlamp" state="0"><bounds x="404" y="364" width="23" height="16"/></element>
+		<element name="lamplabel209" ref="lamplabelel209"><bounds x="404" y="354" width="23" height="10" /></element>
+		<element name="lamp210" ref="matrixlamp" state="0"><bounds x="428" y="364" width="23" height="16"/></element>
+		<element name="lamplabel210" ref="lamplabelel210"><bounds x="428" y="354" width="23" height="10" /></element>
+		<element name="lamp211" ref="matrixlamp" state="0"><bounds x="452" y="364" width="23" height="16"/></element>
+		<element name="lamplabel211" ref="lamplabelel211"><bounds x="452" y="354" width="23" height="10" /></element>
+		<element name="lamp212" ref="matrixlamp" state="0"><bounds x="476" y="364" width="23" height="16"/></element>
+		<element name="lamplabel212" ref="lamplabelel212"><bounds x="476" y="354" width="23" height="10" /></element>
+		<element name="lamp213" ref="matrixlamp" state="0"><bounds x="500" y="364" width="23" height="16"/></element>
+		<element name="lamplabel213" ref="lamplabelel213"><bounds x="500" y="354" width="23" height="10" /></element>
+		<element name="lamp214" ref="matrixlamp" state="0"><bounds x="524" y="364" width="23" height="16"/></element>
+		<element name="lamplabel214" ref="lamplabelel214"><bounds x="524" y="354" width="23" height="10" /></element>
+		<element name="lamp215" ref="matrixlamp" state="0"><bounds x="548" y="364" width="23" height="16"/></element>
+		<element name="lamplabel215" ref="lamplabelel215"><bounds x="548" y="354" width="23" height="10" /></element>
+		<element name="lamp216" ref="matrixlamp" state="0"><bounds x="572" y="364" width="23" height="16"/></element>
+		<element name="lamplabel216" ref="lamplabelel216"><bounds x="572" y="354" width="23" height="10" /></element>
+		<element name="lamp217" ref="matrixlamp" state="0"><bounds x="596" y="364" width="23" height="16"/></element>
+		<element name="lamplabel217" ref="lamplabelel217"><bounds x="596" y="354" width="23" height="10" /></element>
+		<element name="lamp218" ref="matrixlamp" state="0"><bounds x="620" y="364" width="23" height="16"/></element>
+		<element name="lamplabel218" ref="lamplabelel218"><bounds x="620" y="354" width="23" height="10" /></element>
+		<element name="lamp219" ref="matrixlamp" state="0"><bounds x="644" y="364" width="23" height="16"/></element>
+		<element name="lamplabel219" ref="lamplabelel219"><bounds x="644" y="354" width="23" height="10" /></element>
+		<element name="lamp220" ref="matrixlamp" state="0"><bounds x="668" y="364" width="23" height="16"/></element>
+		<element name="lamplabel220" ref="lamplabelel220"><bounds x="668" y="354" width="23" height="10" /></element>
+		<element name="lamp221" ref="matrixlamp" state="0"><bounds x="692" y="364" width="23" height="16"/></element>
+		<element name="lamplabel221" ref="lamplabelel221"><bounds x="692" y="354" width="23" height="10" /></element>
+		<element name="lamp222" ref="matrixlamp" state="0"><bounds x="716" y="364" width="23" height="16"/></element>
+		<element name="lamplabel222" ref="lamplabelel222"><bounds x="716" y="354" width="23" height="10" /></element>
+		<element name="lamp223" ref="unusedlamp" state="0"><bounds x="740" y="364" width="23" height="16"/></element>
+		<element name="lamplabel223" ref="lamplabelel223"><bounds x="740" y="354" width="23" height="10" /></element>
+		<element name="lamp224" ref="matrixlamp" state="0"><bounds x="380" y="392" width="23" height="16"/></element>
+		<element name="lamplabel224" ref="lamplabelel224"><bounds x="380" y="382" width="23" height="10" /></element>
+		<element name="lamp225" ref="matrixlamp" state="0"><bounds x="404" y="392" width="23" height="16"/></element>
+		<element name="lamplabel225" ref="lamplabelel225"><bounds x="404" y="382" width="23" height="10" /></element>
+		<element name="lamp226" ref="matrixlamp" state="0"><bounds x="428" y="392" width="23" height="16"/></element>
+		<element name="lamplabel226" ref="lamplabelel226"><bounds x="428" y="382" width="23" height="10" /></element>
+		<element name="lamp227" ref="matrixlamp" state="0"><bounds x="452" y="392" width="23" height="16"/></element>
+		<element name="lamplabel227" ref="lamplabelel227"><bounds x="452" y="382" width="23" height="10" /></element>
+		<element name="lamp228" ref="matrixlamp" state="0"><bounds x="476" y="392" width="23" height="16"/></element>
+		<element name="lamplabel228" ref="lamplabelel228"><bounds x="476" y="382" width="23" height="10" /></element>
+		<element name="lamp229" ref="matrixlamp" state="0"><bounds x="500" y="392" width="23" height="16"/></element>
+		<element name="lamplabel229" ref="lamplabelel229"><bounds x="500" y="382" width="23" height="10" /></element>
+		<element name="lamp230" ref="matrixlamp" state="0"><bounds x="524" y="392" width="23" height="16"/></element>
+		<element name="lamplabel230" ref="lamplabelel230"><bounds x="524" y="382" width="23" height="10" /></element>
+		<element name="lamp231" ref="matrixlamp" state="0"><bounds x="548" y="392" width="23" height="16"/></element>
+		<element name="lamplabel231" ref="lamplabelel231"><bounds x="548" y="382" width="23" height="10" /></element>
+		<element name="lamp232" ref="matrixlamp" state="0"><bounds x="572" y="392" width="23" height="16"/></element>
+		<element name="lamplabel232" ref="lamplabelel232"><bounds x="572" y="382" width="23" height="10" /></element>
+		<element name="lamp233" ref="matrixlamp" state="0"><bounds x="596" y="392" width="23" height="16"/></element>
+		<element name="lamplabel233" ref="lamplabelel233"><bounds x="596" y="382" width="23" height="10" /></element>
+		<element name="lamp234" ref="unusedlamp" state="0"><bounds x="620" y="392" width="23" height="16"/></element>
+		<element name="lamplabel234" ref="lamplabelel234"><bounds x="620" y="382" width="23" height="10" /></element>
+		<element name="lamp235" ref="unusedlamp" state="0"><bounds x="644" y="392" width="23" height="16"/></element>
+		<element name="lamplabel235" ref="lamplabelel235"><bounds x="644" y="382" width="23" height="10" /></element>
+		<element name="lamp236" ref="unusedlamp" state="0"><bounds x="668" y="392" width="23" height="16"/></element>
+		<element name="lamplabel236" ref="lamplabelel236"><bounds x="668" y="382" width="23" height="10" /></element>
+		<element name="lamp237" ref="unusedlamp" state="0"><bounds x="692" y="392" width="23" height="16"/></element>
+		<element name="lamplabel237" ref="lamplabelel237"><bounds x="692" y="382" width="23" height="10" /></element>
+		<element name="lamp238" ref="unusedlamp" state="0"><bounds x="716" y="392" width="23" height="16"/></element>
+		<element name="lamplabel238" ref="lamplabelel238"><bounds x="716" y="382" width="23" height="10" /></element>
+		<element name="lamp239" ref="unusedlamp" state="0"><bounds x="740" y="392" width="23" height="16"/></element>
+		<element name="lamplabel239" ref="lamplabelel239"><bounds x="740" y="382" width="23" height="10" /></element>
+		<element name="lamp240" ref="unusedlamp" state="0"><bounds x="380" y="420" width="23" height="16"/></element>
+		<element name="lamplabel240" ref="lamplabelel240"><bounds x="380" y="410" width="23" height="10" /></element>
+		<element name="lamp241" ref="unusedlamp" state="0"><bounds x="404" y="420" width="23" height="16"/></element>
+		<element name="lamplabel241" ref="lamplabelel241"><bounds x="404" y="410" width="23" height="10" /></element>
+		<element name="lamp242" ref="unusedlamp" state="0"><bounds x="428" y="420" width="23" height="16"/></element>
+		<element name="lamplabel242" ref="lamplabelel242"><bounds x="428" y="410" width="23" height="10" /></element>
+		<element name="lamp243" ref="unusedlamp" state="0"><bounds x="452" y="420" width="23" height="16"/></element>
+		<element name="lamplabel243" ref="lamplabelel243"><bounds x="452" y="410" width="23" height="10" /></element>
+		<element name="lamp244" ref="unusedlamp" state="0"><bounds x="476" y="420" width="23" height="16"/></element>
+		<element name="lamplabel244" ref="lamplabelel244"><bounds x="476" y="410" width="23" height="10" /></element>
+		<element name="lamp245" ref="unusedlamp" state="0"><bounds x="500" y="420" width="23" height="16"/></element>
+		<element name="lamplabel245" ref="lamplabelel245"><bounds x="500" y="410" width="23" height="10" /></element>
+		<element name="lamp246" ref="unusedlamp" state="0"><bounds x="524" y="420" width="23" height="16"/></element>
+		<element name="lamplabel246" ref="lamplabelel246"><bounds x="524" y="410" width="23" height="10" /></element>
+		<element name="lamp247" ref="unusedlamp" state="0"><bounds x="548" y="420" width="23" height="16"/></element>
+		<element name="lamplabel247" ref="lamplabelel247"><bounds x="548" y="410" width="23" height="10" /></element>
+		<element name="lamp248" ref="unusedlamp" state="0"><bounds x="572" y="420" width="23" height="16"/></element>
+		<element name="lamplabel248" ref="lamplabelel248"><bounds x="572" y="410" width="23" height="10" /></element>
+		<element name="lamp249" ref="unusedlamp" state="0"><bounds x="596" y="420" width="23" height="16"/></element>
+		<element name="lamplabel249" ref="lamplabelel249"><bounds x="596" y="410" width="23" height="10" /></element>
+		<element name="lamp250" ref="unusedlamp" state="0"><bounds x="620" y="420" width="23" height="16"/></element>
+		<element name="lamplabel250" ref="lamplabelel250"><bounds x="620" y="410" width="23" height="10" /></element>
+		<element name="lamp251" ref="unusedlamp" state="0"><bounds x="644" y="420" width="23" height="16"/></element>
+		<element name="lamplabel251" ref="lamplabelel251"><bounds x="644" y="410" width="23" height="10" /></element>
+		<element name="lamp252" ref="unusedlamp" state="0"><bounds x="668" y="420" width="23" height="16"/></element>
+		<element name="lamplabel252" ref="lamplabelel252"><bounds x="668" y="410" width="23" height="10" /></element>
+		<element name="lamp253" ref="unusedlamp" state="0"><bounds x="692" y="420" width="23" height="16"/></element>
+		<element name="lamplabel253" ref="lamplabelel253"><bounds x="692" y="410" width="23" height="10" /></element>
+		<element name="lamp254" ref="unusedlamp" state="0"><bounds x="716" y="420" width="23" height="16"/></element>
+		<element name="lamplabel254" ref="lamplabelel254"><bounds x="716" y="410" width="23" height="10" /></element>
+		<element name="lamp255" ref="unusedlamp" state="0"><bounds x="740" y="420" width="23" height="16"/></element>
+		<element name="lamplabel255" ref="lamplabelel255"><bounds x="740" y="410" width="23" height="10" /></element>
+		<element name="input1-0" ref="button" state="0" inputtag="IN-1" inputmask="0x01"><bounds x="180" y="0" width="19" height="10" /></element>
+		<element name="inputlab1-0" ref="inputlabel1-0"><bounds x="180" y="-10" width="19" height="10" /></element>
+		<element name="input1-1" ref="button" state="0" inputtag="IN-1" inputmask="0x02"><bounds x="200" y="0" width="19" height="10" /></element>
+		<element name="inputlab1-1" ref="inputlabel1-1"><bounds x="200" y="-10" width="19" height="10" /></element>
+		<element name="input1-2" ref="button" state="0" inputtag="IN-1" inputmask="0x04"><bounds x="220" y="0" width="19" height="10" /></element>
+		<element name="inputlab1-2" ref="inputlabel1-2"><bounds x="220" y="-10" width="19" height="10" /></element>
+		<element name="input1-3" ref="button" state="0" inputtag="IN-1" inputmask="0x08"><bounds x="240" y="0" width="19" height="10" /></element>
+		<element name="inputlab1-3" ref="inputlabel1-3"><bounds x="240" y="-10" width="19" height="10" /></element>
+		<element name="input1-4" ref="button" state="0" inputtag="IN-1" inputmask="0x10"><bounds x="260" y="0" width="19" height="10" /></element>
+		<element name="inputlab1-4" ref="inputlabel1-4"><bounds x="260" y="-10" width="19" height="10" /></element>
+		<element name="input1-5" ref="button" state="0" inputtag="IN-1" inputmask="0x20"><bounds x="280" y="0" width="19" height="10" /></element>
+		<element name="inputlab1-5" ref="inputlabel1-5"><bounds x="280" y="-10" width="19" height="10" /></element>
+		<element name="input2-0" ref="button" state="0" inputtag="IN-2" inputmask="0x01"><bounds x="180" y="20" width="19" height="10" /></element>
+		<element name="inputlab2-0" ref="inputlabel2-0"><bounds x="180" y="10" width="19" height="10" /></element>
+		<element name="input2-1" ref="button" state="0" inputtag="IN-2" inputmask="0x02"><bounds x="200" y="20" width="19" height="10" /></element>
+		<element name="inputlab2-1" ref="inputlabel2-1"><bounds x="200" y="10" width="19" height="10" /></element>
+		<element name="input2-2" ref="button" state="0" inputtag="IN-2" inputmask="0x04"><bounds x="220" y="20" width="19" height="10" /></element>
+		<element name="inputlab2-2" ref="inputlabel2-2"><bounds x="220" y="10" width="19" height="10" /></element>
+		<element name="input2-3" ref="button" state="0" inputtag="IN-2" inputmask="0x08"><bounds x="240" y="20" width="19" height="10" /></element>
+		<element name="inputlab2-3" ref="inputlabel2-3"><bounds x="240" y="10" width="19" height="10" /></element>
+		<element name="input2-4" ref="button" state="0" inputtag="IN-2" inputmask="0x10"><bounds x="260" y="20" width="19" height="10" /></element>
+		<element name="inputlab2-4" ref="inputlabel2-4"><bounds x="260" y="10" width="19" height="10" /></element>
+		<element name="input2-5" ref="button" state="0" inputtag="IN-2" inputmask="0x20"><bounds x="280" y="20" width="19" height="10" /></element>
+		<element name="inputlab2-5" ref="inputlabel2-5"><bounds x="280" y="10" width="19" height="10" /></element>
+		<element name="input8-0" ref="button" state="0" inputtag="IN-8" inputmask="0x01"><bounds x="180" y="40" width="19" height="10" /></element>
+		<element name="inputlab8-0" ref="inputlabel8-0"><bounds x="180" y="30" width="19" height="10" /></element>
+		<element name="input8-1" ref="button" state="0" inputtag="IN-8" inputmask="0x02"><bounds x="200" y="40" width="19" height="10" /></element>
+		<element name="inputlab8-1" ref="inputlabel8-1"><bounds x="200" y="30" width="19" height="10" /></element>
+		<element name="input8-2" ref="button" state="0" inputtag="IN-8" inputmask="0x04"><bounds x="220" y="40" width="19" height="10" /></element>
+		<element name="inputlab8-2" ref="inputlabel8-2"><bounds x="220" y="30" width="19" height="10" /></element>
+		<element name="input8-3" ref="button" state="0" inputtag="IN-8" inputmask="0x08"><bounds x="240" y="40" width="19" height="10" /></element>
+		<element name="inputlab8-3" ref="inputlabel8-3"><bounds x="240" y="30" width="19" height="10" /></element>
+		<element name="input8-4" ref="button" state="0" inputtag="IN-8" inputmask="0x10"><bounds x="260" y="40" width="19" height="10" /></element>
+		<element name="inputlab8-4" ref="inputlabel8-4"><bounds x="260" y="30" width="19" height="10" /></element>
+		<element name="input8-5" ref="button" state="0" inputtag="IN-8" inputmask="0x20"><bounds x="280" y="40" width="19" height="10" /></element>
+		<element name="inputlab8-5" ref="inputlabel8-5"><bounds x="280" y="30" width="19" height="10" /></element>
+		<element name="input9-0" ref="button" state="0" inputtag="IN-9" inputmask="0x01"><bounds x="180" y="60" width="19" height="10" /></element>
+		<element name="inputlab9-0" ref="inputlabel9-0"><bounds x="180" y="50" width="19" height="10" /></element>
+		<element name="input9-1" ref="button" state="0" inputtag="IN-9" inputmask="0x02"><bounds x="200" y="60" width="19" height="10" /></element>
+		<element name="inputlab9-1" ref="inputlabel9-1"><bounds x="200" y="50" width="19" height="10" /></element>
+		<element name="input9-2" ref="button" state="0" inputtag="IN-9" inputmask="0x04"><bounds x="220" y="60" width="19" height="10" /></element>
+		<element name="inputlab9-2" ref="inputlabel9-2"><bounds x="220" y="50" width="19" height="10" /></element>
+		<element name="input9-3" ref="button" state="0" inputtag="IN-9" inputmask="0x08"><bounds x="240" y="60" width="19" height="10" /></element>
+		<element name="inputlab9-3" ref="inputlabel9-3"><bounds x="240" y="50" width="19" height="10" /></element>
+		<element name="input9-4" ref="button" state="0" inputtag="IN-9" inputmask="0x10"><bounds x="260" y="60" width="19" height="10" /></element>
+		<element name="inputlab9-4" ref="inputlabel9-4"><bounds x="260" y="50" width="19" height="10" /></element>
+		<element name="input9-5" ref="button" state="0" inputtag="IN-9" inputmask="0x20"><bounds x="280" y="60" width="19" height="10" /></element>
+		<element name="inputlab9-5" ref="inputlabel9-5"><bounds x="280" y="50" width="19" height="10" /></element>
+		<element name="input10-0" ref="button" state="0" inputtag="IN-10" inputmask="0x01"><bounds x="180" y="80" width="19" height="10" /></element>
+		<element name="inputlab10-0" ref="inputlabel10-0"><bounds x="180" y="70" width="19" height="10" /></element>
+		<element name="input10-1" ref="button" state="0" inputtag="IN-10" inputmask="0x02"><bounds x="200" y="80" width="19" height="10" /></element>
+		<element name="inputlab10-1" ref="inputlabel10-1"><bounds x="200" y="70" width="19" height="10" /></element>
+		<element name="input10-2" ref="button" state="0" inputtag="IN-10" inputmask="0x04"><bounds x="220" y="80" width="19" height="10" /></element>
+		<element name="inputlab10-2" ref="inputlabel10-2"><bounds x="220" y="70" width="19" height="10" /></element>
+		<element name="input10-3" ref="button" state="0" inputtag="IN-10" inputmask="0x08"><bounds x="240" y="80" width="19" height="10" /></element>
+		<element name="inputlab10-3" ref="inputlabel10-3"><bounds x="240" y="70" width="19" height="10" /></element>
+		<element name="input10-4" ref="button" state="0" inputtag="IN-10" inputmask="0x10"><bounds x="260" y="80" width="19" height="10" /></element>
+		<element name="inputlab10-4" ref="inputlabel10-4"><bounds x="260" y="70" width="19" height="10" /></element>
+		<element name="input10-5" ref="button" state="0" inputtag="IN-10" inputmask="0x20"><bounds x="280" y="80" width="19" height="10" /></element>
+		<element name="inputlab10-5" ref="inputlabel10-5"><bounds x="280" y="70" width="19" height="10" /></element>
+		<element name="input20-0" ref="button" state="0" inputtag="IN-20" inputmask="0x01"><bounds x="180" y="100" width="19" height="10" /></element>
+		<element name="inputlab20-0" ref="inputlabel20-0"><bounds x="180" y="90" width="19" height="10" /></element>
+		<element name="input20-1" ref="button" state="0" inputtag="IN-20" inputmask="0x02"><bounds x="200" y="100" width="19" height="10" /></element>
+		<element name="inputlab20-1" ref="inputlabel20-1"><bounds x="200" y="90" width="19" height="10" /></element>
+		<element name="input20-2" ref="button" state="0" inputtag="IN-20" inputmask="0x04"><bounds x="220" y="100" width="19" height="10" /></element>
+		<element name="inputlab20-2" ref="inputlabel20-2"><bounds x="220" y="90" width="19" height="10" /></element>
+		<element name="input20-3" ref="button" state="0" inputtag="IN-20" inputmask="0x08"><bounds x="240" y="100" width="19" height="10" /></element>
+		<element name="inputlab20-3" ref="inputlabel20-3"><bounds x="240" y="90" width="19" height="10" /></element>
+		<element name="input20-4" ref="button" state="0" inputtag="IN-20" inputmask="0x10"><bounds x="260" y="100" width="19" height="10" /></element>
+		<element name="inputlab20-4" ref="inputlabel20-4"><bounds x="260" y="90" width="19" height="10" /></element>
+		<element name="input20-5" ref="button" state="0" inputtag="IN-20" inputmask="0x20"><bounds x="280" y="100" width="19" height="10" /></element>
+		<element name="inputlab20-5" ref="inputlabel20-5"><bounds x="280" y="90" width="19" height="10" /></element>
+
+		<repeat count="6">
+			<param name="i" start="0" increment="40" />
+			<param name="b" start="4" increment="24" />
+			<repeat count="5">
+				<param name="j" start="~i~" increment="8" />
+				<param name="x" start="~b~" increment="4" />
+				<repeat count="8">
+					<param name="k" start="~j~" increment="1" />
+					<param name="y" start="40" increment="4" />
+					<element name="matrix~k~" ref="matrixlamp" state="0">
+						<bounds x="~x~" y="~y~" width="3" height="3" />
+					</element>
+				</repeat>
+			</repeat>
+		</repeat>
+		<repeat count="2">
+			<param name="j" start="240" increment="8" />
+			<param name="x" start="148" increment="4" />
+			<repeat count="8">
+				<param name="k" start="~j~" increment="1" />
+				<param name="y" start="40" increment="4" />
+				<element name="matrix~k~" ref="matrixlamp" state="0">
+					<bounds x="~x~" y="~y~" width="3" height="3" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<repeat count="16">
+			<param name="i" start="0" increment="2" />
+			<param name="x" start="150" increment="-10" />
+			<repeat count="2">
+				<param name="j" start="~i~" increment="1" />
+				<param name="y" start="80" increment="20" />
+				<element name="digit~j~" ref="digit" state="0">
+					<bounds x="~x~" y="~y~" width="9" height="19" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<repeat count="16">
+			<param name="i" start="0" increment="1" />
+			<param name="x" start="0" increment="10" />
+			<element name="vfd~i~" ref="vfd0" state="0">
+				<bounds x="~x~" y="10" width="9" height="17" />
+			</element>
+		</repeat>
+
+		<element name="reel1:pos" ref="Steppers" state="0"><bounds x="40" y="350" width="10" height="5" /></element>
+		<element ref="SteppersReel1">
+			<bounds x="0" y="300" width="50" height="50" />
+			<yscroll name="reel1:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
+		<element name="reel2:pos" ref="Steppers" state="0"><bounds x="90" y="350" width="10" height="5" /></element>
+		<element ref="SteppersReel2">
+			<bounds x="50" y="300" width="50" height="50" />
+			<yscroll name="reel2:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
+		<element name="reel3:pos" ref="Steppers" state="0"><bounds x="140" y="350" width="10" height="5" /></element>
+		<element ref="SteppersReel3">
+			<bounds x="100" y="300" width="50" height="50" />
+			<yscroll name="reel3:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
+		<element name="reel4:pos" ref="Steppers" state="0"><bounds x="190" y="350" width="10" height="5" /></element>
+		<element ref="SteppersReel4">
+			<bounds x="150" y="300" width="50" height="50" />
+			<yscroll name="reel4:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
+		<element name="reel5:pos" ref="Steppers" state="0"><bounds x="240" y="350" width="10" height="5" /></element>
+		<element ref="SteppersReel5">
+			<bounds x="200" y="300" width="50" height="50" />
+			<yscroll name="reel5:scroll" size="0.25" wrap="yes" min="19788" max="85323"/>
+		</element>
+		<element name="reel6:pos" ref="Steppers" state="0"><bounds x="290" y="350" width="10" height="5" /></element>
+		<element ref="SteppersReel6">
+			<bounds x="250" y="300" width="50" height="50" />
+			<yscroll name="reel6:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
+	</view>
+</mamelayout>

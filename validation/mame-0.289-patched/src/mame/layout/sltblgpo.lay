@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="slot1" defstate="0">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="SLOT 1" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="slot2" defstate="0">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="SLOT 2" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="slot3" defstate="0">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="SLOT 3" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="slot4" defstate="0">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="SLOT 4" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="start" defstate="0">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="START" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="door0" defstate="1">
+		<rect state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="DOOR OPEN" state="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="vfd0">
+		<led14segsc>
+			<color red="0" green="0.6" blue="1.0" />
+		</led14segsc>
+	</element>
+
+	<view name="Adder, VFD and Lamps">
+		<collection name="Lamps">
+			<element name="lamp1" ref="slot1">
+				<bounds x="145" y="280" width="26" height="14" />
+			</element>
+			<element name="lamp3" ref="slot2">
+				<bounds x="175" y="280" width="26" height="14" />
+			</element>
+			<element name="lamp5" ref="slot3">
+				<bounds x="205" y="280" width="26" height="14" />
+			</element>
+			<element name="lamp6" ref="slot4">
+				<bounds x="235" y="280" width="26" height="14" />
+			</element>
+			<element name="lamp7" ref="start">
+				<bounds x="265" y="280" width="26" height="14" />
+			</element>
+			<element name="door" ref="door0">
+				<bounds x="370" y="280" width="26" height="14" />
+			</element>
+		</collection>
+		<collection name="VFD" visible="no">
+			<repeat count="16">
+				<param name="n" start="0" increment="1" />
+				<param name="x" start="0" increment="9" />
+				<element name="vfd~n~" ref="vfd0" state="0">
+					<bounds x="~x~" y="280" width="9" height="14"/>
+				</element>
+			</repeat>
+		</collection>
+		<screen index="0">
+			<bounds x="0" y="0" width="400" height="280" />
+		</screen>
+	</view>
+</mamelayout>

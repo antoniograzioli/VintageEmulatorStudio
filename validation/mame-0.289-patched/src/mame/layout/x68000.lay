@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Basic display of disk drive LEDs for the Sharp X680x0
+-->
+
+<mamelayout version="2">
+
+	<element name="access_led">
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="ctrl_led">
+		<disk state="0">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="eject_led">
+		<disk state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="drv0">
+		<text string="Drv0:">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="drv1">
+		<text string="Drv1:">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="drv2">
+		<text string="Drv2:">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="drv3">
+		<text string="Drv3:">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="kana">
+		<text string="Kana">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="romaji">
+		<text string="Romaji">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="code">
+		<text string="Code">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="caps">
+		<text string="Caps">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="insert">
+		<text string="Insert">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="hiragana">
+		<text string="Hiragana">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="fullsize">
+		<text string="Fullsize">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="Disk Drive and Keyboard LEDs">
+		<screen index="0">
+			<bounds x="61" y="0" width="1024" height="768" />
+		</screen>
+
+		<element name="drv0text" ref="drv0">
+			<bounds left="0" right="59" top="0" bottom="30" />
+		</element>
+		<element name="ctrl_drv0" ref="ctrl_led">
+			<bounds left="40" right="54" top="31" bottom="45" />
+		</element>
+		<element name="access_drv0" ref="access_led">
+			<bounds left="0" right="14" top="31" bottom="45" />
+		</element>
+		<element name="eject_drv0" ref="eject_led">
+			<bounds left="20" right="34" top="31" bottom="45" />
+		</element>
+		<element name="drv1text" ref="drv1">
+			<bounds left="0" right="59" top="70" bottom="100" />
+		</element>
+		<element name="ctrl_drv1" ref="ctrl_led">
+			<bounds left="40" right="54" top="101" bottom="115" />
+		</element>
+		<element name="access_drv1" ref="access_led">
+			<bounds left="0" right="14" top="101" bottom="115" />
+		</element>
+		<element name="eject_drv1" ref="eject_led">
+			<bounds left="20" right="34" top="101" bottom="115" />
+		</element>
+		<element name="drv2text" ref="drv2">
+			<bounds left="0" right="59" top="140" bottom="170" />
+		</element>
+		<element name="ctrl_drv2" ref="ctrl_led">
+			<bounds left="40" right="54" top="171" bottom="185" />
+		</element>
+		<element name="access_drv2" ref="access_led">
+			<bounds left="0" right="14" top="171" bottom="185" />
+		</element>
+		<element name="eject_drv2" ref="eject_led">
+			<bounds left="20" right="34" top="171" bottom="185" />
+		</element>
+		<element name="drv3text" ref="drv3">
+			<bounds left="0" right="59" top="210" bottom="240" />
+		</element>
+		<element name="ctrl_drv3" ref="ctrl_led">
+			<bounds left="40" right="54" top="241" bottom="255" />
+		</element>
+		<element name="access_drv3" ref="access_led">
+			<bounds left="0" right="14" top="241" bottom="255" />
+		</element>
+		<element name="eject_drv3" ref="eject_led">
+			<bounds left="20" right="34" top="241" bottom="255" />
+		</element>
+		<element name="kana_text" ref="kana">
+			<bounds left="0" right="40" top="300" bottom="314" />
+		</element>
+		<element name="key_led_kana" ref="access_led">
+			<bounds left="40" right="54" top="300" bottom="314" />
+		</element>
+		<element name="romaji_text" ref="romaji">
+			<bounds left="0" right="40" top="330" bottom="344" />
+		</element>
+		<element name="key_led_romaji" ref="access_led">
+			<bounds left="40" right="54" top="330" bottom="344" />
+		</element>
+		<element name="code_text" ref="code">
+			<bounds left="0" right="40" top="360" bottom="374" />
+		</element>
+		<element name="key_led_code" ref="access_led">
+			<bounds left="40" right="54" top="360" bottom="374" />
+		</element>
+		<element name="caps_text" ref="caps">
+			<bounds left="0" right="40" top="390" bottom="404" />
+		</element>
+		<element name="key_led_caps" ref="access_led">
+			<bounds left="40" right="54" top="390" bottom="404" />
+		</element>
+		<element name="insert_text" ref="insert">
+			<bounds left="0" right="40" top="420" bottom="434" />
+		</element>
+		<element name="key_led_insert" ref="access_led">
+			<bounds left="40" right="54" top="420" bottom="434" />
+		</element>
+		<element name="hiragana_text" ref="hiragana">
+			<bounds left="0" right="40" top="450" bottom="464" />
+		</element>
+		<element name="key_led_hiragana" ref="access_led">
+			<bounds left="40" right="54" top="450" bottom="464" />
+		</element>
+		<element name="fullsize_text" ref="fullsize">
+			<bounds left="0" right="40" top="480" bottom="494" />
+		</element>
+		<element name="key_led_fullsize" ref="access_led">
+			<bounds left="40" right="54" top="480" bottom="494" />
+		</element>
+	</view>
+
+</mamelayout>

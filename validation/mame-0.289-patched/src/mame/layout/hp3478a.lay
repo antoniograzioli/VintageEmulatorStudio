@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+loosely based on tranz330.lay
+-->
+<mamelayout version="2">
+	<element name="vfd"><led16segsc><color red="0.19" green="0.20" blue="0.22" /></led16segsc></element>
+
+	<!-- set text for 12 annunciators -->
+	<element name="ann0"><text string="SRQ" /></element>
+	<element name="ann1"><text string="LSTN" /></element>
+	<element name="ann2"><text string="TLK" /></element>
+	<element name="ann3"><text string="RMT" /></element>
+	<element name="ann4"><text string="MATH" /></element>
+	<element name="ann5"><text string="AZ OFF" /></element>
+	<element name="ann6"><text string="2Ω" /></element>
+	<element name="ann7"><text string="4Ω" /></element>
+	<element name="ann8"><text string="M RNG" /></element>
+	<element name="ann9"><text string="S TRG" /></element>
+	<element name="ann10"><text string="CAL" /></element>
+	<element name="ann11"><text string="SHIFT" /></element>
+
+
+	<element name="front"><rect><color red="0.6" green="0.63" blue="0.65" /></rect></element>
+	<element name="vfd_back"><rect><color red="0.46" green="0.44" blue="0.35" /></rect></element>
+	<element name="button_digit_back"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+
+	<element name="hl" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.5" alpha="0.2" />
+		</rect>
+	</element>
+
+
+	<element name="btn00_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="DCV"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn01_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="ACV"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn02_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="2W"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn03_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="4W"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn04_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="DCA"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn05_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="ACA"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn06_text">
+		<rect><color red="0.3" green="0.35" blue="0.85" /></rect>
+		<text string=""><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn10_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="AUTO/MAN"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn11_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="UP"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn12_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="DN"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn13_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="INT"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn14_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="SGL"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn15_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="SRQ"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn16_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="LCL"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<!-- a few extra labels -->
+	<element name="3dig"><text string="3"/></element>
+	<element name="4dig"><text string="4"/></element>
+	<element name="5dig"><text string="5"/></element>
+	<element name="az"><text string="Autozero"/></element>
+	<element name="trst"><text string="Test/Rst"/></element>
+	<element name="adrs"><text string="Adrs"/></element>
+	<element name="cal"><text string="Cal"/></element>
+
+
+	<view name="Internal Layout">
+		<element name="case_bg"      ref="front">            <bounds x=" 0" y=" 0" width="126" height="70"/></element>
+
+		<element name="vfd_backdrop" ref="vfd_back">         <bounds x="0" y="0" width="126" height="32"/></element>
+
+		<!-- pattern of 12 digits -->
+		<repeat count="12">
+			<param name="vfdnum" start="0" increment="1" />
+			<param name="vfd_xpos" start="9" increment="9" />
+			<element name="vfd~vfdnum~" ref="vfd" state="0">
+				<bounds x="~vfd_xpos~" y="9" width="9" height="14" />
+			</element>
+		</repeat>
+
+		<!-- pattern of 12 text annunciators -->
+		<repeat count="12">
+			<param name="ann_i" start="0" increment="1" />
+			<param name="ann_xpos" start="9" increment="9" />
+			<element name="ann~ann_i~" ref="ann~ann_i~">
+				<bounds x="~ann_xpos~" y="24" width="8" height="3" />
+				<color state="0" red="0.19" green="0.20" blue="0.22" alpha="0.13" />
+				<color state="1" red="0.19" green="0.20" blue="0.22" />
+			</element>
+		</repeat>
+
+		<!-- 2 rows of 7 button backgrounds and text elements, but electrical switch matrix is different -->
+		<repeat count="2">
+			<param name="brow" start="0" increment="1"/>
+			<param name="by" start="35" increment="15" />
+			<param name="ty" start="37" increment="15" />
+			<repeat count="7">
+				<param name="bcol" start="0" increment="1"/>
+				<param name="bx" start="5" increment="15" />
+				<element name="btn~brow~~bcol~_back" ref="button_digit_back">
+					<bounds x="~bx~" y="~by~" width="10" height="10"/>
+				</element>
+				<element name="btn~brow~~bcol~_text1" ref="btn~brow~~bcol~_text">
+					<bounds x="~bx~" y="~ty~" width="10" height="8"/>
+				</element>
+			</repeat>
+		</repeat>
+
+
+<!-- not sure how to parametrize this one : switch matrix doesn't match button layout. -->
+<!-- to match the schematics, we consider Col.0-3 to be driven by P14-17. The value in "inputmask" is the one read as "p1 & 0x0F", i.e. P13-P10. -->
+<!--    col.0 : (nc)|shift|ACA|DCA
+        col.1 : 4W|2W|ACV|DCV
+        col.2 : int|dn|up|auto
+        col.3 : (nc)|loc|srq|sgl -->
+		<element ref="hl" inputtag="COL.0" inputmask="0x01"><bounds x="65" y="35" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.0" inputmask="0x02"><bounds x="80" y="35" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.0" inputmask="0x04"><bounds x="95" y="35" width="10" height="10" /><color alpha="0.2" /></element>
+		<!--element ref="hl" inputtag="COL.0" inputmask="0x08"><bounds x="" y="54" width="10" height="10" /><color alpha="0.2" /></element -->
+		<element ref="hl" inputtag="COL.1" inputmask="0x01"><bounds x="5" y="35" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.1" inputmask="0x02"><bounds x="20" y="35" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.1" inputmask="0x04"><bounds x="35" y="35" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.1" inputmask="0x08"><bounds x="50" y="35" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.2" inputmask="0x01"><bounds x="5" y="50" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.2" inputmask="0x02"><bounds x="20" y="50" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.2" inputmask="0x04"><bounds x="35" y="50" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.2" inputmask="0x08"><bounds x="50" y="50" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.3" inputmask="0x01"><bounds x="65" y="50" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.3" inputmask="0x02"><bounds x="80" y="50" width="10" height="10" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="COL.3" inputmask="0x04"><bounds x="95" y="50" width="10" height="10" /><color alpha="0.2" /></element>
+		<!--element ref="hl" inputtag="COL.3" inputmask="0x08"><bounds x="" y="5" width="10" height="10" /><color alpha="0.2" /></element -->
+
+		<!-- misc text above buttons -->
+		<param name="bluetext_r" value="0.1"/>
+		<param name="bluetext_g" value="0.1"/>
+		<param name="bluetext_b" value="0.6"/>
+		<element name="3dig" ref="3dig">
+			<bounds x="5" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="4dig" ref="4dig">
+			<bounds x="20" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="5dig" ref="5dig">
+			<bounds x="35" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="az" ref="az">
+			<bounds x="50" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="trst" ref="trst">
+			<bounds x="65" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="adrs" ref="adrs">
+			<bounds x="80" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="cal" ref="cal">
+			<bounds x="95" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+	</view>
+</mamelayout>

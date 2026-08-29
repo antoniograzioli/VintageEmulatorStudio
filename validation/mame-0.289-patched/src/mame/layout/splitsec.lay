@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+
+	<element name="lamp_disk" defstate="0">
+		<disk state="1"><color red="1.0" green="0.24" blue="0.26" /></disk>
+		<disk state="0"><color red="0.15" green="0.043" blue="0.047" /></disk>
+	</element>
+	<element name="lamp_rect" defstate="0">
+		<rect state="1"><color red="1.0" green="0.24" blue="0.26" /></rect>
+		<rect state="0"><color red="0.15" green="0.043" blue="0.047" /></rect>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="18" top="0" bottom="28" />
+		<element ref="static_black">
+			<bounds left="0" right="18" top="0" bottom="28" />
+		</element>
+
+		<!-- maze of lamps -->
+		<element name="0.0" ref="lamp_rect"><bounds x="2" y="1" width="4" height="1" /></element>
+		<element name="0.2" ref="lamp_rect"><bounds x="7" y="1" width="4" height="1" /></element>
+		<element name="0.4" ref="lamp_rect"><bounds x="12" y="1" width="4" height="1" /></element>
+
+		<element name="1.0" ref="lamp_rect"><bounds x="1" y="2" width="1" height="4" /></element>
+		<element name="0.1" ref="lamp_disk"><bounds x="3" y="3" width="2" height="2" /></element>
+		<element name="1.2" ref="lamp_rect"><bounds x="6" y="2" width="1" height="4" /></element>
+		<element name="0.3" ref="lamp_disk"><bounds x="8" y="3" width="2" height="2" /></element>
+		<element name="1.4" ref="lamp_rect"><bounds x="11" y="2" width="1" height="4" /></element>
+		<element name="0.5" ref="lamp_disk"><bounds x="13" y="3" width="2" height="2" /></element>
+		<element name="1.6" ref="lamp_rect"><bounds x="16" y="2" width="1" height="4" /></element>
+
+		<element name="1.1" ref="lamp_rect"><bounds x="2" y="6" width="4" height="1" /></element>
+		<element name="1.3" ref="lamp_rect"><bounds x="7" y="6" width="4" height="1" /></element>
+		<element name="1.5" ref="lamp_rect"><bounds x="12" y="6" width="4" height="1" /></element>
+
+		<element name="2.0" ref="lamp_rect"><bounds x="1" y="7" width="1" height="4" /></element>
+		<element name="2.1" ref="lamp_disk"><bounds x="3" y="8" width="2" height="2" /></element>
+		<element name="2.2" ref="lamp_rect"><bounds x="6" y="7" width="1" height="4" /></element>
+		<element name="2.3" ref="lamp_disk"><bounds x="8" y="8" width="2" height="2" /></element>
+		<element name="2.4" ref="lamp_rect"><bounds x="11" y="7" width="1" height="4" /></element>
+		<element name="2.5" ref="lamp_disk"><bounds x="13" y="8" width="2" height="2" /></element>
+		<element name="2.6" ref="lamp_rect"><bounds x="16" y="7" width="1" height="4" /></element>
+
+		<element name="3.1" ref="lamp_rect"><bounds x="2" y="11" width="4" height="1" /></element>
+		<element name="3.3" ref="lamp_rect"><bounds x="7" y="11" width="4" height="1" /></element>
+		<element name="3.5" ref="lamp_rect"><bounds x="12" y="11" width="4" height="1" /></element>
+
+		<element name="3.0" ref="lamp_rect"><bounds x="1" y="12" width="1" height="4" /></element>
+		<element name="4.1" ref="lamp_disk"><bounds x="3" y="13" width="2" height="2" /></element>
+		<element name="3.2" ref="lamp_rect"><bounds x="6" y="12" width="1" height="4" /></element>
+		<element name="4.3" ref="lamp_disk"><bounds x="8" y="13" width="2" height="2" /></element>
+		<element name="3.4" ref="lamp_rect"><bounds x="11" y="12" width="1" height="4" /></element>
+		<element name="4.5" ref="lamp_disk"><bounds x="13" y="13" width="2" height="2" /></element>
+		<element name="3.6" ref="lamp_rect"><bounds x="16" y="12" width="1" height="4" /></element>
+
+		<element name="5.1" ref="lamp_rect"><bounds x="2" y="16" width="4" height="1" /></element>
+		<element name="5.3" ref="lamp_rect"><bounds x="7" y="16" width="4" height="1" /></element>
+		<element name="5.5" ref="lamp_rect"><bounds x="12" y="16" width="4" height="1" /></element>
+
+		<element name="4.0" ref="lamp_rect"><bounds x="1" y="17" width="1" height="4" /></element>
+		<element name="6.1" ref="lamp_disk"><bounds x="3" y="18" width="2" height="2" /></element>
+		<element name="4.2" ref="lamp_rect"><bounds x="6" y="17" width="1" height="4" /></element>
+		<element name="6.3" ref="lamp_disk"><bounds x="8" y="18" width="2" height="2" /></element>
+		<element name="4.4" ref="lamp_rect"><bounds x="11" y="17" width="1" height="4" /></element>
+		<element name="6.5" ref="lamp_disk"><bounds x="13" y="18" width="2" height="2" /></element>
+		<element name="4.6" ref="lamp_rect"><bounds x="16" y="17" width="1" height="4" /></element>
+
+		<element name="7.1" ref="lamp_rect"><bounds x="2" y="21" width="4" height="1" /></element>
+		<element name="7.3" ref="lamp_rect"><bounds x="7" y="21" width="4" height="1" /></element>
+		<element name="7.5" ref="lamp_rect"><bounds x="12" y="21" width="4" height="1" /></element>
+
+		<element name="5.0" ref="lamp_rect"><bounds x="1" y="22" width="1" height="4" /></element>
+		<element name="6.0" ref="lamp_disk"><bounds x="3" y="23" width="2" height="2" /></element>
+		<element name="5.2" ref="lamp_rect"><bounds x="6" y="22" width="1" height="4" /></element>
+		<element name="6.2" ref="lamp_disk"><bounds x="8" y="23" width="2" height="2" /></element>
+		<element name="5.4" ref="lamp_rect"><bounds x="11" y="22" width="1" height="4" /></element>
+		<element name="6.4" ref="lamp_disk"><bounds x="13" y="23" width="2" height="2" /></element>
+		<element name="5.6" ref="lamp_rect"><bounds x="16" y="22" width="1" height="4" /></element>
+
+		<element name="7.0" ref="lamp_rect"><bounds x="2" y="26" width="4" height="1" /></element>
+		<element name="7.2" ref="lamp_rect"><bounds x="7" y="26" width="4" height="1" /></element>
+		<element name="7.4" ref="lamp_rect"><bounds x="12" y="26" width="4" height="1" /></element>
+
+	</view>
+</mamelayout>

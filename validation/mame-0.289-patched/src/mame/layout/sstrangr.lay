@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="overlay upright">
+		<rect>
+			<bounds left="0" top="0" right="67" bottom="32" />
+			<color red="0.113" green="0.672" blue="0.980" />
+		</rect>
+		<rect>
+			<bounds left="67" top="0" right="148" bottom="32" />
+			<color red="0.039" green="0.922" blue="0.625" />
+		</rect>
+		<rect>
+			<bounds left="148" top="0" right="224" bottom="32" />
+			<color red="0.113" green="0.672" blue="0.980" />
+		</rect>
+		<rect>
+			<bounds left="0" top="32" right="224" bottom="64" />
+			<color red="0.832" green="0.199" blue="0.375" />
+		</rect>
+		<rect>
+			<bounds left="0" top="64" right="224" bottom="186" />
+			<color red="1" green="1" blue="0.322" />
+		</rect>
+		<rect>
+			<bounds left="0" top="186" right="224" bottom="215" />
+			<color red="1" green="0.647" blue="0" />
+		</rect>
+		<rect>
+			<bounds left="0" top="215" right="224" bottom="231" />
+			<color red="1" green="1" blue="0.322" />
+		</rect>
+		<rect>
+			<bounds left="0" top="231" right="224" bottom="256" />
+			<color red="0.113" green="0.672" blue="0.980" />
+		</rect>
+	</element>
+
+	<element name="overlay cocktail">
+		<rect>
+			<bounds left="0" top="0" right="224" bottom="256" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect>
+			<bounds left="0" top="0" right="224" bottom="64" />
+			<color red="0.113" green="0.672" blue="0.980" />
+		</rect>
+		<rect>
+			<bounds left="0" top="64" right="224" bottom="192" />
+			<color red="1" green="1" blue="0.322" />
+		</rect>
+		<rect>
+			<bounds left="0" top="192" right="224" bottom="256" />
+			<color red="0.113" green="0.672" blue="0.980" />
+		</rect>
+	</element>
+
+	<view name="Color Overlay Upright">
+		<screen index="0">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</screen>
+		<element ref="overlay upright" blend="multiply">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</element>
+	</view>
+	<view name="Color Overlay Cocktail">
+		<screen index="0">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</screen>
+		<element ref="overlay cocktail" blend="multiply">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</element>
+	</view>
+</mamelayout>

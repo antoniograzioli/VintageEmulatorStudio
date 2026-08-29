@@ -1,0 +1,310 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
+	<element name="shifter" defstate="0">
+		<rect>
+			<bounds left="0" right="32" top="0" bottom="64" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</rect>
+		<rect>
+			<bounds left="2" right="30" top="2" bottom="62" />
+			<color red="0.14" green="0.17" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="14" right="18" top="15" bottom="49" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</rect>
+		<disk>
+			<bounds left="14" right="18" top="13" bottom="17" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<disk>
+			<bounds left="14" right="18" top="47" bottom="51" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<text string="LOW" state="1">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<text string="LOW" state="0">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+
+		<text string="HIGH" state="1">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="HIGH" state="0">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<disk state="1">
+			<bounds left="9" right="23" top="14" bottom="28" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+		<disk state="0">
+			<bounds left="9" right="23" top="36" bottom="50" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+	</element>
+
+
+<!-- score panel -->
+
+	<element name="digit">
+		<led7seg>
+			<color red="1.0" green="0.15" blue="0.17" />
+		</led7seg>
+	</element>
+
+	<element name="panel">
+		<rect>
+			<bounds left="-168.29" top="0" right="0" bottom="376" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+
+		<text string="1ST">
+			<bounds x="-88" y="35" width="70" height="16" />
+			<color red="0.6" green="0.2" blue="0.3" />
+		</text>
+
+		<text string="2ND">
+			<bounds x="-88" y="62" width="70" height="16" />
+			<color red="0.6" green="0.2" blue="0.3" />
+		</text>
+
+		<text string="3RD">
+			<bounds x="-88" y="89" width="70" height="16" />
+			<color red="0.6" green="0.2" blue="0.3" />
+		</text>
+
+		<text string="4TH">
+			<bounds x="-88" y="116" width="70" height="16" />
+			<color red="0.6" green="0.2" blue="0.3" />
+		</text>
+
+		<text string="5TH">
+			<bounds x="-88" y="143" width="70" height="16" />
+			<color red="0.6" green="0.2" blue="0.3" />
+		</text>
+
+		<text string="SCORE">
+			<bounds x="-88" y="177" width="70" height="16" />
+			<color red="0.6" green="0.2" blue="0.3" />
+		</text>
+
+		<text string="TIME">
+			<bounds x="-88" y="266" width="70" height="16" />
+			<color red="0.1" green="0.3" blue="0.6" />
+		</text>
+	</element>
+
+	<element name="lampGO" defstate="0">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="GAME OVER" state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0.0" y="0.1" width="1.0" height="0.8" />
+		</text>
+		<text string="GAME OVER" state="1">
+			<bounds x="0.0" y="0.1" width="1.0" height="0.8" />
+		</text>
+	</element>
+
+	<element name="lampEP" defstate="0">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="EXTENDED PLAY" state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0.0" y="0.1" width="1.0" height="0.8" />
+		</text>
+		<text string="EXTENDED PLAY" state="1">
+			<bounds x="0.0" y="0.1" width="1.0" height="0.8" />
+		</text>
+	</element>
+
+	<group name="score">
+		<element ref="panel">
+			<bounds left="-168.29" top="0" right="0" bottom="376" />
+		</element>
+		<element name="lampGO" ref="lampGO">
+			<bounds x="-90" y="355" width="70" height="12" />
+		</element>
+		<element name="lampEP" ref="lampEP">
+			<bounds x="-155" y="355" width="70" height="12" />
+		</element>
+
+		<element name="digit24" ref="digit">
+			<bounds left="-131.90" top="264" right="-120.532" bottom="283" />
+		</element>
+		<element name="digit25" ref="digit">
+			<bounds left="-115.984" top="264" right="-104.613" bottom="283" />
+		</element>
+
+		<repeat count="5">
+			<param name="y" start="33" increment="27" />
+			<param name="s" start="0" increment="4" />
+			<repeat count="4">
+				<param name="x" start="-147.823" increment="15.919" />
+				<param name="n" start="~s~" increment="1" />
+				<element name="digit~n~" ref="digit">
+					<bounds x="~x~" y="~y~" width="11.371" height="19" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<repeat count="4">
+			<param name="x" start="-147.823" increment="15.919" />
+			<param name="n" start="20" increment="1" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="175" width="11.371" height="19" />
+			</element>
+		</repeat>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Simple LEDs + Shifter-R Overlay" showpointers="no">
+		<screen index="0">
+			<bounds left="0" top="0" right="282" bottom="376" />
+		</screen>
+
+		<collection name="Score Display">
+			<group ref="score">
+				<bounds left="-168.29" top="0" right="0" bottom="376" />
+			</group>
+
+			<collection name="Centre Display" visible="no">
+				<element ref="nothing">
+					<bounds left="282" top="0" right="450.29" bottom="376" />
+				</element>
+			</collection>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="IN2" inputmask="0x04">
+				<bounds x="256" y="326" width="24" height="48" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x04">
+					<bounds x="256" y="326" width="24" height="48" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="256" y="326" width="24" height="48" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Simple LEDs + Shifter-R Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds left="0" top="0" right="282" bottom="376" />
+		</screen>
+
+		<collection name="Score Display">
+			<group ref="score">
+				<bounds left="-168.29" top="0" right="0" bottom="376" />
+			</group>
+
+			<collection name="Centre Display" visible="no">
+				<element ref="nothing">
+					<bounds left="282" top="0" right="450.29" bottom="376" />
+				</element>
+			</collection>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="IN2" inputmask="0x04">
+				<bounds x="288" y="326" width="24" height="48" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x04">
+					<bounds x="288" y="326" width="24" height="48" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="288" y="326" width="24" height="48" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Simple LEDs + Shifter-L Overlay" showpointers="no">
+		<screen index="0">
+			<bounds left="0" top="0" right="282" bottom="376" />
+		</screen>
+
+		<collection name="Score Display">
+			<group ref="score">
+				<bounds left="-168.29" top="0" right="0" bottom="376" />
+			</group>
+
+			<collection name="Centre Display" visible="no">
+				<element ref="nothing">
+					<bounds left="282" top="0" right="450.29" bottom="376" />
+				</element>
+			</collection>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="IN2" inputmask="0x04">
+				<bounds x="2" y="326" width="24" height="48" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x04">
+					<bounds x="2" y="326" width="24" height="48" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="2" y="326" width="24" height="48" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Simple LEDs + Shifter-L Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds left="0" top="0" right="282" bottom="376" />
+		</screen>
+
+		<collection name="Score Display">
+			<group ref="score">
+				<bounds left="-168.29" top="0" right="0" bottom="376" />
+			</group>
+
+			<collection name="Centre Display" visible="no">
+				<element ref="nothing">
+					<bounds left="282" top="0" right="450.29" bottom="376" />
+				</element>
+			</collection>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="IN2" inputmask="0x04">
+				<bounds x="-30" y="326" width="24" height="48" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x04">
+					<bounds x="-30" y="326" width="24" height="48" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="-30" y="326" width="24" height="48" />
+			</element>
+		</collection>
+	</view>
+
+</mamelayout>

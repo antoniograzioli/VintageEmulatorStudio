@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Vas Crabb
+
+Midway Space Encounters layout
+-->
+<mamelayout version="2">
+	<element name="reflection" defstate="0"><rect state="1" /></element>
+
+	<view name="Lamp/Strobe Reflection">
+		<!-- left and right edges are stripped on the cabinet -->
+		<bounds left="0" top="0" right="376" bottom="300" />
+		<screen index="0">
+			<bounds left="-8" top="0" right="392" bottom="300" />
+		</screen>
+
+		<!-- NOTE: color overlay is known, but as of yet (10-2012) can't be created with internal .lay -->
+
+		<!-- lamp and strobe reflect onto the inner bezel (and screen) -->
+		<element ref="reflection" name="LAMP" blend="add">
+			<color red="0.5" green="0.125" blue="0.05" />
+			<bounds left="0" top="0" right="376" bottom="300" />
+		</element>
+		<element ref="reflection" name="STROBE" blend="add">
+			<color red="0.7" green="0.7" blue="0.7" />
+			<bounds left="0" top="0" right="376" bottom="300" />
+		</element>
+	</view>
+</mamelayout>

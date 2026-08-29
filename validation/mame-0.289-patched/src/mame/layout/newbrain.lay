@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led14seg>
+			<color red="0.0" green="1.0" blue="1.0" />
+		</led14seg>
+	</element>
+
+	<view name="Standard">
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
+		</screen>
+		<element name="digit0" ref="digit">
+			<bounds x="300" y="480" width="20" height="30" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="320" y="480" width="20" height="30" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="340" y="480" width="20" height="30" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="360" y="480" width="20" height="30" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="380" y="480" width="20" height="30" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="400" y="480" width="20" height="30" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds x="420" y="480" width="20" height="30" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds x="440" y="480" width="20" height="30" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="460" y="480" width="20" height="30" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds x="480" y="480" width="20" height="30" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="500" y="480" width="20" height="30" />
+		</element>
+		<element name="digit11" ref="digit">
+			<bounds x="520" y="480" width="20" height="30" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds x="540" y="480" width="20" height="30" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds x="560" y="480" width="20" height="30" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds x="580" y="480" width="20" height="30" />
+		</element>
+		<element name="digit15" ref="digit">
+			<bounds x="300" y="480" width="20" height="30" />
+		</element>
+	</view>
+</mamelayout>

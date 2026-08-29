@@ -1,0 +1,690 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+/***************************************************************************
+
+    uml.h
+
+    Universal machine language definitions and classes.
+
+***************************************************************************/
+#ifndef MAME_CPU_UML_H
+#define MAME_CPU_UML_H
+
+#pragma once
+
+#include "drccache.h"
+
+#include <algorithm>
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// opaque structure describing UML generation state
+class drcuml_state;
+
+struct drcuml_machine_state;
+
+
+// use a namespace to wrap all the UML instruction concepts so that
+// we can keep names short
+namespace uml {
+
+	// integer registers
+	constexpr int REG_I0 = 0x400;
+	constexpr int REG_I_COUNT = 10;
+	constexpr int REG_I_END = REG_I0 + REG_I_COUNT;
+
+	// floating point registers
+	constexpr int REG_F0 = 0x800;
+	constexpr int REG_F_COUNT = 10;
+	constexpr int REG_F_END = REG_F0 + REG_F_COUNT;
+
+	constexpr int MAPVAR_M0 = 0x1000;
+	constexpr int MAPVAR_COUNT = 10;
+	constexpr int MAPVAR_END = MAPVAR_M0 + MAPVAR_COUNT;
+
+	// flag definitions
+	enum : unsigned
+	{
+		FLAG_BIT_C = 0,
+		FLAG_BIT_V,
+		FLAG_BIT_Z,
+		FLAG_BIT_S,
+		FLAG_BIT_U
+	};
+	constexpr u8 FLAG_C = 1U << FLAG_BIT_C; // carry flag
+	constexpr u8 FLAG_V = 1U << FLAG_BIT_V; // overflow flag (defined for integer only)
+	constexpr u8 FLAG_Z = 1U << FLAG_BIT_Z; // zero flag
+	constexpr u8 FLAG_S = 1U << FLAG_BIT_S; // sign flag (defined for integer only)
+	constexpr u8 FLAG_U = 1U << FLAG_BIT_U; // unordered flag (defined for FP only)
+
+	// flag combinations
+	constexpr u8 FLAGS_NONE = 0x00;
+	constexpr u8 FLAGS_ALL  = FLAG_U | FLAG_S | FLAG_Z | FLAG_V | FLAG_C;
+
+	// testable conditions; note that these are defined such that (condition ^ 1) is
+	// always the opposite
+	enum condition_t
+	{
+		COND_ALWAYS = 0,
+
+		COND_Z = 0x80,              // requires Z (zero/equal)
+		COND_NZ,                    // requires Z (not zero/unequal)
+		COND_S,                     // requires S (signed)
+		COND_NS,                    // requires S (not signed)
+		COND_C,                     // requires C (carry)
+		COND_NC,                    // requires C (no carry)
+		COND_V,                     // requires V (overflow)
+		COND_NV,                    // requires V (no overflow)
+		COND_U,                     // requires U (unordered)
+		COND_NU,                    // requires U (not unordered)
+		COND_A,                     // requires CZ, unsigned
+		COND_BE,                    // requires CZ, unsigned
+		COND_G,                     // requires SVZ, signed
+		COND_LE,                    // requires SVZ, signed
+		COND_L,                     // requires SV, signed
+		COND_GE,                    // requires SV, signed
+
+		COND_MAX,
+
+		// basic condition code aliases
+		COND_E = COND_Z,
+		COND_NE = COND_NZ,
+		COND_B = COND_C, // unsigned
+		COND_AE = COND_NC // unsigned
+	};
+
+	// floating point rounding modes
+	enum float_rounding_mode
+	{
+		ROUND_TRUNC = 0,            // truncate
+		ROUND_ROUND,                // round
+		ROUND_CEIL,                 // round up
+		ROUND_FLOOR,                // round down
+		ROUND_DEFAULT
+	};
+
+	// operand sizes
+	enum operand_size
+	{
+		SIZE_BYTE = 0,              // 1-byte
+		SIZE_WORD,                  // 2-byte
+		SIZE_DWORD,                 // 4-byte
+		SIZE_QWORD,                 // 8-byte
+		SIZE_SHORT = SIZE_DWORD,    // 4-byte (float)
+		SIZE_DOUBLE = SIZE_QWORD    // 8-byte (float)
+	};
+
+	// memory scale factors
+	enum memory_scale
+	{
+		SCALE_x1 = 0,               // index * 1
+		SCALE_x2,                   // index * 2
+		SCALE_x4,                   // index * 4
+		SCALE_x8                    // index * 8
+	};
+
+	// spaces
+	enum memory_space
+	{
+		SPACE_PROGRAM = AS_PROGRAM,
+		SPACE_DATA = AS_DATA,
+		SPACE_IO = AS_IO,
+		SPACE_OPCODES = AS_OPCODES
+	};
+
+	// opcodes
+	enum opcode_t
+	{
+		OP_INVALID,
+
+		// compile-time opcodes
+		OP_HANDLE,                  // HANDLE  handle
+		OP_HASH,                    // HASH    mode,pc
+		OP_LABEL,                   // LABEL   imm
+		OP_COMMENT,                 // COMMENT string
+		OP_MAPVAR,                  // MAPVAR  mapvar,value
+
+		// control flow operations
+		OP_NOP,                     // NOP
+		OP_DEBUG,                   // DEBUG   pc
+		OP_BREAK,                   // BREAK
+		OP_EXIT,                    // EXIT    src1[,c]
+		OP_HASHJMP,                 // HASHJMP mode,pc,handle
+		OP_JMP,                     // JMP     imm[,c]
+		OP_EXH,                     // EXH     handle,param[,c]
+		OP_CALLH,                   // CALLH   handle[,c]
+		OP_RET,                     // RET     [c]
+		OP_CALLC,                   // CALLC   func,ptr[,c]
+		OP_RECOVER,                 // RECOVER dst,mapvar
+
+		// internal register operations
+		OP_SETFMOD,                 // SETFMOD src
+		OP_GETFMOD,                 // GETFMOD dst
+		OP_GETEXP,                  // GETEXP  dst
+		OP_GETFLGS,                 // GETFLGS dst[,f]
+		OP_SETFLGS,                 // SETFLGS src
+		OP_SAVE,                    // SAVE    mem
+		OP_RESTORE,                 // RESTORE mem
+
+		// integer operations
+		OP_LOAD,                    // LOAD    dst,base,index,size
+		OP_LOADS,                   // LOADS   dst,base,index,size
+		OP_STORE,                   // STORE   base,index,src,size
+		OP_READ,                    // READ    dst,src1,space/size
+		OP_READM,                   // READM   dst,src1,mask,space/size
+		OP_WRITE,                   // WRITE   dst,src1,space/size
+		OP_WRITEM,                  // WRITEM  dst,mask,src1,space/size
+		OP_CARRY,                   // CARRY   src,bitnum
+		OP_SET,                     // SET     dst,c
+		OP_MOV,                     // MOV     dst,src[,c]
+		OP_SEXT,                    // SEXT    dst,src,size
+		OP_BFXU,                    // BFXU    dst,src,shift,width
+		OP_BFXS,                    // BFXS    dst,src,shift,width
+		OP_ROLAND,                  // ROLAND  dst,src,shift,mask
+		OP_ROLINS,                  // ROLINS  dst,src,shift,mask
+		OP_ADD,                     // ADD     dst,src1,src2[,f]
+		OP_ADDC,                    // ADDC    dst,src1,src2[,f]
+		OP_SUB,                     // SUB     dst,src1,src2[,f]
+		OP_SUBB,                    // SUBB    dst,src1,src2[,f]
+		OP_CMP,                     // CMP     src1,src2[,f]
+		OP_MULU,                    // MULU    dst,edst,src1,src2[,f]
+		OP_MULULW,                  // MULULW  dst,src1,src2[,f]
+		OP_MULS,                    // MULS    dst,edst,src1,src2[,f]
+		OP_MULSLW,                  // MULSLW  dst,src1,src2[,f]
+		OP_DIVU,                    // DIVU    dst,edst,src1,src2[,f]
+		OP_DIVS,                    // DIVS    dst,edst,src1,src2[,f]
+		OP_AND,                     // AND     dst,src1,src2[,f]
+		OP_TEST,                    // TEST    src1,src2[,f]
+		OP_OR,                      // OR      dst,src1,src2[,f]
+		OP_XOR,                     // XOR     dst,src1,src2[,f]
+		OP_LZCNT,                   // LZCNT   dst,src
+		OP_TZCNT,                   // TZCNT   dst,src
+		OP_BSWAP,                   // BSWAP   dst,src
+		OP_SHL,                     // SHL     dst,src,count[,f]
+		OP_SHR,                     // SHR     dst,src,count[,f]
+		OP_SAR,                     // SAR     dst,src,count[,f]
+		OP_ROL,                     // ROL     dst,src,count[,f]
+		OP_ROLC,                    // ROLC    dst,src,count[,f]
+		OP_ROR,                     // ROL     dst,src,count[,f]
+		OP_RORC,                    // ROLC    dst,src,count[,f]
+
+		// floating point operations
+		OP_FLOAD,                   // FLOAD   dst,base,index
+		OP_FSTORE,                  // FSTORE  base,index,src
+		OP_FREAD,                   // FREAD   dst,space,src1
+		OP_FWRITE,                  // FWRITE  space,dst,src1
+		OP_FMOV,                    // FMOV    dst,src1[,c]
+		OP_FTOINT,                  // FTOINT  dst,src1,size,round
+		OP_FFRINT,                  // FFRINT  dst,src1,size
+		OP_FFRFLT,                  // FFRFLT  dst,src1,size
+		OP_FRNDS,                   // FRNDS   dst,src1
+		OP_FADD,                    // FADD    dst,src1,src2
+		OP_FSUB,                    // FSUB    dst,src1,src2
+		OP_FCMP,                    // FCMP    src1,src2
+		OP_FMUL,                    // FMUL    dst,src1,src2
+		OP_FDIV,                    // FDIV    dst,src1,src2
+		OP_FNEG,                    // FNEG    dst,src1
+		OP_FABS,                    // FABS    dst,src1
+		OP_FSQRT,                   // FSQRT   dst,src1
+		OP_FRECIP,                  // FRECIP  dst,src1
+		OP_FRSQRT,                  // FRSQRT  dst,src1
+		OP_FCOPYI,                  // FCOPYI  dst,src
+		OP_ICOPYF,                  // ICOPYF  dst,src
+
+		OP_MAX
+	};
+
+	// C function callback definition
+	using c_function = void (*)(void *ptr);
+
+	// class describing a global code handle
+	class code_handle
+	{
+	public:
+		// construction/destruction
+		code_handle(drcuml_state &drcuml, const char *name);
+
+		// getters
+		drccodeptr codeptr() const { return *m_code; }
+		drccodeptr *codeptr_addr() { return m_code; }
+		char const *string() const { return m_string.c_str(); }
+
+		// setters
+		void set_codeptr(drccodeptr code);
+
+	private:
+		// internal state
+		drccodeptr *            m_code;             // pointer in the cache to the associated code
+		std::string             m_string;           // pointer to string attached to handle
+		drcuml_state &          m_drcuml;           // pointer to owning object
+	};
+
+	// class describing a local code label
+	class code_label
+	{
+	public:
+		// construction
+		constexpr code_label(u32 label = 0) : m_label(label) { }
+
+		// operators
+		operator u32 &() { return m_label; }
+		constexpr operator u32 () const { return m_label; }
+		constexpr bool operator==(code_label const &rhs) const { return (m_label == rhs.m_label); }
+		constexpr bool operator!=(code_label const &rhs) const { return (m_label != rhs.m_label); }
+
+		// getters
+		constexpr u32 label() const { return m_label; }
+
+	private:
+		u32 m_label;
+	};
+
+	// a parameter for a UML instruction is encoded like this
+	class parameter
+	{
+	public:
+		// opcode parameter types
+		enum parameter_type
+		{
+			PTYPE_NONE = 0,                     // invalid
+			PTYPE_IMMEDIATE,                    // immediate; value = sign-extended to 64 bits
+			PTYPE_INT_REGISTER,                 // integer register; value = REG_I0 - REG_I_END
+			PTYPE_FLOAT_REGISTER,               // floating point register; value = REG_F0 - REG_F_END
+			PTYPE_MAPVAR,                       // map variable; value = MAPVAR_M0 - MAPVAR_END
+			PTYPE_MEMORY,                       // memory; value = pointer to memory
+			PTYPE_SIZE,                         // size; value = operand_size
+			PTYPE_SIZE_SCALE,                   // scale + size; value = memory_scale * 16 + operand_size
+			PTYPE_SIZE_SPACE,                   // space + size; value = memory_space * 16 + operand_size
+			PTYPE_CODE_HANDLE,                  // code handle; value = pointer to handle
+			PTYPE_CODE_LABEL,                   // code label; value = label index
+			PTYPE_C_FUNCTION,                   // C function; value = pointer to C code
+			PTYPE_ROUNDING,                     // floating point rounding mode; value = float_rounding_mode
+			PTYPE_STRING,                       // string parameter; value = pointer to string
+			PTYPE_MAX
+		};
+
+		// represents the value of an opcode parameter
+		typedef u64 parameter_value;
+
+		// construction
+		constexpr parameter() : m_type(PTYPE_NONE), m_value(0) { }
+		constexpr parameter(parameter const &param) : m_type(param.m_type), m_value(param.m_value) { }
+		constexpr parameter(u64 val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
+		parameter(operand_size size, memory_scale scale) : m_type(PTYPE_SIZE_SCALE), m_value((scale << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); assert(scale >= SCALE_x1 && scale <= SCALE_x8); }
+		parameter(operand_size size, memory_space space) : m_type(PTYPE_SIZE_SPACE), m_value((space << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); }
+		parameter(code_handle &handle) : m_type(PTYPE_CODE_HANDLE), m_value(reinterpret_cast<parameter_value>(&handle)) { }
+		constexpr parameter(code_label const &label) : m_type(PTYPE_CODE_LABEL), m_value(label) { }
+
+		// creators for types that don't safely default
+		static parameter make_ireg(int regnum) { assert(regnum >= REG_I0 && regnum < REG_I_END); return parameter(PTYPE_INT_REGISTER, regnum); }
+		static parameter make_freg(int regnum) { assert(regnum >= REG_F0 && regnum < REG_F_END); return parameter(PTYPE_FLOAT_REGISTER, regnum); }
+		static parameter make_mapvar(int mvnum) { assert(mvnum >= MAPVAR_M0 && mvnum < MAPVAR_END); return parameter(PTYPE_MAPVAR, mvnum); }
+		static parameter make_memory(void *base) { return parameter(PTYPE_MEMORY, reinterpret_cast<parameter_value>(base)); }
+		static parameter make_memory(void const *base) { return parameter(PTYPE_MEMORY, reinterpret_cast<parameter_value>(const_cast<void *>(base))); }
+		static parameter make_size(operand_size size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); return parameter(PTYPE_SIZE, size); }
+		static parameter make_string(char const *string) { return parameter(PTYPE_STRING, reinterpret_cast<parameter_value>(const_cast<char *>(string))); }
+		template <typename T> static parameter make_cfunc(void (*func)(T *)) { return parameter(PTYPE_C_FUNCTION, parameter_value(reinterpret_cast<uintptr_t>(func))); }
+		template <typename T> static parameter make_cfunc(void (*func)(T &)) { return parameter(PTYPE_C_FUNCTION, parameter_value(reinterpret_cast<uintptr_t>(func))); }
+		static parameter make_rounding(float_rounding_mode mode) { assert(mode >= ROUND_TRUNC && mode <= ROUND_DEFAULT); return parameter(PTYPE_ROUNDING, mode); }
+
+		// operators
+		constexpr bool operator==(parameter const &rhs) const { return (m_type == rhs.m_type) && (m_value == rhs.m_value); }
+		constexpr bool operator!=(parameter const &rhs) const { return (m_type != rhs.m_type) || (m_value != rhs.m_value); }
+
+		// getters
+		constexpr parameter_type type() const { return m_type; }
+		u64 immediate() const { assert(m_type == PTYPE_IMMEDIATE); return m_value; }
+		int ireg() const { assert(m_type == PTYPE_INT_REGISTER); assert(m_value >= REG_I0 && m_value < REG_I_END); return m_value; }
+		int freg() const { assert(m_type == PTYPE_FLOAT_REGISTER); assert(m_value >= REG_F0 && m_value < REG_F_END); return m_value; }
+		int mapvar() const { assert(m_type == PTYPE_MAPVAR); assert(m_value >= MAPVAR_M0 && m_value < MAPVAR_END); return m_value; }
+		void *memory() const { assert(m_type == PTYPE_MEMORY); return reinterpret_cast<void *>(m_value); }
+		operand_size size() const { assert(m_type == PTYPE_SIZE || m_type == PTYPE_SIZE_SCALE || m_type == PTYPE_SIZE_SPACE); return operand_size(m_value & 15); }
+		memory_scale scale() const { assert(m_type == PTYPE_SIZE_SCALE); return memory_scale(m_value >> 4); }
+		memory_space space() const { assert(m_type == PTYPE_SIZE_SPACE); return memory_space(m_value >> 4); }
+		code_handle &handle() const { assert(m_type == PTYPE_CODE_HANDLE); return *reinterpret_cast<code_handle *>(m_value); }
+		code_label label() const { assert(m_type == PTYPE_CODE_LABEL); return code_label(m_value); }
+		c_function cfunc() const { assert(m_type == PTYPE_C_FUNCTION); return reinterpret_cast<c_function>(uintptr_t(m_value)); }
+		float_rounding_mode rounding() const { assert(m_type == PTYPE_ROUNDING); return float_rounding_mode(m_value); }
+		char const *string() const { assert(m_type == PTYPE_STRING); return reinterpret_cast<char const *>(m_value); }
+
+		// type queries
+		constexpr bool is_immediate() const { return m_type == PTYPE_IMMEDIATE; }
+		constexpr bool is_int_register() const { return m_type == PTYPE_INT_REGISTER; }
+		constexpr bool is_float_register() const { return m_type == PTYPE_FLOAT_REGISTER; }
+		constexpr bool is_mapvar() const { return m_type == PTYPE_MAPVAR; }
+		constexpr bool is_memory() const { return m_type == PTYPE_MEMORY; }
+		constexpr bool is_size() const { return m_type == PTYPE_SIZE; }
+		constexpr bool is_size_scale() const { return m_type == PTYPE_SIZE_SCALE; }
+		constexpr bool is_size_space() const { return m_type == PTYPE_SIZE_SPACE; }
+		constexpr bool is_code_handle() const { return m_type == PTYPE_CODE_HANDLE; }
+		constexpr bool is_code_label() const { return m_type == PTYPE_CODE_LABEL; }
+		constexpr bool is_c_function() const { return m_type == PTYPE_C_FUNCTION; }
+		constexpr bool is_rounding() const { return m_type == PTYPE_ROUNDING; }
+		constexpr bool is_string() const { return m_type == PTYPE_STRING; }
+
+		// other queries
+		constexpr bool is_immediate_value(u64 value) const { return (m_type == PTYPE_IMMEDIATE) && (m_value == value); }
+
+	private:
+		// private constructor
+		constexpr parameter(parameter_type type, parameter_value value) : m_type(type), m_value(value) { }
+
+		// internals
+		parameter_type      m_type;             // parameter type
+		parameter_value     m_value;            // parameter value
+	};
+
+	// structure describing rules for opcode encoding
+	struct opcode_info
+	{
+		struct parameter_info
+		{
+			u8                  output;         // input or output?
+			u8                  size;           // size of the parameter
+			u16                 typemask;       // types allowed
+		};
+
+		opcode_t            opcode;             // the opcode itself
+		char const *        mnemonic;           // mnemonic string
+		u8                  sizes;              // allowed sizes
+		bool                condition;          // conditions allowed?
+		u8                  inflags;            // input flags
+		u8                  outflags;           // output flags
+		u8                  modflags;           // modified flags
+		parameter_info      param[4];           // information about parameters
+	};
+
+	// a single UML instruction is encoded like this
+	class instruction
+	{
+	public:
+		// constants
+		static constexpr int MAX_PARAMS = 4;
+
+		// construction/destruction
+		constexpr instruction() : m_param{ } { }
+
+		bool is_param_out(int paramnum) const { assert(m_opcode < OP_MAX); assert(paramnum < m_numparams); return (s_opcode_info_table[m_opcode].param[paramnum].output & 0x02) != 0; }
+
+		// getters
+		constexpr opcode_t opcode() const { return m_opcode; }
+		constexpr condition_t condition() const { return m_condition; }
+		constexpr u8 flags() const { return m_flags; }
+		constexpr u8 size() const { return m_size; }
+		constexpr u8 numparams() const { return m_numparams; }
+		const parameter &param(int index) const { assert(index < m_numparams); return m_param[index]; }
+
+		// setters
+		void set_flags(u8 flags) { m_flags = flags; }
+		void set_mapvar(int paramnum, u32 value) { assert(paramnum < m_numparams); assert(m_param[paramnum].is_mapvar()); m_param[paramnum] = value; }
+
+		// misc
+		std::string disasm(drcuml_state *drcuml = nullptr) const;
+		u8 input_flags() const;
+		u8 output_flags() const;
+		u8 modified_flags() const;
+		void simplify();
+
+		// operators
+		bool operator==(instruction const &that) const
+		{
+			if ((m_opcode != that.m_opcode) || (m_condition != that.m_condition) || (m_flags != that.m_flags) || (m_size != that.m_size) || (m_numparams != that.m_numparams))
+				return false;
+			auto const last = m_param + m_numparams;
+			return std::mismatch(std::begin(m_param), last, std::begin(that.m_param)).first == last;
+		}
+		bool operator!=(instruction const &that) const
+		{
+			if ((m_opcode != that.m_opcode) || (m_condition != that.m_condition) || (m_flags != that.m_flags) || (m_size != that.m_size) || (m_numparams != that.m_numparams))
+				return true;
+			auto const last = m_param + m_numparams;
+			return std::mismatch(std::begin(m_param), last, std::begin(that.m_param)).first != last;
+		}
+
+		// compile-time opcodes
+		void handle(code_handle &hand) { configure(OP_HANDLE, 4, hand); }
+		void hash(u32 mode, u32 pc) { configure(OP_HASH, 4, mode, pc); }
+		void label(code_label lab) { configure(OP_LABEL, 4, lab); }
+		void comment(char const *string) { configure(OP_COMMENT, 4, parameter::make_string(string)); }
+		void mapvar(parameter mapvar, u32 value) { assert(mapvar.is_mapvar()); configure(OP_MAPVAR, 4, mapvar, value); }
+
+		// control flow operations
+		void nop() { configure(OP_NOP, 4); }
+		void break_() { configure(OP_BREAK, 4); }
+		void debug(u32 pc) { configure(OP_DEBUG, 4, pc); }
+		void exit(parameter param) { configure(OP_EXIT, 4, param); }
+		void exit(condition_t cond, parameter param) { configure(OP_EXIT, 4, param, cond); }
+		void hashjmp(parameter mode, parameter pc, code_handle &handle) { configure(OP_HASHJMP, 4, mode, pc, handle); }
+		void jmp(code_label label) { configure(OP_JMP, 4, label); }
+		void jmp(condition_t cond, code_label label) { configure(OP_JMP, 4, label, cond); }
+		void exh(code_handle &handle, parameter param) { configure(OP_EXH, 4, handle, param); }
+		void exh(condition_t cond, code_handle &handle, parameter param) { configure(OP_EXH, 4, handle, param, cond); }
+		void callh(code_handle &handle) { configure(OP_CALLH, 4, handle); }
+		void callh(condition_t cond, code_handle &handle) { configure(OP_CALLH, 4, handle, cond); }
+		void ret() { configure(OP_RET, 4); }
+		void ret(condition_t cond) { configure(OP_RET, 4, cond); }
+		template <typename T> void callc(T func, void *ptr) { configure(OP_CALLC, 4, parameter::make_cfunc(func), parameter::make_memory(ptr)); }
+		template <typename T> void callc(condition_t cond, T func, void *ptr) { configure(OP_CALLC, 4, parameter::make_cfunc(func), parameter::make_memory(ptr), cond); }
+		void recover(parameter dst, parameter mapvar) { assert(mapvar.is_mapvar()); configure(OP_RECOVER, 4, dst, mapvar); }
+
+		// internal register operations
+		void setfmod(parameter mode) { configure(OP_SETFMOD, 4, mode); }
+		void getfmod(parameter dst) { configure(OP_GETFMOD, 4, dst); }
+		void getexp(parameter dst) { configure(OP_GETEXP, 4, dst); }
+		void getflgs(parameter dst, u32 flags) { configure(OP_GETFLGS, 4, dst, flags); }
+		void setflgs(u32 flags) { configure(OP_SETFLGS, 4, flags); }
+		void save(drcuml_machine_state *dst) { configure(OP_SAVE, 4, parameter::make_memory(dst)); }
+		void restore(drcuml_machine_state *src) { configure(OP_RESTORE, 4, parameter::make_memory(src)); }
+
+		// 32-bit integer operations
+		void load(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOAD, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void loads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOADS, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void store(void *base, parameter index, parameter src1, operand_size size, memory_scale scale) { configure(OP_STORE, 4, parameter::make_memory(base), index, src1, parameter(size, scale)); }
+		void read(parameter dst, parameter addr, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 4, dst, addr, parameter(size, space)); }
+		void readm(parameter dst, parameter addr, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 4, dst, addr, mask, parameter(size, space)); }
+		void write(parameter addr, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 4, addr, src1, parameter(size, space)); }
+		void writem(parameter addr, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 4, addr, src1, mask, parameter(size, space)); }
+		void carry(parameter src, parameter bitnum) { configure(OP_CARRY, 4, src, bitnum); }
+		void set(condition_t cond, parameter dst) { configure(OP_SET, 4, dst, cond); }
+		void mov(parameter dst, parameter src1) { configure(OP_MOV, 4, dst, src1); }
+		void mov(condition_t cond, parameter dst, parameter src1) { configure(OP_MOV, 4, dst, src1, cond); }
+		void sext(parameter dst, parameter src1, operand_size size) { configure(OP_SEXT, 4, dst, src1, parameter::make_size(size)); }
+		void bfxu(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXU, 4, dst, src, shift, width); }
+		void bfxs(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXS, 4, dst, src, shift, width); }
+		void roland(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLAND, 4, dst, src, shift, mask); }
+		void rolins(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLINS, 4, dst, src, shift, mask); }
+		void add(parameter dst, parameter src1, parameter src2) { configure(OP_ADD, 4, dst, src1, src2); }
+		void addc(parameter dst, parameter src1, parameter src2) { configure(OP_ADDC, 4, dst, src1, src2); }
+		void sub(parameter dst, parameter src1, parameter src2) { configure(OP_SUB, 4, dst, src1, src2); }
+		void subb(parameter dst, parameter src1, parameter src2) { configure(OP_SUBB, 4, dst, src1, src2); }
+		void cmp(parameter src1, parameter src2) { configure(OP_CMP, 4, src1, src2); }
+		void mulu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULU, 4, dst, edst, src1, src2); }
+		void mululw(parameter dst, parameter src1, parameter src2) { configure(OP_MULULW, 4, dst, src1, src2); }
+		void muls(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULS, 4, dst, edst, src1, src2); }
+		void mulslw(parameter dst, parameter src1, parameter src2) { configure(OP_MULSLW, 4, dst, src1, src2); }
+		void divu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVU, 4, dst, edst, src1, src2); }
+		void divs(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVS, 4, dst, edst, src1, src2); }
+		void _and(parameter dst, parameter src1, parameter src2) { configure(OP_AND, 4, dst, src1, src2); }
+		void test(parameter src1, parameter src2) { configure(OP_TEST, 4, src1, src2); }
+		void _or(parameter dst, parameter src1, parameter src2) { configure(OP_OR, 4, dst, src1, src2); }
+		void _xor(parameter dst, parameter src1, parameter src2) { configure(OP_XOR, 4, dst, src1, src2); }
+		void lzcnt(parameter dst, parameter src) { configure(OP_LZCNT, 4, dst, src); }
+		void tzcnt(parameter dst, parameter src) { configure(OP_TZCNT, 4, dst, src); }
+		void bswap(parameter dst, parameter src) { configure(OP_BSWAP, 4, dst, src); }
+		void shl(parameter dst, parameter src, parameter count) { configure(OP_SHL, 4, dst, src, count); }
+		void shr(parameter dst, parameter src, parameter count) { configure(OP_SHR, 4, dst, src, count); }
+		void sar(parameter dst, parameter src, parameter count) { configure(OP_SAR, 4, dst, src, count); }
+		void rol(parameter dst, parameter src, parameter count) { configure(OP_ROL, 4, dst, src, count); }
+		void rolc(parameter dst, parameter src, parameter count) { configure(OP_ROLC, 4, dst, src, count); }
+		void ror(parameter dst, parameter src, parameter count) { configure(OP_ROR, 4, dst, src, count); }
+		void rorc(parameter dst, parameter src, parameter count) { configure(OP_RORC, 4, dst, src, count); }
+
+		// 64-bit integer operations
+		void dload(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOAD, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void dloads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOADS, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void dstore(void *base, parameter index, parameter src1, operand_size size, memory_scale scale) { configure(OP_STORE, 8, parameter::make_memory(base), index, src1, parameter(size, scale)); }
+		void dread(parameter dst, parameter addr, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 8, dst, addr, parameter(size, space)); }
+		void dreadm(parameter dst, parameter addr, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 8, dst, addr, mask, parameter(size, space)); }
+		void dwrite(parameter addr, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 8, addr, src1, parameter(size, space)); }
+		void dwritem(parameter addr, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 8, addr, src1, mask, parameter(size, space)); }
+		void dcarry(parameter src, parameter bitnum) { configure(OP_CARRY, 8, src, bitnum); }
+		void dset(condition_t cond, parameter dst) { configure(OP_SET, 8, dst, cond); }
+		void dmov(parameter dst, parameter src1) { configure(OP_MOV, 8, dst, src1); }
+		void dmov(condition_t cond, parameter dst, parameter src1) { configure(OP_MOV, 8, dst, src1, cond); }
+		void dsext(parameter dst, parameter src1, operand_size size) { configure(OP_SEXT, 8, dst, src1, parameter::make_size(size)); }
+		void dbfxu(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXU, 8, dst, src, shift, width); }
+		void dbfxs(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXS, 8, dst, src, shift, width); }
+		void droland(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLAND, 8, dst, src, shift, mask); }
+		void drolins(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLINS, 8, dst, src, shift, mask); }
+		void dadd(parameter dst, parameter src1, parameter src2) { configure(OP_ADD, 8, dst, src1, src2); }
+		void daddc(parameter dst, parameter src1, parameter src2) { configure(OP_ADDC, 8, dst, src1, src2); }
+		void dsub(parameter dst, parameter src1, parameter src2) { configure(OP_SUB, 8, dst, src1, src2); }
+		void dsubb(parameter dst, parameter src1, parameter src2) { configure(OP_SUBB, 8, dst, src1, src2); }
+		void dcmp(parameter src1, parameter src2) { configure(OP_CMP, 8, src1, src2); }
+		void dmulu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULU, 8, dst, edst, src1, src2); }
+		void dmululw(parameter dst, parameter src1, parameter src2) { configure(OP_MULULW, 8, dst, src1, src2); }
+		void dmuls(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULS, 8, dst, edst, src1, src2); }
+		void dmulslw(parameter dst, parameter src1, parameter src2) { configure(OP_MULSLW, 8, dst, src1, src2); }
+		void ddivu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVU, 8, dst, edst, src1, src2); }
+		void ddivs(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVS, 8, dst, edst, src1, src2); }
+		void dand(parameter dst, parameter src1, parameter src2) { configure(OP_AND, 8, dst, src1, src2); }
+		void dtest(parameter src1, parameter src2) { configure(OP_TEST, 8, src1, src2); }
+		void dor(parameter dst, parameter src1, parameter src2) { configure(OP_OR, 8, dst, src1, src2); }
+		void dxor(parameter dst, parameter src1, parameter src2) { configure(OP_XOR, 8, dst, src1, src2); }
+		void dlzcnt(parameter dst, parameter src) { configure(OP_LZCNT, 8, dst, src); }
+		void dtzcnt(parameter dst, parameter src) { configure(OP_TZCNT, 8, dst, src); }
+		void dbswap(parameter dst, parameter src) { configure(OP_BSWAP, 8, dst, src); }
+		void dshl(parameter dst, parameter src, parameter count) { configure(OP_SHL, 8, dst, src, count); }
+		void dshr(parameter dst, parameter src, parameter count) { configure(OP_SHR, 8, dst, src, count); }
+		void dsar(parameter dst, parameter src, parameter count) { configure(OP_SAR, 8, dst, src, count); }
+		void drol(parameter dst, parameter src, parameter count) { configure(OP_ROL, 8, dst, src, count); }
+		void drolc(parameter dst, parameter src, parameter count) { configure(OP_ROLC, 8, dst, src, count); }
+		void dror(parameter dst, parameter src, parameter count) { configure(OP_ROR, 8, dst, src, count); }
+		void drorc(parameter dst, parameter src, parameter count) { configure(OP_RORC, 8, dst, src, count); }
+
+		// 32-bit floating point operations
+		void fsload(parameter dst, void const *base, parameter index) { configure(OP_FLOAD, 4, dst, parameter::make_memory(base), index); }
+		void fsstore(void *base, parameter index, parameter src1) { configure(OP_FSTORE, 4, parameter::make_memory(base), index, src1); }
+		void fsread(parameter dst, parameter addr, memory_space space) { configure(OP_FREAD, 4, dst, addr, parameter(SIZE_SHORT, space)); }
+		void fswrite(parameter addr, parameter src1, memory_space space) { configure(OP_FWRITE, 4, addr, src1, parameter(SIZE_SHORT, space)); }
+		void fsmov(parameter dst, parameter src1) { configure(OP_FMOV, 4, dst, src1); }
+		void fsmov(condition_t cond, parameter dst, parameter src1) { configure(OP_FMOV, 4, dst, src1, cond); }
+		void fstoint(parameter dst, parameter src1, operand_size size, float_rounding_mode round) { configure(OP_FTOINT, 4, dst, src1, parameter::make_size(size), parameter::make_rounding(round)); }
+		void fsfrint(parameter dst, parameter src1, operand_size size) { configure(OP_FFRINT, 4, dst, src1, parameter::make_size(size)); }
+		void fsfrflt(parameter dst, parameter src1, operand_size size) { configure(OP_FFRFLT, 4, dst, src1, parameter::make_size(size)); }
+		void fsadd(parameter dst, parameter src1, parameter src2) { configure(OP_FADD, 4, dst, src1, src2); }
+		void fssub(parameter dst, parameter src1, parameter src2) { configure(OP_FSUB, 4, dst, src1, src2); }
+		void fscmp(parameter src1, parameter src2) { configure(OP_FCMP, 4, src1, src2); }
+		void fsmul(parameter dst, parameter src1, parameter src2) { configure(OP_FMUL, 4, dst, src1, src2); }
+		void fsdiv(parameter dst, parameter src1, parameter src2) { configure(OP_FDIV, 4, dst, src1, src2); }
+		void fsneg(parameter dst, parameter src1) { configure(OP_FNEG, 4, dst, src1); }
+		void fsabs(parameter dst, parameter src1) { configure(OP_FABS, 4, dst, src1); }
+		void fssqrt(parameter dst, parameter src1) { configure(OP_FSQRT, 4, dst, src1); }
+		void fsrecip(parameter dst, parameter src1) { configure(OP_FRECIP, 4, dst, src1); }
+		void fsrsqrt(parameter dst, parameter src1) { configure(OP_FRSQRT, 4, dst, src1); }
+		void fscopyi(parameter dst, parameter src) { configure(OP_FCOPYI, 4, dst, src); }
+		void icopyfs(parameter dst, parameter src) { configure(OP_ICOPYF, 4, dst, src); }
+
+		// 64-bit floating point operations
+		void fdload(parameter dst, void const *base, parameter index) { configure(OP_FLOAD, 8, dst, parameter::make_memory(base), index); }
+		void fdstore(void *base, parameter index, parameter src1) { configure(OP_FSTORE, 8, parameter::make_memory(base), index, src1); }
+		void fdread(parameter dst, parameter addr, memory_space space) { configure(OP_FREAD, 8, dst, addr, parameter(SIZE_DOUBLE, space)); }
+		void fdwrite(parameter addr, parameter src1, memory_space space) { configure(OP_FWRITE, 8, addr, src1, parameter(SIZE_DOUBLE, space)); }
+		void fdmov(parameter dst, parameter src1) { configure(OP_FMOV, 8, dst, src1); }
+		void fdmov(condition_t cond, parameter dst, parameter src1) { configure(OP_FMOV, 8, dst, src1, cond); }
+		void fdtoint(parameter dst, parameter src1, operand_size size, float_rounding_mode round) { configure(OP_FTOINT, 8, dst, src1, parameter::make_size(size), parameter::make_rounding(round)); }
+		void fdfrint(parameter dst, parameter src1, operand_size size) { configure(OP_FFRINT, 8, dst, src1, parameter::make_size(size)); }
+		void fdfrflt(parameter dst, parameter src1, operand_size size) { configure(OP_FFRFLT, 8, dst, src1, parameter::make_size(size)); }
+		void fdrnds(parameter dst, parameter src1) { configure(OP_FRNDS, 8, dst, src1); }
+		void fdadd(parameter dst, parameter src1, parameter src2) { configure(OP_FADD, 8, dst, src1, src2); }
+		void fdsub(parameter dst, parameter src1, parameter src2) { configure(OP_FSUB, 8, dst, src1, src2); }
+		void fdcmp(parameter src1, parameter src2) { configure(OP_FCMP, 8, src1, src2); }
+		void fdmul(parameter dst, parameter src1, parameter src2) { configure(OP_FMUL, 8, dst, src1, src2); }
+		void fddiv(parameter dst, parameter src1, parameter src2) { configure(OP_FDIV, 8, dst, src1, src2); }
+		void fdneg(parameter dst, parameter src1) { configure(OP_FNEG, 8, dst, src1); }
+		void fdabs(parameter dst, parameter src1) { configure(OP_FABS, 8, dst, src1); }
+		void fdsqrt(parameter dst, parameter src1) { configure(OP_FSQRT, 8, dst, src1); }
+		void fdrecip(parameter dst, parameter src1) { configure(OP_FRECIP, 8, dst, src1); }
+		void fdrsqrt(parameter dst, parameter src1) { configure(OP_FRSQRT, 8, dst, src1); }
+		void fdcopyi(parameter dst, parameter src) { configure(OP_FCOPYI, 8, dst, src); }
+		void icopyfd(parameter dst, parameter src) { configure(OP_ICOPYF, 8, dst, src); }
+
+	private:
+		// internal configuration
+		void configure(opcode_t op, u8 size, condition_t cond = COND_ALWAYS);
+		void configure(opcode_t op, u8 size, parameter p0, condition_t cond = COND_ALWAYS);
+		void configure(opcode_t op, u8 size, parameter p0, parameter p1, condition_t cond = COND_ALWAYS);
+		void configure(opcode_t op, u8 size, parameter p0, parameter p1, parameter p2, condition_t cond = COND_ALWAYS);
+		void configure(opcode_t op, u8 size, parameter p0, parameter p1, parameter p2, parameter p3, condition_t cond = COND_ALWAYS);
+
+		// opcode validation and simplification
+		void validate();
+
+		// internal state
+		opcode_t            m_opcode = OP_INVALID;      // opcode
+		condition_t         m_condition = COND_ALWAYS;  // condition
+		u8                  m_flags = 0;                // flags
+		u8                  m_size = 4;                 // operation size
+		u8                  m_numparams = 0;            // number of parameters
+		parameter           m_param[MAX_PARAMS];        // up to 4 parameters
+
+		static opcode_info const s_opcode_info_table[OP_MAX];
+		struct simplify_op;
+	};
+
+	// structure describing rules for parameter encoding
+	struct parameter_info
+	{
+		u8                  output;             // input or output?
+		u8                  size;               // size of the parameter
+		u16                 typemask;           // types allowed
+	};
+
+	// global inline functions to specify a register parameter by index
+	inline parameter ireg(int n) { return parameter::make_ireg(REG_I0 + n); }
+	inline parameter freg(int n) { return parameter::make_freg(REG_F0 + n); }
+	inline parameter mapvar(int n) { return parameter::make_mapvar(MAPVAR_M0 + n); }
+
+	// global inline functions to define memory parameters
+	inline parameter mem(const void *ptr) { return parameter::make_memory(ptr); }
+
+	// global register objects for direct access
+	const parameter I0(parameter::make_ireg(REG_I0 + 0));
+	const parameter I1(parameter::make_ireg(REG_I0 + 1));
+	const parameter I2(parameter::make_ireg(REG_I0 + 2));
+	const parameter I3(parameter::make_ireg(REG_I0 + 3));
+	const parameter I4(parameter::make_ireg(REG_I0 + 4));
+	const parameter I5(parameter::make_ireg(REG_I0 + 5));
+	const parameter I6(parameter::make_ireg(REG_I0 + 6));
+	const parameter I7(parameter::make_ireg(REG_I0 + 7));
+	const parameter I8(parameter::make_ireg(REG_I0 + 8));
+	const parameter I9(parameter::make_ireg(REG_I0 + 9));
+
+	const parameter F0(parameter::make_freg(REG_F0 + 0));
+	const parameter F1(parameter::make_freg(REG_F0 + 1));
+	const parameter F2(parameter::make_freg(REG_F0 + 2));
+	const parameter F3(parameter::make_freg(REG_F0 + 3));
+	const parameter F4(parameter::make_freg(REG_F0 + 4));
+	const parameter F5(parameter::make_freg(REG_F0 + 5));
+	const parameter F6(parameter::make_freg(REG_F0 + 6));
+	const parameter F7(parameter::make_freg(REG_F0 + 7));
+	const parameter F8(parameter::make_freg(REG_F0 + 8));
+	const parameter F9(parameter::make_freg(REG_F0 + 9));
+
+	const parameter M0(parameter::make_mapvar(MAPVAR_M0 + 0));
+	const parameter M1(parameter::make_mapvar(MAPVAR_M0 + 1));
+	const parameter M2(parameter::make_mapvar(MAPVAR_M0 + 2));
+	const parameter M3(parameter::make_mapvar(MAPVAR_M0 + 3));
+	const parameter M4(parameter::make_mapvar(MAPVAR_M0 + 4));
+	const parameter M5(parameter::make_mapvar(MAPVAR_M0 + 5));
+	const parameter M6(parameter::make_mapvar(MAPVAR_M0 + 6));
+	const parameter M7(parameter::make_mapvar(MAPVAR_M0 + 7));
+	const parameter M8(parameter::make_mapvar(MAPVAR_M0 + 8));
+	const parameter M9(parameter::make_mapvar(MAPVAR_M0 + 9));
+
+} // namespace uml
+
+#endif // MAME_CPU_UML_H

@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:David Haywood, hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="blue"><rect><color red="0.1" green="0.25" blue="0.85" /></rect></element>
+	<element name="yellow"><rect><color red="1" green="0.85" blue="0.1" /></rect></element>
+	<element name="pink"><rect><color red="0.7" green="0.3" blue="0.4" /></rect></element>
+	<element name="white"><rect><color red="0.92" green="0.92" blue="0.92" /></rect></element>
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
+
+	<element name="powerled" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.1" />
+		</rect>
+	</element>
+
+	<element name="startbutton" defstate="0">
+		<disk state="0">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</disk>
+	</element>
+
+	<element name="text_level_l">
+		<text string="LEVEL GAUGE" align="2"><color red="1" green="0.85" blue="0.1" /></text>
+	</element>
+	<element name="text_level_r">
+		<text string="LEVEL GAUGE" align="1"><color red="1" green="0.85" blue="0.1" /></text>
+	</element>
+	<element name="text_ryu">
+		<text string="Ryu"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_chunli">
+		<text string="Chun-Li"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="text_start">
+		<text string="Start"><color red="0" green="0" blue="0" /></text>
+	</element>
+
+	<element name="mole_sim_red" defstate="0">
+		<disk state="0"><color blue="0.3" green="0.2" red="1.0" alpha="0.2" /></disk>
+		<disk state="1"><color blue="0.3" green="0.2" red="1.0" /></disk>
+	</element>
+
+	<element name="mole_sim_blue" defstate="0">
+		<disk state="0"><color red="0.1" green="0.65" blue="1.0" alpha="0.2" /></disk>
+		<disk state="1"><color red="0.1" green="0.65" blue="1.0" /></disk>
+	</element>
+
+
+<!-- level gauge -->
+
+	<group name="level1">
+		<bounds x="0" y="0" width="105" height="20" />
+
+		<element ref="black"><bounds x="0" y="0" width="105" height="8" /></element>
+		<element ref="text_level_l"><bounds x="51" y="10" width="50" height="8" /></element>
+
+		<repeat count="10">
+			<param name="x" start="4" increment="10" />
+			<param name="i" start="1" increment="1" />
+
+			<element name="lamp~i~" ref="powerled">
+				<bounds x="~x~" y="2" width="7" height="4"/>
+			</element>
+		</repeat>
+	</group>
+
+	<group name="level2">
+		<bounds x="0" y="0" width="105" height="20" />
+
+		<element ref="black"><bounds x="0" y="0" width="105" height="8" /></element>
+		<element ref="text_level_r"><bounds x="4" y="10" width="50" height="8" /></element>
+
+		<repeat count="10">
+			<param name="x" start="4" increment="10" />
+			<param name="i" start="20" increment="-1" />
+
+			<element name="lamp~i~" ref="powerled">
+				<bounds x="~x~" y="2" width="7" height="4"/>
+			</element>
+		</repeat>
+	</group>
+
+
+<!-- mole cpanel -->
+
+	<group name="cpanel1">
+		<bounds x="2" y="0" width="116" height="92" />
+
+		<element ref="blackd"><bounds xc= "20" yc="35" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc= "60" yc="20" width="38" height="38" /></element>
+		<element ref="blackd"><bounds xc="100" yc="35" width="33" height="33" /></element>
+
+		<element ref="blackd"><bounds xc= "20" yc="75" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc= "60" yc="70" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc="100" yc="75" width="33" height="33" /></element>
+
+		<element name="molea_1" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x02" ><bounds xc= "20" yc="35" width="25" height="25"/></element>
+		<element name="molea_0" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x01" ><bounds xc= "60" yc="20" width="30" height="30"/></element> <!-- big mole -->
+		<element name="molea_2" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x04" ><bounds xc="100" yc="35" width="25" height="25"/></element>
+
+		<element name="molea_3" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x08" ><bounds xc= "20" yc="75" width="25" height="25"/></element>
+		<element name="molea_4" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x10" ><bounds xc= "60" yc="70" width="25" height="25"/></element>
+		<element name="molea_5" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x20" ><bounds xc="100" yc="75" width="25" height="25"/></element>
+	</group>
+
+	<group name="cpanel2">
+		<bounds x="2" y="0" width="116" height="92" />
+
+		<element ref="blackd"><bounds xc= "20" yc="35" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc= "60" yc="20" width="38" height="38" /></element>
+		<element ref="blackd"><bounds xc="100" yc="35" width="33" height="33" /></element>
+
+		<element ref="blackd"><bounds xc= "20" yc="75" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc= "60" yc="70" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc="100" yc="75" width="33" height="33" /></element>
+
+		<element name="moleb_1" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x02" ><bounds xc= "20" yc="35" width="25" height="25"/></element>
+		<element name="moleb_0" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x01" ><bounds xc= "60" yc="20" width="30" height="30"/></element> <!-- big mole -->
+		<element name="moleb_2" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x04" ><bounds xc="100" yc="35" width="25" height="25"/></element>
+
+		<element name="moleb_3" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x08" ><bounds xc= "20" yc="75" width="25" height="25"/></element>
+		<element name="moleb_4" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x10" ><bounds xc= "60" yc="70" width="25" height="25"/></element>
+		<element name="moleb_5" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x20" ><bounds xc="100" yc="75" width="25" height="25"/></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<group name="common">
+		<bounds left="0" top="0" right="320" bottom="400" />
+
+		<screen index="0"><bounds left="0" top="0" right="320" bottom="240" /></screen>
+
+		<element ref="yellow"><bounds x="0" y="242" width="320" height="150" /></element>
+		<element ref="blue"><bounds xc="160" y="244" width="316" height="40" /></element>
+
+		<!-- two "level gauge" powerbars on the bottom of the bezel -->
+		<group ref="level1"><bounds x="8" y="247" width="105" height="20" /></group>
+		<group ref="level2"><bounds x="207" y="247" width="105" height="20" /></group>
+
+		<!-- start buttons -->
+		<!-- NOTE: on real cab, start buttons are on the front panel -->
+		<element ref="white"><bounds xc="160" y="244" width="80" height="36" /></element>
+		<element ref="yellow"><bounds xc="160" y="266" width="80" height="5" /></element>
+
+		<element ref="blackd"><bounds xc="149" yc="255" width="15" height="15" /></element>
+		<element name="startlamp1" ref="startbutton" inputtag="CAB-IN" inputmask="0x02" ><bounds xc="149" yc="255" width="11" height="11"/></element>
+		<element ref="blackd"><bounds xc="171" yc="255" width="15" height="15" /></element>
+		<element name="startlamp2" ref="startbutton" inputtag="CAB-IN" inputmask="0x04"><bounds xc="171" yc="255" width="11" height="11"/></element>
+
+		<element ref="text_ryu"><bounds xc="131" y="249" width="18" height="6"/></element>
+		<element ref="text_start"><bounds xc="131" y="254" width="18" height="6"/></element>
+		<element ref="text_chunli"><bounds xc="189" y="249" width="18" height="6"/></element>
+		<element ref="text_start"><bounds xc="189" y="254" width="18" height="6"/></element>
+	</group>
+
+	<view name="Internal Layout (Lamps+Moles)">
+		<bounds left="0" top="0" right="320" bottom="368" />
+
+		<group ref="common"><bounds x="0" y="0" width="320" height="400" /></group>
+
+		<!-- moles -->
+		<element ref="yellow"><bounds xc="160" y="268" width="320" height="110" /></element>
+		<element ref="pink"><bounds xc="160" y="268" width="316" height="110" /></element>
+
+		<group ref="cpanel1"><bounds x="5" y="272" width="116" height="92" /></group>
+		<group ref="cpanel2"><bounds x="199" y="272" width="116" height="92" /></group>
+
+		<element ref="black"><bounds xc="125" y="268" width="2" height="110" /><color alpha="0.25" /></element>
+		<element ref="black"><bounds xc="195" y="268" width="2" height="110" /><color alpha="0.25" /></element>
+
+		<element ref="black"><bounds xc="160" y="368" width="330" height="100" /></element>
+	</view>
+
+	<view name="Internal Layout (Lamps)">
+		<bounds left="0" top="0" right="320" bottom="268" />
+
+		<group ref="common"><bounds x="0" y="0" width="320" height="400" /></group>
+		<element ref="black"><bounds xc="160" y="268" width="330" height="200" /></element>
+	</view>
+
+	<!-- separate views for moles, so they can be detached with -numscreens n -->
+	<view name="Internal Layout (P1 Moles Only)">
+		<element ref="pink"><bounds xc="0" yc="0" width="125" height="100" /></element>
+		<group ref="cpanel1"><bounds xc="0" yc="0" width="116" height="92" /></group>
+	</view>
+
+	<view name="Internal Layout (P2 Moles Only)">
+		<element ref="pink"><bounds xc="0" yc="0" width="125" height="100" /></element>
+		<group ref="cpanel2"><bounds xc="0" yc="0" width="116" height="92" /></group>
+	</view>
+
+</mamelayout>

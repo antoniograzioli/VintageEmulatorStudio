@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_white0"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
+	<element name="static_white"><rect><color red="0.7" green="0.7" blue="0.7" /></rect></element>
+	<element name="static_green"><rect><color red="0.07" green="0.45" blue="0.27" /></rect></element>
+
+	<element name="text_pos"><text string="POS./DOWN"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_togo"><text string="YARDS TO GO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_line"><text string="YARD LINE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_vis"><text string="VISITOR"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_home"><text string="HOME"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_qtr"><text string="QUARTER"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_time"><text string="TIME REMAINING"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.2" green="1.0" blue="0.9" /></led7seg>
+	</element>
+
+	<element name="ledo">
+		<rect><color red="0.08" green="0.08" blue="0.05" /></rect>
+	</element>
+	<element name="ledr" defstate="0">
+		<rect state="0"><color red="0" green="0" blue="0" /></rect>
+		<rect state="1"><color red="1" green="0" blue="0" /></rect>
+	</element>
+	<element name="ledg" defstate="0">
+		<rect state="0"><color red="0" green="0" blue="0" /></rect>
+		<rect state="1"><color red="0" green="1" blue="0" /></rect>
+	</element>
+
+
+<!-- led matrix -->
+
+	<group name="display1">
+		<bounds x="0" y="0" width="50" height="23.54166" />
+
+		<element ref="ledo"><bounds x="0.1"  y="0.1" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="9.4"  y="0.1" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="18.7" y="0.1" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="27.8" y="0.1" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="37.1" y="0.1" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="45.9" y="0.1" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="0.1"  y="4.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="9.4"  y="4.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="18.7" y="4.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="27.8" y="4.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="37.1" y="4.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="45.9" y="4.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="0.1"  y="9.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="9.4"  y="9.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="18.7" y="9.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="27.8" y="9.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="37.1" y="9.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="45.9" y="9.9" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="0.1"  y="14.7" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="9.4"  y="14.7" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="18.7" y="14.7" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="27.8" y="14.7" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="37.1" y="14.7" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="45.9" y="14.7" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="0.1"  y="19.4" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="9.4"  y="19.4" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="18.7" y="19.4" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="27.8" y="19.4" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="37.1" y="19.4" width="4" height="4" /></element>
+		<element ref="ledo"><bounds x="45.9" y="19.4" width="4" height="4" /></element>
+
+		<element ref="ledg" name="9.5" blend="add"><bounds x="0.1"  y="0.1" width="4" height="4" /></element>
+		<element ref="ledg" name="9.4" blend="add"><bounds x="9.4"  y="0.1" width="4" height="4" /></element>
+		<element ref="ledg" name="9.3" blend="add"><bounds x="18.7" y="0.1" width="4" height="4" /></element>
+		<element ref="ledg" name="9.2" blend="add"><bounds x="27.8" y="0.1" width="4" height="4" /></element>
+		<element ref="ledg" name="9.1" blend="add"><bounds x="37.1" y="0.1" width="4" height="4" /></element>
+		<element ref="ledg" name="9.0" blend="add"><bounds x="45.9" y="0.1" width="4" height="4" /></element>
+		<element ref="ledg" name="8.5" blend="add"><bounds x="0.1"  y="4.9" width="4" height="4" /></element>
+		<element ref="ledg" name="8.4" blend="add"><bounds x="9.4"  y="4.9" width="4" height="4" /></element>
+		<element ref="ledg" name="8.3" blend="add"><bounds x="18.7" y="4.9" width="4" height="4" /></element>
+		<element ref="ledg" name="8.2" blend="add"><bounds x="27.8" y="4.9" width="4" height="4" /></element>
+		<element ref="ledg" name="8.1" blend="add"><bounds x="37.1" y="4.9" width="4" height="4" /></element>
+		<element ref="ledg" name="8.0" blend="add"><bounds x="45.9" y="4.9" width="4" height="4" /></element>
+		<element ref="ledg" name="7.5" blend="add"><bounds x="0.1"  y="9.9" width="4" height="4" /></element>
+		<element ref="ledg" name="7.4" blend="add"><bounds x="9.4"  y="9.9" width="4" height="4" /></element>
+		<element ref="ledg" name="7.3" blend="add"><bounds x="18.7" y="9.9" width="4" height="4" /></element>
+		<element ref="ledg" name="7.2" blend="add"><bounds x="27.8" y="9.9" width="4" height="4" /></element>
+		<element ref="ledg" name="7.1" blend="add"><bounds x="37.1" y="9.9" width="4" height="4" /></element>
+		<element ref="ledg" name="7.0" blend="add"><bounds x="45.9" y="9.9" width="4" height="4" /></element>
+		<element ref="ledg" name="6.5" blend="add"><bounds x="0.1"  y="14.7" width="4" height="4" /></element>
+		<element ref="ledg" name="6.4" blend="add"><bounds x="9.4"  y="14.7" width="4" height="4" /></element>
+		<element ref="ledg" name="6.3" blend="add"><bounds x="18.7" y="14.7" width="4" height="4" /></element>
+		<element ref="ledg" name="6.2" blend="add"><bounds x="27.8" y="14.7" width="4" height="4" /></element>
+		<element ref="ledg" name="6.1" blend="add"><bounds x="37.1" y="14.7" width="4" height="4" /></element>
+		<element ref="ledg" name="6.0" blend="add"><bounds x="45.9" y="14.7" width="4" height="4" /></element>
+		<element ref="ledg" name="5.5" blend="add"><bounds x="0.1"  y="19.4" width="4" height="4" /></element>
+		<element ref="ledg" name="5.4" blend="add"><bounds x="9.4"  y="19.4" width="4" height="4" /></element>
+		<element ref="ledg" name="5.3" blend="add"><bounds x="18.7" y="19.4" width="4" height="4" /></element>
+		<element ref="ledg" name="5.2" blend="add"><bounds x="27.8" y="19.4" width="4" height="4" /></element>
+		<element ref="ledg" name="5.1" blend="add"><bounds x="37.1" y="19.4" width="4" height="4" /></element>
+		<element ref="ledg" name="5.0" blend="add"><bounds x="45.9" y="19.4" width="4" height="4" /></element>
+
+		<element ref="ledr" name="4.5" blend="add"><bounds x="0.1"  y="0.1" width="4" height="4" /></element>
+		<element ref="ledr" name="4.4" blend="add"><bounds x="9.4"  y="0.1" width="4" height="4" /></element>
+		<element ref="ledr" name="4.3" blend="add"><bounds x="18.7" y="0.1" width="4" height="4" /></element>
+		<element ref="ledr" name="4.2" blend="add"><bounds x="27.8" y="0.1" width="4" height="4" /></element>
+		<element ref="ledr" name="4.1" blend="add"><bounds x="37.1" y="0.1" width="4" height="4" /></element>
+		<element ref="ledr" name="4.0" blend="add"><bounds x="45.9" y="0.1" width="4" height="4" /></element>
+		<element ref="ledr" name="3.5" blend="add"><bounds x="0.1"  y="4.9" width="4" height="4" /></element>
+		<element ref="ledr" name="3.4" blend="add"><bounds x="9.4"  y="4.9" width="4" height="4" /></element>
+		<element ref="ledr" name="3.3" blend="add"><bounds x="18.7" y="4.9" width="4" height="4" /></element>
+		<element ref="ledr" name="3.2" blend="add"><bounds x="27.8" y="4.9" width="4" height="4" /></element>
+		<element ref="ledr" name="3.1" blend="add"><bounds x="37.1" y="4.9" width="4" height="4" /></element>
+		<element ref="ledr" name="3.0" blend="add"><bounds x="45.9" y="4.9" width="4" height="4" /></element>
+		<element ref="ledr" name="2.5" blend="add"><bounds x="0.1"  y="9.9" width="4" height="4" /></element>
+		<element ref="ledr" name="2.4" blend="add"><bounds x="9.4"  y="9.9" width="4" height="4" /></element>
+		<element ref="ledr" name="2.3" blend="add"><bounds x="18.7" y="9.9" width="4" height="4" /></element>
+		<element ref="ledr" name="2.2" blend="add"><bounds x="27.8" y="9.9" width="4" height="4" /></element>
+		<element ref="ledr" name="2.1" blend="add"><bounds x="37.1" y="9.9" width="4" height="4" /></element>
+		<element ref="ledr" name="2.0" blend="add"><bounds x="45.9" y="9.9" width="4" height="4" /></element>
+		<element ref="ledr" name="1.5" blend="add"><bounds x="0.1"  y="14.7" width="4" height="4" /></element>
+		<element ref="ledr" name="1.4" blend="add"><bounds x="9.4"  y="14.7" width="4" height="4" /></element>
+		<element ref="ledr" name="1.3" blend="add"><bounds x="18.7" y="14.7" width="4" height="4" /></element>
+		<element ref="ledr" name="1.2" blend="add"><bounds x="27.8" y="14.7" width="4" height="4" /></element>
+		<element ref="ledr" name="1.1" blend="add"><bounds x="37.1" y="14.7" width="4" height="4" /></element>
+		<element ref="ledr" name="1.0" blend="add"><bounds x="45.9" y="14.7" width="4" height="4" /></element>
+		<element ref="ledr" name="0.5" blend="add"><bounds x="0.1"  y="19.4" width="4" height="4" /></element>
+		<element ref="ledr" name="0.4" blend="add"><bounds x="9.4"  y="19.4" width="4" height="4" /></element>
+		<element ref="ledr" name="0.3" blend="add"><bounds x="18.7" y="19.4" width="4" height="4" /></element>
+		<element ref="ledr" name="0.2" blend="add"><bounds x="27.8" y="19.4" width="4" height="4" /></element>
+		<element ref="ledr" name="0.1" blend="add"><bounds x="37.1" y="19.4" width="4" height="4" /></element>
+		<element ref="ledr" name="0.0" blend="add"><bounds x="45.9" y="19.4" width="4" height="4" /></element>
+
+		<screen index="0" blend="multiply"><bounds x="0" y="0" width="50" height="23.54166" /></screen>
+	</group>
+
+
+<!-- 7seg display -->
+
+	<group name="display2">
+		<bounds x="13" y="20.5" width="56" height="19.85" />
+
+		<element ref="static_white0"><bounds x="13" y="23" width="56" height="0.3" /></element>
+		<element ref="static_white0"><bounds x="13" y="35.7" width="56" height="0.3" /></element>
+
+		<element ref="static_white0"><bounds x="34.2" y="23.1" width="0.3" height="12.8" /></element>
+		<element ref="static_white0"><bounds x="35.6" y="23.1" width="0.3" height="12.8" /></element>
+		<element ref="static_white0"><bounds x="52.2" y="23.1" width="0.3" height="12.8" /></element>
+		<element ref="static_white0"><bounds x="53.6" y="23.1" width="0.3" height="12.8" /></element>
+
+		<element ref="static_black"><bounds x="14" y="24.5" width="54" height="10" /></element>
+
+		<element                ref="digit"><bounds x="14" y="25" width="6" height="9" /></element> <!-- N/C -->
+		<element name="digit15" ref="digit"><bounds x="20" y="25" width="6" height="9" /></element>
+		<element name="digit14" ref="digit"><bounds x="26" y="25" width="6" height="9" /></element>
+		<element                ref="digit"><bounds x="32" y="25" width="6" height="9" /></element> <!-- N/C -->
+		<element name="digit13" ref="digit"><bounds x="38" y="25" width="6" height="9" /></element>
+		<element name="digit12" ref="digit"><bounds x="44" y="25" width="6" height="9" /></element>
+		<element                ref="digit"><bounds x="50" y="25" width="6" height="9" /></element> <!-- N/C -->
+		<element name="digit11" ref="digit"><bounds x="56" y="25" width="6" height="9" /></element>
+		<element name="digit10" ref="digit"><bounds x="62" y="25" width="6" height="9" /></element>
+
+		<element ref="text_pos"><bounds x="18" y="20.5" width="16" height="2" /></element>
+		<element ref="text_togo"><bounds x="36" y="20.5" width="16" height="2" /></element>
+		<element ref="text_line"><bounds x="53" y="20.5" width="16" height="2" /></element>
+
+		<element ref="text_vis"><bounds x="18" y="36.3" width="16" height="2" /></element>
+		<element ref="text_qtr"><bounds x="18" y="38.35" width="16" height="2" /></element>
+		<element ref="text_home"><bounds x="53" y="36.3" width="16" height="2" /></element>
+		<element ref="text_time"><bounds x="53" y="38.35" width="16" height="2" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<element ref="static_green"><bounds x="13" y="43.4" width="56" height="34.4" /></element>
+		<element ref="static_white"><bounds x="15.7" y="47.9" width="50.6" height="25.4" /></element>
+		<element ref="static_black"><bounds x="16.1" y="48.3" width="49.8" height="24.6" /></element>
+
+		<element ref="static_white"><bounds x="20.9" y="48.1" width="0.2" height="25" /></element>
+		<element ref="static_white"><bounds x="25.9" y="48.1" width="0.2" height="25" /></element>
+		<element ref="static_white"><bounds x="30.9" y="48.1" width="0.2" height="25" /></element>
+		<element ref="static_white"><bounds x="35.9" y="48.1" width="0.2" height="25" /></element>
+		<element ref="static_white"><bounds x="40.9" y="48.1" width="0.2" height="25" /></element>
+		<element ref="static_white"><bounds x="45.9" y="48.1" width="0.2" height="25" /></element>
+		<element ref="static_white"><bounds x="50.9" y="48.1" width="0.2" height="25" /></element>
+		<element ref="static_white"><bounds x="55.9" y="48.1" width="0.2" height="25" /></element>
+		<element ref="static_white"><bounds x="60.9" y="48.1" width="0.2" height="25" /></element>
+
+		<element ref="static_black"><bounds x="16.2" y="48.9" width="49.6" height="23.4" /></element>
+		<group ref="display1"><bounds x="16.2" y="49" width="49.6" height="23.02374" /></group>
+
+		<element ref="static_black"><bounds x="-0.5" y="43.4" width="1" height="1" /></element>
+		<group ref="display2"><bounds x="0" y="43.4" width="12.115" height="34.4" /><orientation rotate="270" /></group>
+	</view>
+
+</mamelayout>

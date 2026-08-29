@@ -1,0 +1,411 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
+	<element name="lamp_miss" defstate="0">
+		<text string="MISSILES" state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</text>
+		<text string="MISSILES" state="1">
+			<color red="1.0" green="0.4" blue="0.2" />
+		</text>
+	</element>
+	<element name="lamp_oil" defstate="0">
+		<text string="OIL SLICK" state="0">
+			<color red="0.3" green="0.0" blue="0.25" />
+		</text>
+		<text string="OIL SLICK" state="1">
+			<color red="1.0" green="0.2" blue="0.8" />
+		</text>
+	</element>
+	<element name="lamp_van" defstate="0">
+		<text string="WEAPONS VAN" state="0">
+			<color red="0.3" green="0.25" blue="0.0" />
+		</text>
+		<text string="WEAPONS VAN" state="1">
+			<color red="1.0" green="0.8" blue="0.2" />
+		</text>
+	</element>
+	<element name="lamp_smoke" defstate="0">
+		<text string="SMOKE SCREEN" state="0">
+			<color red="0.3" green="0.0" blue="0.25" />
+		</text>
+		<text string="SMOKE SCREEN" state="1">
+			<color red="1.0" green="0.2" blue="0.8" />
+		</text>
+	</element>
+	<element name="lamp_gun" defstate="0">
+		<text string="MACHINE GUNS" state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</text>
+		<text string="MACHINE GUNS" state="1">
+			<color red="1.0" green="0.4" blue="0.2" />
+		</text>
+	</element>
+
+	<element name="lamp_miss_r" defstate="0">
+		<text string="MISL." align="1" state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</text>
+		<text string="MISL." align="1" state="1">
+			<color red="1.0" green="0.4" blue="0.2" />
+		</text>
+	</element>
+	<element name="lamp_oil_r" defstate="0">
+		<text string="OIL" align="1" state="0">
+			<color red="0.3" green="0.0" blue="0.25" />
+		</text>
+		<text string="OIL" align="1" state="1">
+			<color red="1.0" green="0.2" blue="0.8" />
+		</text>
+	</element>
+	<element name="lamp_van_r" defstate="0">
+		<text string="VAN" align="1" state="0">
+			<color red="0.3" green="0.25" blue="0.0" />
+		</text>
+		<text string="VAN" align="1" state="1">
+			<color red="1.0" green="0.8" blue="0.2" />
+		</text>
+	</element>
+	<element name="lamp_smoke_r" defstate="0">
+		<text string="SMOKE " align="1" state="0">
+			<color red="0.3" green="0.0" blue="0.25" />
+		</text>
+		<text string="SMOKE " align="1" state="1">
+			<color red="1.0" green="0.2" blue="0.8" />
+		</text>
+	</element>
+	<element name="lamp_gun_r" defstate="0">
+		<text string="GUNS" align="1" state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</text>
+		<text string="GUNS" align="1" state="1">
+			<color red="1.0" green="0.4" blue="0.2" />
+		</text>
+	</element>
+
+	<element name="lamp_miss_l" defstate="0">
+		<text string="MISL." align="2" state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</text>
+		<text string="MISL." align="2" state="1">
+			<color red="1.0" green="0.4" blue="0.2" />
+		</text>
+	</element>
+	<element name="lamp_oil_l" defstate="0">
+		<text string="OIL" align="2" state="0">
+			<color red="0.3" green="0.0" blue="0.25" />
+		</text>
+		<text string="OIL" align="2" state="1">
+			<color red="1.0" green="0.2" blue="0.8" />
+		</text>
+	</element>
+	<element name="lamp_van_l" defstate="0">
+		<text string="VAN" align="2" state="0">
+			<color red="0.3" green="0.25" blue="0.0" />
+		</text>
+		<text string="VAN" align="2" state="1">
+			<color red="1.0" green="0.8" blue="0.2" />
+		</text>
+	</element>
+	<element name="lamp_smoke_l" defstate="0">
+		<text string=" SMOKE" align="2" state="0">
+			<color red="0.3" green="0.0" blue="0.25" />
+		</text>
+		<text string=" SMOKE" align="2" state="1">
+			<color red="1.0" green="0.2" blue="0.8" />
+		</text>
+	</element>
+	<element name="lamp_gun_l" defstate="0">
+		<text string="GUNS" align="2" state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</text>
+		<text string="GUNS" align="2" state="1">
+			<color red="1.0" green="0.4" blue="0.2" />
+		</text>
+	</element>
+
+	<element name="shifter" defstate="0">
+		<rect>
+			<bounds left="0" right="32" top="0" bottom="64" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</rect>
+		<rect>
+			<bounds left="2" right="30" top="2" bottom="62" />
+			<color red="0.14" green="0.17" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="14" right="18" top="15" bottom="49" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</rect>
+		<disk>
+			<bounds left="14" right="18" top="13" bottom="17" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<disk>
+			<bounds left="14" right="18" top="47" bottom="51" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<text string="LOW" state="0">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<text string="LOW" state="1">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+
+		<text string="HIGH" state="0">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="HIGH" state="1">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<disk state="0">
+			<bounds left="9" right="23" top="14" bottom="28" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+		<disk state="1">
+			<bounds left="9" right="23" top="36" bottom="50" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+	</element>
+
+
+<!-- lamps -->
+
+	<group name="lamps_bottom">
+		<bounds x="0" y="0" width="480" height="25" />
+
+		<element name="lamp1" ref="lamp_miss">
+			<bounds x="5" y="0" width="60" height="25" />
+		</element>
+		<element name="lamp0" ref="lamp_oil">
+			<bounds x="72" y="0" width="59" height="25" />
+		</element>
+		<element name="lamp2" ref="lamp_van">
+			<bounds x="165" y="0" width="85" height="25" />
+		</element>
+		<element name="lamp3" ref="lamp_smoke">
+			<bounds x="287" y="0" width="93" height="25" />
+		</element>
+		<element name="lamp4" ref="lamp_gun">
+			<bounds x="387" y="0" width="90" height="25" />
+		</element>
+	</group>
+
+	<group name="lamps_left">
+		<bounds x="-53" y="0" width="53" height="640" />
+
+		<element name="lamp1" ref="lamp_miss_l">
+			<bounds x="-42" y="430" width="38" height="25" />
+		</element>
+		<element name="lamp0" ref="lamp_oil_l">
+			<bounds x="-30" y="455" width="22" height="25" />
+		</element>
+		<element name="lamp2" ref="lamp_van_l">
+			<bounds x="-34" y="480" width="26" height="25" />
+		</element>
+		<element name="lamp3" ref="lamp_smoke_l">
+			<bounds x="-53" y="505" width="45" height="25" />
+		</element>
+		<element name="lamp4" ref="lamp_gun_l">
+			<bounds x="-40" y="530" width="32" height="25" />
+		</element>
+	</group>
+
+	<group name="lamps_right">
+		<bounds x="480" y="0" width="53" height="640" />
+
+		<element name="lamp1" ref="lamp_miss_r">
+			<bounds x="488" y="430" width="38" height="25" />
+		</element>
+		<element name="lamp0" ref="lamp_oil_r">
+			<bounds x="488" y="455" width="22" height="25" />
+		</element>
+		<element name="lamp2" ref="lamp_van_r">
+			<bounds x="488" y="480" width="26" height="25" />
+		</element>
+		<element name="lamp3" ref="lamp_smoke_r">
+			<bounds x="488" y="505" width="45" height="25" />
+		</element>
+		<element name="lamp4" ref="lamp_gun_r">
+			<bounds x="488" y="530" width="32" height="25" />
+		</element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Lamps Bottom + Shifter-R Overlay" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+
+		<collection name="Lamps">
+			<group ref="lamps_bottom">
+				<bounds x="0" y="641" width="480" height="25" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="446" y="574" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="446" y="574" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="446" y="574" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Lamps Bottom + Shifter-R Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+
+		<collection name="Lamps">
+			<group ref="lamps_bottom">
+				<bounds x="0" y="641" width="480" height="25" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="488" y="574" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="488" y="574" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="488" y="574" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Lamps Bottom + Shifter-L Overlay" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+
+		<collection name="Lamps">
+			<group ref="lamps_bottom">
+				<bounds x="0" y="641" width="480" height="25" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="2" y="574" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="2" y="574" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="2" y="574" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Lamps Bottom + Shifter-L Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+
+		<collection name="Lamps">
+			<group ref="lamps_bottom">
+				<bounds x="0" y="641" width="480" height="25" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="-40" y="574" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="-40" y="574" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="-40" y="574" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Lamps Right + Shifter-R Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+
+		<collection name="Lamps">
+			<group ref="lamps_right">
+				<bounds x="480" y="0" width="53" height="640" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="488" y="574" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="488" y="574" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="488" y="574" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Lamps Left + Shifter-L Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+
+		<collection name="Lamps">
+			<group ref="lamps_left">
+				<bounds x="-53" y="0" width="53" height="640" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="-40" y="574" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="-40" y="574" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="-40" y="574" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+</mamelayout>

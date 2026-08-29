@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <VesProjectRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..'))</VesProjectRoot>
+    <VesMameRoot>$(VesProjectRoot)\validation\mame-0.289-patched</VesMameRoot>
+    <VesMameObj>$(VesMameRoot)\build\vs2022\obj\x64\Release\mamevesembedded</VesMameObj>
+    <VesMameLib>$(VesMameRoot)\build\vs2022\bin\x64\Release</VesMameLib>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(VesMameRoot)\src;$(VesMameRoot)\src\frontend\mame;$(VesMameRoot)\src\emu;$(VesMameRoot)\src\osd;$(VesMameRoot)\src\osd\windows;$(VesMameRoot)\src\devices;$(VesMameRoot)\src\lib\util;$(VesMameRoot)\src\lib;$(VesMameRoot)\3rdparty;$(VesMameRoot)\3rdparty\asmjit;$(VesMameRoot)\3rdparty\sol2;$(VesMameRoot)\3rdparty\lua\src;$(VesMameRoot)\3rdparty\rapidjson\include;$(VesMameRoot)\build\generated;$(VesMameRoot)\build\generated\emu;$(VesMameRoot)\build\generated\mame;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>VES_EMBEDDED_BUILD=1;VES_VIRTUAL_MIDI_RETROFIT=1;VES_LAYOUT_PLUGIN_SUPPORT=1;OSD_WINDOWS;USE_SDL=0;CRLF=3;LSB_FIRST;FLAC__NO_DLL;PUGIXML_HEADER_ONLY;ASMJIT_STATIC;XML_STATIC;__STDC_CONSTANT_MACROS;__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/bigobj /utf-8 /Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(VesMameLib);$(VesMameLib)\mame_vesembedded;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(VesMameObj)\s3000.obj;$(VesMameObj)\mpc60.obj;$(VesMameObj)\mpc3000.obj;$(VesMameObj)\prophet5.obj;$(VesMameObj)\tg100.obj;$(VesMameObj)\ymtx81z.obj;$(VesMameObj)\ctk551.obj;$(VesMameObj)\gt913_io.obj;$(VesMameObj)\gt913_kbd.obj;$(VesMameObj)\gt913_snd.obj;$(VesMameObj)\pwm.obj;$(VesMameObj)\midi.obj;$(VesMameObj)\midiinport.obj;$(VesMameObj)\midioutport.obj;$(VesMameRoot)\build\vs2022\obj\x64\Release\dasm\6800dasm.obj;$(VesMameObj)\ct8000.obj;$(VesMameObj)\ct8000_midi.obj;$(VesMameObj)\cz1.obj;$(VesMameObj)\cz101.obj;$(VesMameObj)\cz230s.obj;$(VesMameObj)\ra3.obj;$(VesMameObj)\dmx.obj;$(VesMameObj)\ympsr11.obj;$(VesMameObj)\rz1.obj;$(VesMameObj)\fb01.obj;$(VesMameObj)\esq1.obj;$(VesMameObj)\esq5505.obj;$(VesMameObj)\esqkt.obj;$(VesMameObj)\esqlcd.obj;$(VesMameObj)\esqpanel.obj;$(VesMameObj)\esqvfd.obj;$(VesMameObj)\vfxcart.obj;$(VesMameObj)\fatman.obj;$(VesMameObj)\linndrum.obj;$(VesMameObj)\mb63h114.obj;$(VesMameObj)\roland_tr707.obj;$(VesMameObj)\sixtrak.obj;$(VesMameObj)\mulcd.obj;$(VesMameObj)\ymdx100.obj;$(VesMameObj)\ymmu2000.obj;$(VesMameObj)\ymmu50.obj;$(VesMameObj)\ympsr150.obj;$(VesMameObj)\ympsr60.obj;optional.lib;formats.lib;emu.lib;utils.lib;ocore_windows.lib;osd_windows.lib;qtdbg_windows.lib;softfloat3.lib;ymfm.lib;7z.lib;zlib.lib;zstd.lib;expat.lib;flac.lib;jpeg.lib;utf8proc.lib;wdlfft.lib;asmjit.lib;lua.lib;lualibs.lib;sqlite3.lib;portaudio.lib;portmidi.lib;linenoise.lib;bx.lib;bimg.lib;bgfx.lib;dasm.lib;user32.lib;advapi32.lib;wsock32.lib;ws2_32.lib;iphlpapi.lib;shell32.lib;userenv.lib;setupapi.lib;opengl32.lib;gdi32.lib;dsound.lib;dxguid.lib;oleaut32.lib;winmm.lib;comctl32.lib;comdlg32.lib;dinput8.lib;ole32.lib;psapi.lib;shcore.lib;shlwapi.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VesPluginResource Include="$(VesProjectRoot)\Resources\plugins\**\*" />
+    <VesArtworkResource Include="$(VesProjectRoot)\artwork\**\*" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VesPackagedResourcesDir Condition="'$(ConfigurationType)'=='Application'">$(TargetDir)Resources</VesPackagedResourcesDir>
+    <VesPackagedResourcesDir Condition="'$(ConfigurationType)'=='DynamicLibrary'">$(TargetDir)$(TargetName).vst3\Contents\Resources</VesPackagedResourcesDir>
+  </PropertyGroup>
+
+  <Target Name="StageVESPackagedResources"
+          AfterTargets="Build"
+          Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(VesPackagedResourcesDir)'!=''">
+    <MakeDir Directories="$(VesPackagedResourcesDir)\plugins;$(VesPackagedResourcesDir)\artwork" />
+    <Copy SourceFiles="@(VesPluginResource)"
+          DestinationFiles="@(VesPluginResource->'$(VesPackagedResourcesDir)\plugins\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(VesArtworkResource)"
+          DestinationFiles="@(VesArtworkResource->'$(VesPackagedResourcesDir)\artwork\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>

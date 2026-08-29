@@ -1,0 +1,252 @@
+// license:BSD-3-Clause
+// copyright-holders:Ramiro Polla
+/*
+ * E05A30 Gate Array (used in the Epson ActionPrinter 2000)
+ *
+ */
+
+#include "emu.h"
+#include "e05a30.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+DEFINE_DEVICE_TYPE(E05A30, e05a30_device, "e05a30", "Epson E05A30 Gate Array")
+
+e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, E05A30, tag, owner, clock),
+	m_write_printhead(*this),
+	m_write_pf_stepper(*this),
+	m_write_cr_stepper(*this),
+	m_write_ready(*this),
+	m_write_centronics_ack(*this),
+	m_write_centronics_busy(*this),
+	m_write_centronics_perror(*this),
+	m_write_centronics_fault(*this),
+	m_write_centronics_select(*this),
+	m_write_cpu_reset(*this),
+	m_write_ready_led(*this),
+	m_printhead(0),
+	m_pf_stepper(0),
+	m_cr_stepper(0), m_centronics_data(0), m_centronics_busy(0), m_centronics_nack(0), m_centronics_init(1), m_centronics_strobe(0), m_centronics_data_latch(0), m_centronics_data_latched(0)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void e05a30_device::device_start()
+{
+	/* register for state saving */
+	save_item(NAME(m_printhead));
+	save_item(NAME(m_pf_stepper));
+	save_item(NAME(m_cr_stepper));
+	save_item(NAME(m_c000_shift_register));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void e05a30_device::device_reset()
+{
+	m_printhead  = 0x00;
+	m_pf_stepper = 0x00;
+	m_cr_stepper = 0x00;
+
+	/* centronics init */
+	m_centronics_nack = false;
+	m_centronics_busy = false;
+	m_write_ready_led(get_ready_led());
+	m_write_centronics_ack   (!m_centronics_nack);
+	m_write_centronics_busy  ( m_centronics_busy);
+	m_write_centronics_perror(false);
+	m_write_centronics_fault (true);
+	m_write_centronics_select(true);
+
+	m_write_ready(1);
+}
+
+
+/***************************************************************************
+    PRINT HEAD
+***************************************************************************/
+
+/* The e05a30 controls the printhead through MMIOs 0xC005 and 0xC006.
+ * MMIO 0xC006 keeps the first 8 pins.
+ * MMIO 0xC005 keeps the 9th pin in the MSB.
+ */
+
+void e05a30_device::update_printhead(int pos, uint8_t data)
+{
+	if (pos == 0) {
+		m_printhead &= 0x01fe;
+		m_printhead |= (data >> 7);
+	} else {
+		m_printhead &= 0x0001;
+		m_printhead |= (uint16_t) (data << 1);
+	}
+	m_write_printhead(m_printhead);
+}
+
+/***************************************************************************
+    STEPPER MOTORS
+***************************************************************************/
+
+/* The e05a30 controls two stepper motors:
+ * - The Paper Feed stepper motor is controlled through MMIO 0xC007
+ * - The Carriage Return stepper motor is controlled through MMIO 0xC008
+ * The Carriage Return stepper motor is used throug the SLA7020M driver. It
+ * is therefore necessary to translate the input data from the SLA7020M
+ * format to a format describing the 4 phases of a stepper motor.
+ * For the PF motor, the output data is fed directly to the stepper motor.
+ */
+
+void e05a30_device::update_pf_stepper(uint8_t data)
+{
+	m_pf_stepper = data & 0x0f;
+	m_write_pf_stepper(m_pf_stepper);
+}
+
+static uint8_t cr_sla7020m(uint8_t data)
+{
+	bool ina = BIT(data, 0);
+	bool inb = BIT(data, 1);
+	bool tda = BIT(data, 2);
+	bool tdb = BIT(data, 3);
+	bool outa0 =  ina && tda;
+	bool outa1 = !ina && tda;
+	bool outb0 =  inb && tdb;
+	bool outb1 = !inb && tdb;
+	return (outb1<<3)|(outb0<<2)|(outa1<<1)|(outa0<<0);
+}
+void e05a30_device::update_cr_stepper(uint8_t data)
+{
+	m_cr_stepper = data & 0x0f;
+	m_write_cr_stepper(cr_sla7020m(m_cr_stepper));
+}
+
+
+/***************************************************************************
+    Centronics
+***************************************************************************/
+
+void e05a30_device::centronics_input_strobe(int state)
+{
+	if (m_centronics_strobe == true && state == false && !m_centronics_busy) {
+		m_centronics_data_latch   = m_centronics_data;
+
+		m_centronics_data_latched = true;
+		m_centronics_busy         = true;
+		m_write_ready_led(get_ready_led());
+		m_write_centronics_busy(m_centronics_busy);
+	}
+
+	m_centronics_strobe = state;
+}
+
+
+void e05a30_device::centronics_input_init(int state)
+{
+	if (m_centronics_init == 1 && state == 0) // when init goes low, do a reset cycle
+	{
+		m_write_cpu_reset(0);
+		m_write_cpu_reset(1);
+		device_reset(); // this will trigger an NMI after 0.9 seconds
+	}
+	m_centronics_init = state;
+}
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+void e05a30_device::write(offs_t offset, uint8_t data)
+{
+	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", machine().describe_context(), offset, data);
+
+	switch (offset) {
+		/* The documentation on the e05a30 in the LX-810/850 Technical Manual
+		 * is incomplete. There are instances of writing 0 to c000, so it is a guess
+		 * that writing to c000 will clear the shift register. */
+	case 0x00:
+		m_c000_shift_register = 0;
+		break;
+		/* A similar Epson Gate Array, the e05a03 has a 24 bit shift
+		 * register documented in the LX-800 Technical Manual (p.48).
+		 * It is a guess that c001,c002, and c003 are the high, middle, and low bytes
+		 * of a 24 bit shift register. */
+	case 0x01:
+	case 0x02:
+	case 0x03:
+		m_c000_shift_register &= ~(uint32_t (0xff) << ((3-offset)*8));
+		m_c000_shift_register |=  (uint32_t (data) << ((3-offset)*8));
+		break;
+	case 0x04:
+		m_centronics_nack = BIT(data,5);
+		m_centronics_busy = BIT(data,0);
+		m_write_ready_led(get_ready_led());
+		/* The ActionPrinter 2000 firmware might overwrite the busy signal at
+		 * address 20AB if the host depends only on the busy signal and
+		 * doesn't wait for the ack pulse. To avoid skipping input data, we
+		 * assume the busy signal cannot be reset while the data hasn't been
+		 * read. */
+		if (m_centronics_data_latched)
+		{
+			m_centronics_busy = true;
+			m_write_ready_led(get_ready_led());
+		}
+		m_write_centronics_ack (!m_centronics_nack);
+		m_write_centronics_busy( m_centronics_busy);
+		break;
+	/* printhead */
+	case 0x05: update_printhead(0, data); break;
+	case 0x06: update_printhead(1, data); break;
+	/* paper feed stepper motor */
+	case 0x07: update_pf_stepper(data); break;
+	/* carriage return stepper motor */
+	case 0x08: update_cr_stepper(data); break;
+	}
+}
+
+uint8_t e05a30_device::read(offs_t offset)
+{
+	uint8_t result = 0;
+
+	LOG("%s: e05a30_r([0xC0%02x]): ", machine().describe_context(), offset);
+
+	switch (offset) {
+	case 0x00:
+		result = BIT(m_c000_shift_register, 23) << 7;
+		if (!machine().side_effects_disabled()) {
+			m_c000_shift_register = (m_c000_shift_register << 1) & 0xffffff;
+		}
+		break;
+	case 0x02:
+		result = m_centronics_data_latched << 7;
+		break;
+	case 0x03:
+		result = m_centronics_data_latch;
+		m_centronics_data_latched = false;
+		break;
+	case 0x04:
+		result |= m_centronics_busy << 0;
+		result |= m_centronics_nack << 5;
+		break;
+	/* paper feed stepper motor */
+	case 0x07: result = m_pf_stepper; break;
+	/* carriage return stepper motor */
+	case 0x08: result = m_cr_stepper; break;
+	}
+
+	LOG("0x%02x\n", result);
+
+	return result;
+}

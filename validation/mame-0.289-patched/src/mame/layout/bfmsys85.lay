@@ -1,0 +1,533 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="matrixlamp">
+		<rect state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.7" green="0.7" blue="0.7" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="0.0" blue="1.0" />
+		</rect>
+		<rect state ="2">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="Steppers" defstate="0">
+		<simplecounter maxstate="999" digits="3">
+		<color red="1.0" green="1.0" blue="1.0" />
+		<bounds x="0" y="0" width="1" height="1" />
+		</simplecounter>
+	</element>
+
+	<element name="vfd0">
+	<led16segsc>
+			<color red="0" green="0.6" blue="1.0" />
+	</led16segsc>
+	</element>
+
+	<view name="AWP Simulated Video (No Artwork)">
+		<element name="vfd0" ref="vfd0" state="0">
+			<bounds x="10" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd1" ref="vfd0" state="0">
+			<bounds x="19" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd2" ref="vfd0" state="0">
+			<bounds x="28" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd3" ref="vfd0" state="0">
+			<bounds x="37" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd4" ref="vfd0" state="0">
+			<bounds x="46" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd5" ref="vfd0" state="0">
+			<bounds x="55" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd6" ref="vfd0" state="0">
+			<bounds x="64" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd7" ref="vfd0" state="0">
+			<bounds x="73" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd8" ref="vfd0" state="0">
+			<bounds x="82" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd9" ref="vfd0" state="0">
+			<bounds x="91" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd10" ref="vfd0" state="0">
+			<bounds x="100" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd11" ref="vfd0" state="0">
+			<bounds x="109" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd12" ref="vfd0" state="0">
+			<bounds x="118" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd13" ref="vfd0" state="0">
+			<bounds x="127" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd14" ref="vfd0" state="0">
+			<bounds x="136" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd15" ref="vfd0" state="0">
+			<bounds x="145" y="200" width="9" height="17"/>
+		</element>
+		<element name="reel1:pos" ref="Steppers" state="0">
+			<bounds x="10" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel2:pos" ref="Steppers" state="0">
+			<bounds x="60" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel3:pos" ref="Steppers" state="0">
+			<bounds x="110" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel4:pos" ref="Steppers" state="0">
+			<bounds x="160" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel5:pos" ref="Steppers" state="0">
+			<bounds x="220" y="300" width="50" height="50"/>
+		</element>
+		<element name="lamp0" ref="matrixlamp" state="0">
+			<bounds x="0" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp1" ref="matrixlamp" state="0">
+			<bounds x="8" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp2" ref="matrixlamp" state="0">
+			<bounds x="16" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp3" ref="matrixlamp" state="0">
+			<bounds x="24" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp4" ref="matrixlamp" state="0">
+			<bounds x="32" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp5" ref="matrixlamp" state="0">
+			<bounds x="40" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp6" ref="matrixlamp" state="0">
+			<bounds x="48" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp7" ref="matrixlamp" state="0">
+			<bounds x="56" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp8" ref="matrixlamp" state="0">
+			<bounds x="64" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp9" ref="matrixlamp" state="0">
+			<bounds x="72" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp10" ref="matrixlamp" state="0">
+			<bounds x="80" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp11" ref="matrixlamp" state="0">
+			<bounds x="88" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp12" ref="matrixlamp" state="0">
+			<bounds x="96" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp13" ref="matrixlamp" state="0">
+			<bounds x="104" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp14" ref="matrixlamp" state="0">
+			<bounds x="112" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp15" ref="matrixlamp" state="0">
+			<bounds x="120" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp16" ref="matrixlamp" state="0">
+			<bounds x="0" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp17" ref="matrixlamp" state="0">
+			<bounds x="8" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp18" ref="matrixlamp" state="0">
+			<bounds x="16" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp19" ref="matrixlamp" state="0">
+			<bounds x="24" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp20" ref="matrixlamp" state="0">
+			<bounds x="32" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp21" ref="matrixlamp" state="0">
+			<bounds x="40" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp22" ref="matrixlamp" state="0">
+			<bounds x="48" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp23" ref="matrixlamp" state="0">
+			<bounds x="56" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp24" ref="matrixlamp" state="0">
+			<bounds x="64" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp25" ref="matrixlamp" state="0">
+			<bounds x="72" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp26" ref="matrixlamp" state="0">
+			<bounds x="80" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp27" ref="matrixlamp" state="0">
+			<bounds x="88" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp28" ref="matrixlamp" state="0">
+			<bounds x="96" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp29" ref="matrixlamp" state="0">
+			<bounds x="104" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp30" ref="matrixlamp" state="0">
+			<bounds x="112" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp31" ref="matrixlamp" state="0">
+			<bounds x="120" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp32" ref="matrixlamp" state="0">
+			<bounds x="0" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp33" ref="matrixlamp" state="0">
+			<bounds x="8" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp34" ref="matrixlamp" state="0">
+			<bounds x="16" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp35" ref="matrixlamp" state="0">
+			<bounds x="24" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp36" ref="matrixlamp" state="0">
+			<bounds x="32" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp37" ref="matrixlamp" state="0">
+			<bounds x="40" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp38" ref="matrixlamp" state="0">
+			<bounds x="48" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp39" ref="matrixlamp" state="0">
+			<bounds x="56" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp40" ref="matrixlamp" state="0">
+			<bounds x="64" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp41" ref="matrixlamp" state="0">
+			<bounds x="72" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp42" ref="matrixlamp" state="0">
+			<bounds x="80" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp43" ref="matrixlamp" state="0">
+			<bounds x="88" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp44" ref="matrixlamp" state="0">
+			<bounds x="96" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp45" ref="matrixlamp" state="0">
+			<bounds x="104" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp46" ref="matrixlamp" state="0">
+			<bounds x="112" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp47" ref="matrixlamp" state="0">
+			<bounds x="120" y="16" width="7" height="7"/>
+		</element>
+		<element name="lamp48" ref="matrixlamp" state="0">
+			<bounds x="0" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp49" ref="matrixlamp" state="0">
+			<bounds x="8" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp50" ref="matrixlamp" state="0">
+			<bounds x="16" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp51" ref="matrixlamp" state="0">
+			<bounds x="24" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp52" ref="matrixlamp" state="0">
+			<bounds x="32" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp53" ref="matrixlamp" state="0">
+			<bounds x="40" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp54" ref="matrixlamp" state="0">
+			<bounds x="48" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp55" ref="matrixlamp" state="0">
+			<bounds x="56" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp56" ref="matrixlamp" state="0">
+			<bounds x="64" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp57" ref="matrixlamp" state="0">
+			<bounds x="72" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp58" ref="matrixlamp" state="0">
+			<bounds x="80" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp59" ref="matrixlamp" state="0">
+			<bounds x="88" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp60" ref="matrixlamp" state="0">
+			<bounds x="96" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp61" ref="matrixlamp" state="0">
+			<bounds x="104" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp62" ref="matrixlamp" state="0">
+			<bounds x="112" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp63" ref="matrixlamp" state="0">
+			<bounds x="120" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp64" ref="matrixlamp" state="0">
+			<bounds x="0" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp65" ref="matrixlamp" state="0">
+			<bounds x="8" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp66" ref="matrixlamp" state="0">
+			<bounds x="16" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp67" ref="matrixlamp" state="0">
+			<bounds x="24" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp68" ref="matrixlamp" state="0">
+			<bounds x="32" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp69" ref="matrixlamp" state="0">
+			<bounds x="40" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp70" ref="matrixlamp" state="0">
+			<bounds x="48" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp71" ref="matrixlamp" state="0">
+			<bounds x="56" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp72" ref="matrixlamp" state="0">
+			<bounds x="64" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp73" ref="matrixlamp" state="0">
+			<bounds x="72" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp74" ref="matrixlamp" state="0">
+			<bounds x="80" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp75" ref="matrixlamp" state="0">
+			<bounds x="88" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp76" ref="matrixlamp" state="0">
+			<bounds x="96" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp77" ref="matrixlamp" state="0">
+			<bounds x="104" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp78" ref="matrixlamp" state="0">
+			<bounds x="112" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp79" ref="matrixlamp" state="0">
+			<bounds x="120" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp80" ref="matrixlamp" state="0">
+			<bounds x="0" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp81" ref="matrixlamp" state="0">
+			<bounds x="8" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp82" ref="matrixlamp" state="0">
+			<bounds x="16" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp83" ref="matrixlamp" state="0">
+			<bounds x="24" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp84" ref="matrixlamp" state="0">
+			<bounds x="32" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp85" ref="matrixlamp" state="0">
+			<bounds x="40" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp86" ref="matrixlamp" state="0">
+			<bounds x="48" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp87" ref="matrixlamp" state="0">
+			<bounds x="56" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp88" ref="matrixlamp" state="0">
+			<bounds x="64" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp89" ref="matrixlamp" state="0">
+			<bounds x="72" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp90" ref="matrixlamp" state="0">
+			<bounds x="80" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp91" ref="matrixlamp" state="0">
+			<bounds x="88" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp92" ref="matrixlamp" state="0">
+			<bounds x="96" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp93" ref="matrixlamp" state="0">
+			<bounds x="104" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp94" ref="matrixlamp" state="0">
+			<bounds x="112" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp95" ref="matrixlamp" state="0">
+			<bounds x="120" y="40" width="7" height="7"/>
+		</element>
+		<element name="lamp96" ref="matrixlamp" state="0">
+			<bounds x="0" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp97" ref="matrixlamp" state="0">
+			<bounds x="8" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp98" ref="matrixlamp" state="0">
+			<bounds x="16" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp99" ref="matrixlamp" state="0">
+			<bounds x="24" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp100" ref="matrixlamp" state="0">
+			<bounds x="32" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp101" ref="matrixlamp" state="0">
+			<bounds x="40" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp102" ref="matrixlamp" state="0">
+			<bounds x="48" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp103" ref="matrixlamp" state="0">
+			<bounds x="56" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp104" ref="matrixlamp" state="0">
+			<bounds x="64" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp105" ref="matrixlamp" state="0">
+			<bounds x="72" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp106" ref="matrixlamp" state="0">
+			<bounds x="80" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp107" ref="matrixlamp" state="0">
+			<bounds x="88" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp108" ref="matrixlamp" state="0">
+			<bounds x="96" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp109" ref="matrixlamp" state="0">
+			<bounds x="104" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp110" ref="matrixlamp" state="0">
+			<bounds x="112" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp111" ref="matrixlamp" state="0">
+			<bounds x="120" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp112" ref="matrixlamp" state="0">
+			<bounds x="0" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp113" ref="matrixlamp" state="0">
+			<bounds x="8" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp114" ref="matrixlamp" state="0">
+			<bounds x="16" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp115" ref="matrixlamp" state="0">
+			<bounds x="24" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp116" ref="matrixlamp" state="0">
+			<bounds x="32" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp117" ref="matrixlamp" state="0">
+			<bounds x="40" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp118" ref="matrixlamp" state="0">
+			<bounds x="48" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp119" ref="matrixlamp" state="0">
+			<bounds x="56" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp120" ref="matrixlamp" state="0">
+			<bounds x="64" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp121" ref="matrixlamp" state="0">
+			<bounds x="72" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp122" ref="matrixlamp" state="0">
+			<bounds x="80" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp123" ref="matrixlamp" state="0">
+			<bounds x="88" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp124" ref="matrixlamp" state="0">
+			<bounds x="96" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp125" ref="matrixlamp" state="0">
+			<bounds x="104" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp126" ref="matrixlamp" state="0">
+			<bounds x="112" y="56" width="7" height="7"/>
+		</element>
+		<element name="lamp127" ref="matrixlamp" state="0">
+			<bounds x="120" y="56" width="7" height="7"/>
+		</element>
+	</view>
+	<view name="VFD Display Output Only">
+		<element name="vfd0" ref="vfd0" state="0">
+			<bounds x="10" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd1" ref="vfd0" state="0">
+			<bounds x="19" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd2" ref="vfd0" state="0">
+			<bounds x="28" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd3" ref="vfd0" state="0">
+			<bounds x="37" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd4" ref="vfd0" state="0">
+			<bounds x="46" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd5" ref="vfd0" state="0">
+			<bounds x="55" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd6" ref="vfd0" state="0">
+			<bounds x="64" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd7" ref="vfd0" state="0">
+			<bounds x="73" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd8" ref="vfd0" state="0">
+			<bounds x="82" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd9" ref="vfd0" state="0">
+			<bounds x="91" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd10" ref="vfd0" state="0">
+			<bounds x="100" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd11" ref="vfd0" state="0">
+			<bounds x="109" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd12" ref="vfd0" state="0">
+			<bounds x="118" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd13" ref="vfd0" state="0">
+			<bounds x="127" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd14" ref="vfd0" state="0">
+			<bounds x="136" y="200" width="9" height="17"/>
+		</element>
+		<element name="vfd15" ref="vfd0" state="0">
+			<bounds x="145" y="200" width="9" height="17"/>
+		</element>
+	</view>
+</mamelayout>
+

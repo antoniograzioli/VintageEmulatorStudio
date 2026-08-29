@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Basic display of keyboard LEDs for the BBC Master series
+-->
+
+<mamelayout version="2">
+
+	<element name="red_led" defstate="1">
+		<disk state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="label_power">
+		<text string="power">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_on">
+		<text string="on">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_caps">
+		<text string="caps">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_shift">
+		<text string="shift">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_lock">
+		<text string="lock">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_drive">
+		<text string="Drive">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_d0">
+		<text string="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_d1">
+		<text string="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="drive_led" defstate="0">
+		<disk state="0">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<view name="Keyboard LED's">
+		<bounds left="0" right="800" top="0" bottom="660" />
+		<screen index="0">
+			<bounds left="0" right="800" top="0" bottom="600" />
+		</screen>
+
+		<element name="label_power" ref="label_power">
+			<bounds x="20" y="610" width="48" height="14" />
+		</element>
+
+		<element name="label_on" ref="label_on">
+			<bounds x="20" y="624" width="48" height="14" />
+		</element>
+
+		<element name="power_led" ref="red_led">
+			<bounds x="40" y="640" width="10" height="10" />
+		</element>
+
+		<element name="label_caps" ref="label_caps">
+			<bounds x="80" y="610" width="48" height="14" />
+		</element>
+
+		<element name="label_lock" ref="label_lock">
+			<bounds x="80" y="624" width="48" height="14" />
+		</element>
+
+		<element name="capslock_led" ref="red_led">
+			<bounds x="100" y="640" width="10" height="10" />
+		</element>
+
+		<element name="label_shift" ref="label_shift">
+			<bounds x="140" y="610" width="48" height="14" />
+		</element>
+
+		<element name="label_lock" ref="label_lock">
+			<bounds x="140" y="624" width="48" height="14" />
+		</element>
+
+		<element name="shiftlock_led" ref="red_led">
+			<bounds x="160" y="640" width="10" height="10" />
+		</element>
+
+		<element name="label_drive0" ref="label_drive">
+			<bounds x="700" y="610" width="48" height="14" />
+		</element>
+
+		<element name="label_d0" ref="label_d0">
+			<bounds x="700" y="624" width="48" height="14" />
+		</element>
+
+		<element name="floppy0_led" ref="drive_led">
+			<bounds x="719" y="640" width="10" height="10" />
+		</element>
+
+		<element name="label_drive1" ref="label_drive">
+			<bounds x="740" y="610" width="48" height="14" />
+		</element>
+
+		<element name="label_d1" ref="label_d1">
+			<bounds x="740" y="624" width="48" height="14" />
+		</element>
+
+		<element name="floppy1_led" ref="drive_led">
+			<bounds x="759" y="640" width="10" height="10" />
+		</element>
+	</view>
+
+</mamelayout>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="msemb1" name="Vintage Emulator Studio" projectType="audioplug"
+              useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
+              pluginFormats="buildAU,buildStandalone,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              companyWebsite="www.autodafe.net" version="0.9.289" companyName="Autodafe"
+              companyEmail="info@autodafe.net" pluginManufacturerCode="AtdF"
+              pluginCode="VES1" bundleIdentifier="net.autodafe.VintageEmulatorStudio"
+              cppLanguageStandard="20">
+  <MAINGROUP id="XVfN77" name="Vintage Emulator Studio">
+    <GROUP id="VESASSET" name="Resources">
+      <FILE id="VESLOGO1" name="ves-logo.png" compile="0" resource="1" file="Resources/ves-logo.png"/>
+      <GROUP id="VESMEDIAICONS" name="VES_Media_Icons_SVG">
+        <FILE id="VESROMICON" name="rom.svg" compile="0" resource="1" file="Resources/VES_Media_Icons_SVG/rom.svg"/>
+        <FILE id="VESARTICON" name="artwork.svg" compile="0" resource="1" file="Resources/VES_Media_Icons_SVG/artwork.svg"/>
+        <FILE id="VESFLOPICON" name="floppy.svg" compile="0" resource="1" file="Resources/VES_Media_Icons_SVG/floppy.svg"/>
+        <FILE id="VESCDICON" name="cdrom.svg" compile="0" resource="1" file="Resources/VES_Media_Icons_SVG/cdrom.svg"/>
+        <FILE id="VESHDDICON" name="harddisk.svg" compile="0" resource="1"
+              file="Resources/VES_Media_Icons_SVG/harddisk.svg"/>
+      </GROUP>
+      <GROUP id="VESFONTS" name="Fonts">
+        <FILE id="VESINTERREG" name="Inter-Regular.ttf" compile="0" resource="1"
+              file="Resources/Fonts/Inter-Regular.ttf"/>
+        <FILE id="VESINTERSEMI" name="Inter-SemiBold.ttf" compile="0" resource="1"
+              file="Resources/Fonts/Inter-SemiBold.ttf"/>
+        <FILE id="VESINTEROFL" name="OFL.txt" compile="0" resource="1" file="Resources/Fonts/OFL.txt"/>
+      </GROUP>
+    </GROUP>
+    <GROUP id="{68FD9205-D341-5E8D-5C70-EF1F5941FC74}" name="Source">
+      <FILE id="EPROC1" name="VintageEmulatorStudioProcessor.cpp" compile="1"
+            resource="0" file="Source/VintageEmulatorStudioProcessor.cpp"/>
+      <FILE id="EPROC2" name="VintageEmulatorStudioProcessor.h" compile="0"
+            resource="0" file="Source/VintageEmulatorStudioProcessor.h"/>
+      <FILE id="EEDIT1" name="VintageEmulatorStudioEditor.cpp" compile="1"
+            resource="0" file="Source/VintageEmulatorStudioEditor.cpp"/>
+      <FILE id="EEDIT2" name="VintageEmulatorStudioEditor.h" compile="0"
+            resource="0" file="Source/VintageEmulatorStudioEditor.h"/>
+      <FILE id="EFRSTB" name="EmbeddedEmulatorFrontendStubs.cpp" compile="1"
+            resource="0" file="Source/EmbeddedEmulatorFrontendStubs.cpp"/>
+      <FILE id="EENG1" name="EmbeddedEmulatorEngine.cpp" compile="1" resource="0"
+            file="validation/mame-0.289-patched/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp"/>
+      <FILE id="EENG2" name="EmbeddedEmulatorEngine.h" compile="0" resource="0"
+            file="validation/mame-0.289-patched/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h"/>
+      <FILE id="ELUA01" name="luaengine.cpp" compile="1" resource="0" file="validation/mame-0.289-patched/src/frontend/mame/luaengine.cpp"/>
+      <FILE id="ELUA02" name="luaengine_debug.cpp" compile="0" resource="0"
+            file="validation/mame-0.289-patched/src/frontend/mame/luaengine_debug.cpp"/>
+      <FILE id="ELUA03" name="luaengine_input.cpp" compile="0" resource="0"
+            file="validation/mame-0.289-patched/src/frontend/mame/luaengine_input.cpp"/>
+      <FILE id="ELUA04" name="luaengine_mem.cpp" compile="0" resource="0"
+            file="validation/mame-0.289-patched/src/frontend/mame/luaengine_mem.cpp"/>
+      <FILE id="ELUA05" name="luaengine_render.cpp" compile="1" resource="0"
+            file="validation/mame-0.289-patched/src/frontend/mame/luaengine_render.cpp"/>
+      <FILE id="EPLUG1" name="pluginopts.cpp" compile="1" resource="0" file="validation/mame-0.289-patched/src/frontend/mame/pluginopts.cpp"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX" xcodeValidArchs="arm64" macOSDeploymentTarget="11.0" enablePluginBinaryCopyStep="0" customXcodeResourceFolders="Resources/plugins&#10;artwork"
+               extraCompilerFlags="-DVES_EMBEDDED_BUILD=1 -DVES_VIRTUAL_MIDI_RETROFIT=1 -DVES_LAYOUT_PLUGIN_SUPPORT=1 -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -I../../validation/mame-0.289-patched/src -I../../validation/mame-0.289-patched/src/frontend/mame -I../../validation/mame-0.289-patched/src/emu -I../../validation/mame-0.289-patched/src/osd -I../../validation/mame-0.289-patched/src/devices -I../../validation/mame-0.289-patched/src/lib/util -I../../validation/mame-0.289-patched/src/lib -I../../validation/mame-0.289-patched/3rdparty -I../../validation/mame-0.289-patched/3rdparty/asmjit -I../../validation/mame-0.289-patched/3rdparty/sol2 -I../../validation/mame-0.289-patched/3rdparty/lua/src -I../../validation/mame-0.289-patched/3rdparty/rapidjson/include -I../../validation/mame-0.289-patched/build/generated -I../../validation/mame-0.289-patched/build/generated/emu -I../../validation/mame-0.289-patched/build/generated/mame"
+               extraLinkerFlags="../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/akai/s3000.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/akai/mpc60.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/akai/mpc3000.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/sequential/prophet5.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/tg100.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ymtx81z.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/ctk551.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/devices/machine/gt913_io.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/devices/machine/gt913_kbd.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/devices/machine/gt913_snd.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/devices/video/pwm.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/devices/bus/midi/midi.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/devices/bus/midi/midiinport.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/devices/bus/midi/midioutport.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/devices/cpu/m6800/6800dasm.o ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/mame_vesembedded/liboptional.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/mame_vesembedded/libformats.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libemu.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libutils.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libocore_sdl3.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libosd_sdl3.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libqtdbg_sdl3.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libsoftfloat3.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libymfm.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/lib7z.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libzlib.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libzstd.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libexpat.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libflac.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libjpeg.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libutf8proc.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libwdlfft.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libasmjit.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/liblua.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/liblualibs.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libsqlite3.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libportaudio.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libportmidi.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/liblinenoise.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libbx.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libbimg.a ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/libbgfx.a $(VES_SDL3_PREFIX)/lib/libSDL3.a -framework Carbon -framework Cocoa -framework Foundation -framework IOKit -framework OpenGL -framework Metal -framework QuartzCore -framework CoreMedia -framework CoreVideo -framework UniformTypeIdentifiers -framework ForceFeedback -framework CoreAudio -framework AudioToolbox -framework AVFoundation -framework GameController -weak_framework CoreHaptics">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Vintage Emulator Studio"
+                       extraLinkerFlags="../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/ct8000.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/ct8000_midi.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/cz1.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/cz101.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/cz230s.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/ra3.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/rz1.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esq1.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esq5505.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esqkt.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esqlcd.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esqpanel.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esqvfd.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/vfxcart.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/paia/fatman.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/linn/linndrum.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/roland/mb63h114.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/roland/roland_tr707.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/sequential/sixtrak.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/fb01.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/mulcd.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ymdx100.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ymmu2000.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ymmu50.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ympsr150.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ympsr60.o ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/mame_vesembedded/libdasm.a"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Vintage Emulator Studio"
+                       extraLinkerFlags="../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/ct8000.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/ct8000_midi.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/cz1.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/cz101.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/cz230s.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/ra3.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/oberheim/dmx.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ympsr11.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/casio/rz1.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/fb01.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esq1.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esq5505.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esqkt.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esqlcd.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esqpanel.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/esqvfd.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/ensoniq/vfxcart.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/paia/fatman.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/linn/linndrum.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/roland/mb63h114.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/roland/roland_tr707.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/sequential/sixtrak.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/mulcd.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ymdx100.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ymmu2000.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ymmu50.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ympsr150.o ../../validation/mame-0.289-patched/build/osx_clang/obj/x64/Release/src/mame/yamaha/ympsr60.o ../../validation/mame-0.289-patched/build/osx_clang/bin/x64/Release/mame_vesembedded/libdasm.a"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+  </EXPORTFORMATS>
+</JUCERPROJECT>

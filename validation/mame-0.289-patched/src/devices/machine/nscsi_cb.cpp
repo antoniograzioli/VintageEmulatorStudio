@@ -1,0 +1,49 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
+#include "emu.h"
+#include "nscsi_cb.h"
+
+DEFINE_DEVICE_TYPE(NSCSI_CB, nscsi_callback_device, "nscsi_cb", "SCSI callback (new)")
+
+nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NSCSI_CB, tag, owner, clock),
+	nscsi_device_interface(mconfig, *this),
+	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
+	m_write_rst(*this),
+	m_write_atn(*this),
+	m_write_ack(*this),
+	m_write_req(*this),
+	m_write_msg(*this),
+	m_write_io(*this),
+	m_write_cd(*this),
+	m_write_sel(*this),
+	m_write_bsy(*this), m_ctrl(0)
+{
+}
+
+void nscsi_callback_device::device_start()
+{
+	// state saving
+	save_item(NAME(m_ctrl));
+}
+
+void nscsi_callback_device::device_reset()
+{
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_ALL, S_ALL);
+}
+
+void nscsi_callback_device::scsi_ctrl_changed()
+{
+	m_ctrl = m_scsi_bus->ctrl_r();
+
+	m_write_rst((m_ctrl & S_RST) ? 1 : 0);
+	m_write_atn((m_ctrl & S_ATN) ? 1 : 0);
+	m_write_ack((m_ctrl & S_ACK) ? 1 : 0);
+	m_write_req((m_ctrl & S_REQ) ? 1 : 0);
+	m_write_msg((m_ctrl & S_MSG) ? 1 : 0);
+	m_write_io((m_ctrl & S_INP) ? 1 : 0);
+	m_write_cd((m_ctrl & S_CTL) ? 1 : 0);
+	m_write_sel((m_ctrl & S_SEL) ? 1 : 0);
+	m_write_bsy((m_ctrl & S_BSY) ? 1 : 0);
+}

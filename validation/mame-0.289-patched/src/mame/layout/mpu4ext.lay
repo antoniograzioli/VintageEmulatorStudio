@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="digit">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="matrixlamp">
+		<rect state ="0">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</rect>
+		<rect state ="1">
+			<color red="0.0" green="0.0" blue="1.0" />
+		</rect>
+		<rect state ="2">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="Steppers" defstate="0">
+		<simplecounter maxstate="999" digits="3">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</simplecounter>
+	</element>
+	<element name="vfd0">
+		<led16segsc>
+			<color red="0" green="0.6" blue="1.0" />
+		</led16segsc>
+	</element>
+
+	<group name="vfd">
+		<repeat count="16">
+			<param name="n" start="15" increment="-1" />
+			<param name="x" start="0" increment="9" />
+			<element name="vfdblank~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="0.0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="1.0" />
+				<bounds x="~x~" y="0" width="9" height="17" />
+			</element>
+			<element name="vfd~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0" />
+				<bounds x="~x~" y="0" width="9" height="17" />
+			</element>
+		</repeat>
+	</group>
+
+	<view name="AWP Simulated Video (No Artwork)">
+		<repeat count="4">
+			<param name="n" start="1" increment="1" />
+			<param name="x" start="10" increment="50" />
+			<element name="reel~n~" ref="Steppers" state="0">
+				<bounds x="~x~" y="300" width="50" height="50" />
+			</element>
+		</repeat>
+		<element name="reel5:pos" ref="Steppers" state="0">
+			<bounds x="220" y="300" width="50" height="50" />
+		</element>
+		<element name="reel6:pos" ref="Steppers" state="0">
+			<bounds x="280" y="300" width="50" height="50" />
+		</element>
+		<repeat count="28">
+			<param name="s" start="0" increment="8" />
+			<param name="x" start="0" increment="8" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="0" increment="8" />
+				<element name="lamp~n~" ref="matrixlamp" state="0" blend="add">
+					<bounds x="~x~" y="~y~" width="7" height="7" />
+				</element>
+			</repeat>
+		</repeat>
+		<element name="lamp224" ref="matrixlamp" state="0" blend="add">
+			<bounds x="224" y="0" width="7" height="7" />
+		</element>
+		<repeat count="5">
+			<param name="s" start="0" increment="8" />
+			<param name="y" start="200" increment="11" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="300" increment="8" />
+				<element name="digit~n~" ref="digit" state="0">
+					<bounds x="~x~" y="~y~" width="8" height="10" />
+				</element>
+			</repeat>
+		</repeat>
+		<group ref="vfd">
+			<bounds x="17" y="280" width="112" height="24" />
+		</group>
+	</view>
+	<view name="VFD Display Output Only">
+		<group ref="vfd" />
+	</view>
+</mamelayout>

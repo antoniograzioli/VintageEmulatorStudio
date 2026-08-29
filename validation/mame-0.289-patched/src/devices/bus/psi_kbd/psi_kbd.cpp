@@ -1,0 +1,111 @@
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
+/***************************************************************************
+
+    Kontron PSI keyboard interface
+
+***************************************************************************/
+
+#include "emu.h"
+#include "psi_kbd.h"
+
+#include "ergoline.h"
+#include "hle.h"
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(PSI_KEYBOARD_INTERFACE, psi_keyboard_bus_device, "psi_kbd", "PSI Keyboard Interface")
+
+
+//**************************************************************************
+//  SLOT DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  psi_keyboard_bus_device - constructor
+//-------------------------------------------------
+
+psi_keyboard_bus_device::psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PSI_KEYBOARD_INTERFACE, tag, owner, clock),
+	device_single_card_slot_interface<device_psi_keyboard_interface>(mconfig, *this),
+	m_kbd(nullptr),
+	m_rx_handler(*this),
+	m_key_strobe_handler(*this),
+	m_key_data(0xff)
+{
+	set_options(psi_keyboard_devices, nullptr, false);
+}
+
+//-------------------------------------------------
+//  psi_keyboard_bus_device - destructor
+//-------------------------------------------------
+
+psi_keyboard_bus_device::~psi_keyboard_bus_device()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void psi_keyboard_bus_device::device_start()
+{
+	// get connected keyboard
+	m_kbd = get_card_device();
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void psi_keyboard_bus_device::device_reset()
+{
+	m_key_data = 0xff; // FIXME: dumb port devices shouldn't mess with data - the keyboard should push this if lines change state on reset
+}
+
+//-------------------------------------------------
+//  host to module interface
+//-------------------------------------------------
+
+void psi_keyboard_bus_device::tx_w(int state)
+{
+	if (m_kbd)
+		m_kbd->tx_w(state);
+}
+
+
+//**************************************************************************
+//  KEYBOARD INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_psi_keyboard_interface - constructor
+//-------------------------------------------------
+
+device_psi_keyboard_interface::device_psi_keyboard_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "psikbd")
+{
+	m_host = dynamic_cast<psi_keyboard_bus_device *>(device.owner());
+}
+
+//-------------------------------------------------
+//  ~device_psi_keyboard_interface - destructor
+//-------------------------------------------------
+
+device_psi_keyboard_interface::~device_psi_keyboard_interface()
+{
+}
+
+
+//**************************************************************************
+//  SLOT INTERFACE
+//**************************************************************************
+
+void psi_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("ergoline", ERGOLINE_KEYBOARD);
+	device.option_add("hle", PSI_HLE_KEYBOARD);
+}

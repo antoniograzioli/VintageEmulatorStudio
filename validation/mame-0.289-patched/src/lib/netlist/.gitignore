@@ -1,0 +1,28 @@
+build/doxy/*
+build/obj/*
+buildVS/Release/*
+buildVS/x64/*
+buildVS/.vs/*
+nltool
+nlwav
+nltool.html
+nltool.js
+nltool.wasm
+nlwav.html
+nlwav.js
+nlwav.wasm
+
+# Windows executables
+*.exe
+
+# Local doxygen binaries
+doxygen
+doxyindexer
+doxysearch.cgi
+
+# nltool/nlwav output files
+*.log
+*.wav
+
+# VS 2019
+*.user

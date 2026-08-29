@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<!-- 2016-01-30: Initial version.  [Parduz from R. Belmont / VFDGen 0.1] -->
+
+<mamelayout version="2">
+
+	<element name="rLeds">
+		<rect state ="0">
+			<bounds x="0" y="0" width="5" height="2" />
+			<color red="0.2" green="0.2" blue="0.0" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="5" height="2" />
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state ="2">
+			<bounds x="0" y="0" width="5" height="2" />
+			<color red="0.5" green="0.5" blue="0.0" />
+		</rect>
+		<rect state ="3">
+			<bounds x="0" y="0" width="5" height="2" />
+			<color red="0.0" green="1.0" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.3" green="0.3" blue="0.5" />
+		</rect>
+	</element>
+
+	<element name="dotrow">
+		<rect>
+			<bounds x="-0.05" width="5.55" y="-0.05" height="1.1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<disk state="0" statemask="0x01">
+			<bounds x="0.0" />
+			<color red="0.125" green="0.125" blue="0.125" />
+		</disk>
+		<disk state="0" statemask="0x02">
+			<bounds x="1.1" />
+			<color red="0.125" green="0.125" blue="0.125" />
+		</disk>
+		<disk state="0" statemask="0x04">
+			<bounds x="2.2" />
+			<color red="0.125" green="0.125" blue="0.125" />
+		</disk>
+		<disk state="0" statemask="0x08">
+			<bounds x="3.3" />
+			<color red="0.125" green="0.125" blue="0.125" /></disk>
+		<disk state="0" statemask="0x10">
+			<bounds x="4.4" />
+			<color red="0.125" green="0.125" blue="0.125" />
+		</disk>
+		<disk statemask="0x01">
+			<bounds x="0.0" />
+		</disk>
+		<disk statemask="0x02">
+			<bounds x="1.1" />
+		</disk>
+		<disk statemask="0x04">
+			<bounds x="2.2" />
+		</disk>
+		<disk statemask="0x08">
+			<bounds x="3.3" />
+		</disk>
+		<disk statemask="0x10">
+			<bounds x="4.4" />
+		</disk>
+	</element>
+
+	<group name="page">
+		<repeat count="2">
+			<param name="origin" start="~start~" increment="112" />
+			<param name="row" start="0" increment="10" />
+			<repeat count="16">
+				<param name="char" start="~origin~" increment="7" />
+				<param name="x" start="0" increment="6" />
+				<repeat count="7">
+					<param name="n" start="~char~" increment="1" />
+					<param name="y" start="~row~" increment="1" />
+					<element name="pg_~n~" ref="dotrow" state="0">
+						<bounds x="~x~" y="~y~" width="5" height="1" />
+					</element>
+				</repeat>
+			</repeat>
+		</repeat>
+	</group>
+
+	<view name="Default Layout">
+		<!-- Background -->
+		<element ref="background">
+			<bounds left="0" top="0" right="300" bottom="120" />
+		</element>
+
+		<element name="rLed_0"  ref="rLeds">      <bounds x="200" y="0"  width="5" height="3" />      </element>
+		<element name="rLed_8"  ref="rLeds">      <bounds x="200" y="20" width="5" height="3" />      </element>
+		<element name="rLed_9"  ref="rLeds">      <bounds x="240" y="0"  width="5" height="3" />      </element>
+		<element name="rLed_1"  ref="rLeds">      <bounds x="240" y="20" width="5" height="3" />      </element>
+		<element name="rLed_2"  ref="rLeds">      <bounds x="260" y="00" width="5" height="3" />      </element>
+		<element name="rLed_3"  ref="rLeds">      <bounds x="270" y="00" width="5" height="3" />      </element>
+		<element name="rLed_4"  ref="rLeds">      <bounds x="280" y="00" width="5" height="3" />      </element>
+		<element name="rLed_5"  ref="rLeds">      <bounds x="290" y="00" width="5" height="3" />      </element>
+		<element name="rLed_10" ref="rLeds">      <bounds x="260" y="10" width="5" height="3" />      </element>
+		<element name="rLed_11" ref="rLeds">      <bounds x="270" y="10" width="5" height="3" />      </element>
+		<element name="rLed_12" ref="rLeds">      <bounds x="280" y="10" width="5" height="3" />      </element>
+		<element name="rLed_13" ref="rLeds">      <bounds x="290" y="10" width="5" height="3" />      </element>
+
+		<element name="rLed_6"  ref="rLeds">      <bounds x="260" y="20" width="5" height="3" />      </element>
+		<element name="rLed_7"  ref="rLeds">      <bounds x="270" y="20" width="5" height="3" />      </element>
+		<element name="rLed_14" ref="rLeds">      <bounds x="280" y="20" width="5" height="3" />      </element>
+		<element name="rLed_15" ref="rLeds">      <bounds x="290" y="20" width="5" height="3" />      </element>
+
+
+		<param name="start" value="3000" />
+		<group ref="page">
+			<bounds x="0" y="0" width="95" height="17" />
+			<color red="1.0" green="1.0" blue="0.0" />
+		</group>
+
+		<param name="start" value="2000" />
+		<group ref="page">
+			<bounds x="0" y="20" width="95" height="17" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</group>
+
+		<param name="start" value="1000" />
+		<group ref="page">
+			<bounds x="0" y="40" width="95" height="17" />
+			<color red="0.0" green="1.0" blue="1.0" />
+		</group>
+
+		<param name="start" value="4000" />
+		<group ref="page">
+			<bounds x="0" y="80" width="95" height="17" />
+			<color red="0.0" green="0.0" blue="1.0" />
+		</group>
+	</view>
+</mamelayout>

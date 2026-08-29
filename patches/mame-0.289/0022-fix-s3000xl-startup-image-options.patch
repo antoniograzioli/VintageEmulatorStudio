@@ -1,0 +1,41 @@
+Subject: [PATCH] vesembedded: parse startup image options for selected driver
+
+The embedded launch argv still named TX81Z while the machine manager later
+selected the requested driver.  As a result, S3000XL's -flop option was parsed
+before its image device was registered, and an uncaught options exception could
+terminate the AU.  Select the real driver before parsing and convert malformed
+startup options into a normal MAME startup error.
+
+diff --git a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+--- a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
++++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+@@ -1376,6 +1376,6 @@ private:
+ 		std::vector<std::string> args {
+ 			"EmbeddedMameTx81zTest",
+-			"tx81z",
++			settings.driver_name,
+ 			"-rompath", settings.rom_path,
+ 			"-cfg_directory", settings.cfg_path,
+ 			"-nvram_directory", settings.nvram_path,
+@@ -1415,6 +1415,18 @@ private:
+ 			}
+ 		}
+-		options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
+ 		const auto selected_driver_index = driver_list::find(settings.driver_name.c_str());
+ 		const auto &option_driver = selected_driver_index >= 0 ? driver_list::driver(selected_driver_index) : GAME_NAME(tx81z);
++		// Image options (including S3000XL's -flop) are registered per machine.
++		// Set the real system before parsing them; parsing against the old hardcoded
++		// TX81Z system raised an uncaught unknown-option exception in the AU thread.
++		options.set_system_name(std::string(option_driver.name));
++		try
++		{
++			options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
++		}
++		catch (const options_exception &error)
++		{
++			osd_printf_error("VintageEmulatorStudio startup option error: %s\\n", error.what());
++			return EMU_ERR_INVALID_CONFIG;
++		}
+ 		osd_printf_error("VintageEmulatorStudio driver lookup (options): requested='%s' index=%d effective='%s' fallback=%s\n",
+ 			settings.driver_name.c_str(), selected_driver_index, option_driver.name, selected_driver_index >= 0 ? "no" : "yes");
+ 		options.set_system_name(option_driver.name);

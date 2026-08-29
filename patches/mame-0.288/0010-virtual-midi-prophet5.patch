@@ -1,0 +1,223 @@
+diff --git a/src/mame/sequential/prophet5.cpp b/src/mame/sequential/prophet5.cpp
+index b43c964..2b31061 100644
+--- a/src/mame/sequential/prophet5.cpp
++++ b/src/mame/sequential/prophet5.cpp
+@@ -47,6 +47,11 @@ done, it will load bank 1 program 1.
+ #include "emu.h"
+ 
+ #include "cpu/z80/z80.h"
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++#include "bus/midi/midi.h"
++#include "machine/clock.h"
++#include "machine/i8251.h"
++#endif
+ #include "machine/7474.h"
+ #include "machine/pit8253.h"
+ #include "machine/nvram.h"
+@@ -2535,6 +2540,16 @@ private:
+ 
+ 	void update_nvram_record();
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	// VES Virtual MIDI Retrofit: a non-historical MIDI receiver that
++	// drives only the existing scanned Prophet keyboard matrix.
++	void virtual_midi_rxrdy_w(int state);
++	void virtual_midi_byte_w(u8 data);
++	void virtual_midi_note_w(u8 note, bool pressed);
++	void clear_virtual_midi_state();
++	void virtual_midi_machine_stop();
++#endif
++
+ 	void memory_map(address_map &map) ATTR_COLD;
+ 	void io_map(address_map &map) ATTR_COLD;
+ 
+@@ -2545,6 +2560,9 @@ private:
+ 	required_device<timer_device> m_gate_in_delay;  // R311, C316, U331A
+ 	required_device<pwm_display_device> m_led_matrix_pwm;
+ 	required_device<pwm_display_device> m_digit_pwm;
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	required_device<i8251_device> m_virtual_midi_uart;
++#endif
+ 	memory_view m_nvram_write_view;
+ 	required_ioport_array<16> m_switches;
+ 	required_ioport m_record;
+@@ -2573,6 +2591,14 @@ private:
+ 	bool m_tune_counter_out = false;  // 8253 (U315) counter 0 output.
+ 	bool m_latch_gate5 = false;  // U340 (CD4174) output Q4 (pin 12).
+ 	bool m_ext_gate5 = false;  // U330B (CD4013) output Q (pin 13).
++
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	std::array<u8, 8> m_virtual_midi_rows{};  // Active-high keyboard rows 8-15.
++	std::array<u8, 61> m_virtual_midi_note_counts{};
++	u8 m_virtual_midi_running_status = 0;
++	u8 m_virtual_midi_data[2]{};
++	u8 m_virtual_midi_data_count = 0;
++#endif
+ };
+ 
+ prophet5_state::prophet5_state(const machine_config &mconfig, device_type type, const char *tag)
+@@ -2584,6 +2610,9 @@ prophet5_state::prophet5_state(const machine_config &mconfig, device_type type,
+ 	, m_gate_in_delay(*this, "gate_in_delay")
+ 	, m_led_matrix_pwm(*this, "led_matrix_pwm")
+ 	, m_digit_pwm(*this, "led_digit_pwm")
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	, m_virtual_midi_uart(*this, "ves_virtual_midi_uart")
++#endif
+ 	, m_nvram_write_view(*this, "nvram_write_view")
+ 	, m_switches(*this, "switch_row_%u", 0U)
+ 	, m_record(*this, "record")
+@@ -2642,12 +2671,96 @@ void prophet5_state::switch_w(u8 data)
+ 
+ u8 prophet5_state::switch_r()
+ {
+-	const u8 pressed = m_switches[m_switch_row]->read();
++	u8 pressed = m_switches[m_switch_row]->read();
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	if (m_switch_row >= 8)
++		pressed |= m_virtual_midi_rows[m_switch_row - 8];
++#endif
+ 	if (pressed)
+ 		LOGMASKED(LOG_SWITCHES, "Switches - row: %d, pressed: %02x\n", m_switch_row, pressed);
+ 	return pressed;
+ }
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++void prophet5_state::virtual_midi_rxrdy_w(int state)
++{
++	if (state)
++		virtual_midi_byte_w(m_virtual_midi_uart->data_r());
++}
++
++void prophet5_state::virtual_midi_note_w(u8 note, bool pressed)
++{
++	if (note < 36 || note > 96)
++		return;
++
++	const u8 index = note - 36;
++	const u8 row = 8 + index / 8;
++	const u8 mask = u8(1) << (index % 8);
++	u8 &count = m_virtual_midi_note_counts[index];
++
++	if (pressed)
++	{
++		if (count != 0xff)
++			++count;
++		m_virtual_midi_rows[row - 8] |= mask;
++	}
++	else if (count && --count == 0)
++	{
++		m_virtual_midi_rows[row - 8] &= ~mask;
++	}
++}
++
++void prophet5_state::clear_virtual_midi_state()
++{
++	m_virtual_midi_rows.fill(0);
++	m_virtual_midi_note_counts.fill(0);
++	m_virtual_midi_running_status = 0;
++	m_virtual_midi_data[0] = 0;
++	m_virtual_midi_data[1] = 0;
++	m_virtual_midi_data_count = 0;
++}
++
++void prophet5_state::virtual_midi_byte_w(u8 data)
++{
++	// System real-time messages may occur anywhere and do not cancel running status.
++	if (data >= 0xf8)
++		return;
++
++	if (data & 0x80)
++	{
++		// This retrofit is omni and supports channel voice messages only.  Clearing
++		// running status here also safely discards system-common/SysEx payload data.
++		m_virtual_midi_running_status = data < 0xf0 ? data : 0;
++		m_virtual_midi_data_count = 0;
++		return;
++	}
++
++	if (!m_virtual_midi_running_status)
++		return;
++
++	const u8 message_type = m_virtual_midi_running_status & 0xf0;
++	const u8 data_size = (message_type == 0xc0 || message_type == 0xd0) ? 1 : 2;
++	m_virtual_midi_data[m_virtual_midi_data_count++] = data;
++	if (m_virtual_midi_data_count != data_size)
++		return;
++
++	if (message_type == 0x80)
++		virtual_midi_note_w(m_virtual_midi_data[0], false);
++	else if (message_type == 0x90)
++		virtual_midi_note_w(m_virtual_midi_data[0], m_virtual_midi_data[1] != 0);
++	else if (message_type == 0xb0
++		&& (m_virtual_midi_data[0] == 120 || m_virtual_midi_data[0] == 123))
++	{
++		m_virtual_midi_rows.fill(0);
++		m_virtual_midi_note_counts.fill(0);
++	}
++
++	// Retain running status after a complete channel message. Unsupported channel
++	// messages are deliberately consumed without affecting the virtual keyboard.
++	m_virtual_midi_data_count = 0;
++}
++#endif
++
+ u8 prophet5_state::misc_r()
+ {
+ 	const u8 d0 = 1;  // Cassette in. Will settle to 1 when there is no cassette input.
+@@ -2953,6 +3066,14 @@ void prophet5_state::machine_start()
+ 	save_item(NAME(m_tune_counter_out));
+ 	save_item(NAME(m_latch_gate5));
+ 	save_item(NAME(m_ext_gate5));
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	save_item(NAME(m_virtual_midi_rows));
++	save_item(NAME(m_virtual_midi_note_counts));
++	save_item(NAME(m_virtual_midi_running_status));
++	save_item(NAME(m_virtual_midi_data));
++	save_item(NAME(m_virtual_midi_data_count));
++	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&prophet5_state::virtual_midi_machine_stop, this));
++#endif
+ 
+ 	for (auto &led_row : m_leds)
+ 		for (auto &led : led_row)
+@@ -2961,16 +3082,41 @@ void prophet5_state::machine_start()
+ 
+ void prophet5_state::machine_reset()
+ {
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	clear_virtual_midi_state();
++	// 31.25 kbit/s MIDI is 8-N-1. The UART receives it at 16x bit rate.
++	m_virtual_midi_uart->control_w(0x4e);
++	m_virtual_midi_uart->control_w(0x04);
++#endif
+ 	update_nvram_record();
+ 	m_misc_latch->write(0x00);  // /CLR input tied to /RESET.
+ }
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++void prophet5_state::virtual_midi_machine_stop()
++{
++	clear_virtual_midi_state();
++}
++#endif
++
+ void prophet5_state::prophet5rev30(machine_config &config)
+ {
+ 	Z80(config, m_maincpu, 5_MHz_XTAL / 2);  // Divided by U325.
+ 	m_maincpu->set_addrmap(AS_PROGRAM, &prophet5_state::memory_map);
+ 	m_maincpu->set_addrmap(AS_IO, &prophet5_state::io_map);
+ 
++#if defined(VES_VIRTUAL_MIDI_RETROFIT)
++	// VES Virtual MIDI Retrofit. This is intentionally non-historical:
++	// it decodes the standard MAME MIDI input stream and contributes key states
++	// only to the Prophet's pre-existing scanned keyboard matrix.
++	I8251(config, m_virtual_midi_uart, 0);
++	m_virtual_midi_uart->rxrdy_handler().set(FUNC(prophet5_state::virtual_midi_rxrdy_w));
++	CLOCK(config, "ves_virtual_midi_clock", 500_kHz_XTAL)
++		.signal_handler().set(m_virtual_midi_uart, FUNC(i8251_device::write_rxc));
++	MIDI_PORT(config, "ves_virtual_midiin", midiin_slot, "midiin")
++		.rxd_handler().set(m_virtual_midi_uart, FUNC(i8251_device::write_rxd));
++#endif
++
+ 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+ 
+ 	auto &pit = PIT8253(config, "tune_pit");  // U315

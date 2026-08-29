@@ -1,0 +1,24 @@
+Subject: [PATCH] vesembedded: add experimental Akai CD3000XL
+
+CD3000XL is provided by the existing upstream akai/s3000.cpp translation unit
+and uses the same floppy connector and image-device option as S3000XL.  Add
+only its lexically sorted embedded driver-registry entries.
+
+diff --git a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+--- a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
++++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+@@ -35,5 +35,6 @@ GAME_EXTERN(vfxsd);
+ 
+ GAME_EXTERN(ap10);
++GAME_EXTERN(cd3000xl);
+ GAME_EXTERN(ct8000);
+ GAME_EXTERN(ctfk1);
+ GAME_EXTERN(cz1);
+@@ -76,6 +77,7 @@ const game_driver *const driver_list::s_drivers_sorted[] =
+ {
+ 	&GAME_NAME(___empty),
+ 	&GAME_NAME(ap10),
++	&GAME_NAME(cd3000xl),
+ 	&GAME_NAME(ct8000),
+ 	&GAME_NAME(ctfk1),
+ 	&GAME_NAME(cz1),

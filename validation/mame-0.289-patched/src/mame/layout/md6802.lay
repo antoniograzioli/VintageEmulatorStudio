@@ -1,0 +1,381 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Joakim Larsson Edstrom
+
+Didact MD6802 layout
+-->
+<mamelayout version="2">
+	<element name="redled" defstate="0">
+		<disk state="0"><color red="0.2" green="0.0" blue="0.0" /></disk>
+		<disk state="1"><color red="1.0" green="0.0" blue="0.0" /></disk>
+	</element>
+	<element name="button" defstate="1">
+		<disk state="0"><color red="1.0" green="1.0" blue="1.0" /></disk>
+		<disk state="1"><color red="0.75" green="0.75" blue="0.75" /></disk>
+	</element>
+	<element name="digit" defstate="1">
+		<led7seg><color red="0.75" green="0.0" blue="0.0" /></led7seg>
+	</element>
+	<element name="text_shift"><text string="SHIFT" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_reset"><text string="RESET" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_0"><text string="0 ADR  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_1"><text string="1 STA  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_2"><text string="2 EXF  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_3"><text string="3 CLR  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_4"><text string="4 RUN  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_5"><text string="5 BPS  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_6"><text string="6 EXB  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_7"><text string="7 SP   " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_8"><text string="8 SST  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_9"><text string="9 USERV" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_10"><text string="A MOV  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_11"><text string="B USERJ" align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_12"><text string="C CON  " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_13"><text string="D      " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_14"><text string="E LOAD " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_15"><text string="F FLAG " align="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_md6802_kb"><text string="Mikrodator 6802 (TB) Tangentbord"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_md6802_cpu"><text string="Mikrodator 6802 (CPU)"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_122"><text string="SN74LS122N"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_132"><text string="SN74LS132N"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_138"><text string="SN74LS138N"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_145"><text string="SN74145N"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_244"><text string="SN74LS244N"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_6802"><text string="CPU MC6802P"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_2716"><text string="M5L2716K"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_6116"><text string="HM6116P"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_6821"><text string="MC6821P"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="pcb_color"> <rect><color red="0.22" green="0.26" blue="0.24" /></rect></element>
+	<element name="bb_color"> <rect><color red="0.71" green="0.63" blue="0.46" /></rect></element>
+	<element name="white"> <rect><color red="1.0" green="1.0" blue="1.0" /></rect></element>
+	<element name="gray"> <rect><color red="0.5" green="0.5" blue="0.5" /></rect></element>
+	<element name="black"> <rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="silver"> <rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+	<element name="brown"> <rect><color red="0.18" green="0.08" blue="0.03" /></rect></element>
+	<element name="text_terminal"><text string="Terminal"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+	<element name="mount">
+		<disk><bounds x="0" y="0" width="100" height="100" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="22" y="22" width="56" height="56" /><color red="0.43" green="0.47" blue="0.45" /></disk>
+	</element>
+
+	<element name="screwhead">
+		<disk><bounds x="0" y="0" width="100" height="100" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="2" y="2" width="96"  height="96" /> <color red="0.1" green="0.1" blue="0.1" /></disk>
+		<disk><bounds x="5" y="5" width="90"  height="90" /> <color red="0.2" green="0.2" blue="0.2" /></disk>
+	</element>
+
+	<element name="hole">
+		<disk><bounds x="0" y="0" width="100" height="100" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<group name="screw">
+		<element ref="screwhead"><bounds x="0" y="0" width="100" height="100" /></element>
+		<repeat count="~c~">
+			<param name="xl" start="~x~" increment="~xi~" />
+			<param name="yl" start="~y~" increment="~yi~" />
+			<element ref="hole"><bounds x="~xl~" y="~yl~" width="8" height="8" /></element>
+		</repeat>
+	</group>
+
+	<group name="pinpair">
+		<element ref="silver"><bounds x="29" y="0" width="50" height="100" /></element>
+		<element ref="black"> <bounds x="0" y="10" width="108" height="80" /></element>
+	</group>
+
+	<group name="dip7">
+		<repeat count="7">
+			<param name="x" start="0" increment="100" />
+			<group ref="pinpair"><bounds x="~x~" y="0" width="108" height="100" /></group>
+		</repeat>
+	</group>
+
+	<group name="dip8">
+		<repeat count="8">
+			<param name="x" start="0" increment="100" />
+			<group ref="pinpair"><bounds x="~x~" y="0" width="108" height="100" /></group>
+		</repeat>
+	</group>
+
+	<group name="dip10">
+		<repeat count="10">
+			<param name="x" start="0" increment="100" />
+			<group ref="pinpair"><bounds x="~x~" y="0" width="108" height="100" /></group>
+		</repeat>
+	</group>
+
+	<group name="dip12">
+		<repeat count="12">
+			<param name="x" start="0" increment="100" />
+			<group ref="pinpair"><bounds x="~x~" y="0" width="108" height="100" /></group>
+		</repeat>
+	</group>
+
+	<group name="dip20">
+		<repeat count="20">
+			<param name="x" start="0" increment="100" />
+			<group ref="pinpair"><bounds x="~x~" y="0" width="108" height="100" /></group>
+		</repeat>
+	</group>
+
+	<group name="dip">
+		<repeat count="~pp~">
+			<param name="x" start="0" increment="100" />
+			<param name="xp" start="28" increment="100" />
+			<element ref="silver"><bounds x="~xp~" y="0" width="50" height="100" /></element>
+			<element ref="black"> <bounds x="~x~" y="10" width="106" height="80" /></element>
+		</repeat>
+	</group>
+
+	<group name="vdip">
+		<group ref="dip"><orientation rotate="90" /></group>
+	</group>
+
+	<group name="hdip">
+		<group ref="dip" />
+	</group>
+
+	<group name="digit">
+		<element name="digit~dno~" ref="digit">
+			<bounds x="~x~" y="~y~" width="188" height="276" />
+		</element>
+	</group>
+
+	<element name="keycap">
+		<disk><bounds x="0" y="0" width="100" height="100" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="3" y="3" width="94" height="94" /><color red="0.2" green="0.2" blue="0.2" /></disk>
+		<disk state="0"><bounds x="10" y="10" width="80" height="80" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+		<disk state="1"><bounds x="10" y="10" width="80" height="80" /><color red="0.2" green="0.2" blue="0.2" /></disk>
+	</element>
+
+	<group name="key">
+		<element ref="keycap" inputtag="LINE~line~" inputmask="~mask~">
+			<bounds x="~x~" y="~y~" width="22" height="22" />
+		</element>
+		<element ref="text_~bname~">
+			<bounds x="~xt~" y="~yt~" width="28" height="7" />
+		</element>
+	</group>
+
+	<group name="eurofem">
+		<element ref="white"><bounds x="0" y="0" width="9400" height="1060" /></element>
+		<element ref="black"><bounds x="420" y="60" width="8560" height="660" /></element>
+		<element ref="black"><bounds x="520" y="720" width="8360" height="240" /></element>
+		<element ref="white"><bounds x="440" y="80" width="8520" height="620" /></element>
+		<element ref="white"><bounds x="540" y="700" width="8320" height="240" /></element>
+		<repeat count="3">
+			<param name="y" start="220" increment="254" />
+			<param name="yh" start="200" increment="254" />
+			<repeat count="32">
+				<param name="x" start="740" increment="254" />
+				<param name="xh" start="702" increment="254" />
+				<element ref="gray"><bounds x="~xh~" y="~yh~" width="125" height="90" /></element>
+				<element ref="black"><bounds x="~x~" y="~y~" width="60" height="50" /></element>
+			</repeat>
+		</repeat>
+		<element ref="mount"><bounds x="60"  y="380" width="300" height="300" /></element>
+		<element ref="mount"><bounds x="9040" y="380" width="300" height="300" /></element>
+	</group>
+
+	<group name="keyboard">
+		<element ref="pcb_color"><bounds left="0" top="0" right="289" bottom="327"/></element>
+		<element ref="text_md6802_kb"><bounds x="20" y="10" width="112" height="8" /></element>
+		<element ref="text_terminal"><bounds x="10" y="208" width="26" height="6" /></element>
+
+		<group ref="eurofem"><bounds x="23" y="32" width="228" height="24"/></group>
+
+		<!-- BCD 7seg display -->
+		<!-- AAAADD -->
+		<repeat count="6">
+			<param name="dno" start="0" increment="1" />
+			<param name="x" start="30" increment="38" />
+			<param name="xi" start="32" increment="38" />
+			<param name="xd" start="33" increment="38" />
+			<element ref="white"><bounds x="~x~" y="112" width="39" height="44" /></element>
+			<element ref="pcb_color"><bounds x="~xi~" y="114" width="36" height="40" /></element>
+			<element ref="black"><bounds x="~xd~" y="116" width="34" height="38" /></element>
+			<element name="digit~dno~" ref="digit"><bounds x="~xd~" y="117" width="31" height="36" /></element>
+		</repeat>
+
+		<!-- Key pad -->
+		<repeat count="4">
+			<param name="bname" start="0" increment="4" />
+			<param name="line" start="0" increment="1" />
+			<param name="y" start="295" increment="-30" />
+			<param name="yt" start="287" increment="-30" />
+			<repeat count="4">
+				<param name="bname" start="~bname~" increment="1" />
+				<param name="mask" start="1" lshift="1" />
+				<param name="x" start="115" increment="30" />
+				<param name="xt" start="120" increment="30" />
+				<group ref="key"/>
+			</repeat>
+		</repeat>
+
+		<!-- RESET button -->
+		<param name="line"  value="4" />
+		<param name="mask"  value="0x04" />
+		<param name="y"     value="295" />
+		<param name="yt"    value="287" />
+		<param name="x"     value="85" />
+		<param name="xt"    value="90" />
+		<param name="line"  value="4" />
+		<param name="bname" value="reset" />
+		<group ref="key" />
+
+		<!-- SHIFT key led -->
+		<element name="led1" ref="redled"><bounds x="92" y="245" width="10" height="10"/></element>
+
+		<!-- SHIFT button -->
+		<param name="mask"  value="0x08" />
+		<param name="y"     value="265" />
+		<param name="yt"    value="257" />
+		<param name="x"     value="85" />
+		<param name="xt"    value="90" />
+		<param name="line"  value="4" />
+		<param name="bname" value="shift" />
+		<group ref="key" />
+
+		<!-- screws -->
+		<param name="x"  value="15" />
+		<param name="xi" value="1" />
+		<param name="y"  value="15" />
+		<param name="yi" value="1" />
+		<param name="c" value="60" />
+		<group ref="screw"><bounds x="4"   y="4"   width="16" height="16" /></group>
+		<param name="x"  value="75" />
+		<param name="xi" value="-1" />
+		<group ref="screw"><bounds x="270" y="4"   width="16" height="16" /></group>
+		<param name="c" value="90" />
+		<param name="y"  value="2" />
+		<param name="x"  value="45" />
+		<param name="xi" value="0" />
+		<group ref="screw"><bounds x="270" y="290" width="16" height="16" /></group>
+		<param name="y"  value="45" />
+		<param name="x"  value="2" />
+		<param name="xi" value="1" />
+		<param name="yi" value="0" />
+		<group ref="screw"><bounds x="4"   y="290" width="16" height="16" /></group>
+
+		<!-- scattered ICs -->
+		<group ref="dip7">         <bounds x="45"  y="70"  width="44" height="20" /></group>
+		<element ref="text_122"> <bounds x="51"  y="74"  width="25" height="7" /></element>
+
+		<group ref="dip8">         <bounds x="44"  y="176" width="20" height="50" /><orientation rotate="90" /></group>
+		<element ref="text_145"> <bounds x="50"  y="180" width="7" height="25" /><orientation rotate="90" /></element>
+
+		<group ref="dip10">        <bounds x="97"  y="59" width="65" height="20" /></group>
+		<element ref="text_145"> <bounds x="103" y="63" width="25" height="7" /></element>
+
+	</group>
+
+	<group name="cpuboard">
+		<element ref="pcb_color"><bounds left="0" top="0" right="390" bottom="242"/></element>
+		<element ref="text_md6802_cpu"><bounds x="25" y="22" width="8" height="75" /><orientation rotate="90" /></element>
+
+		<group ref="eurofem"><bounds x="267" y="12" height="228" width="24" /><orientation rotate="90" /></group>
+
+		<!-- screws -->
+		<param name="x"  value="15" />
+		<param name="xi" value="1" />
+		<param name="y"  value="15" />
+		<param name="yi" value="1" />
+		<param name="c" value="60" />
+		<group ref="screw"><bounds x="4"   y="4"   width="16" height="16" /></group>
+		<param name="x"  value="75" />
+		<param name="xi" value="-1" />
+		<group ref="screw"><bounds x="369" y="4"   width="16" height="16" /></group>
+		<param name="c" value="90" />
+		<param name="y"  value="2" />
+		<param name="x"  value="45" />
+		<param name="xi" value="0" />
+		<group ref="screw"><bounds x="369" y="222" width="16" height="16" /></group>
+		<param name="y"  value="45" />
+		<param name="x"  value="2" />
+		<param name="xi" value="1" />
+		<param name="yi" value="0" />
+		<group ref="screw"><bounds x="4"   y="222" width="16" height="16" /></group>
+
+		<!-- scattered ICs -->
+		<group ref="dip7">         <bounds x="37"  y="193" width="44" height="20" /></group>
+		<element ref="text_132"> <bounds x="43"  y="197" width="25" height="7" /></element>
+
+		<group ref="dip8">         <bounds x="167" y="20"  width="50" height="20" /></group>
+		<element ref="text_138"> <bounds x="173" y="24"  width="25" height="7" /></element>
+
+		<!-- CPU -->
+		<group ref="dip20">        <bounds x="39" y="47" width="40" height="125" /><orientation rotate="90" /></group>
+		<element ref="text_6802"><bounds x="50" y="53" width="15" height="52" /><orientation rotate="90" /></element>
+		<!-- PIAs -->
+		<group ref="dip20">        <bounds x="218" y="84" width="40" height="125" /><orientation rotate="90" /></group>
+		<element ref="text_6821"><bounds x="229" y="90" width="15" height="48" /><orientation rotate="90" /></element>
+		<group ref="dip20">        <bounds x="312" y="84" width="40" height="125" /><orientation rotate="90" /></group>
+		<element ref="text_6821"><bounds x="323" y="90" width="15" height="48" /><orientation rotate="90" /></element>
+		<!-- ROM -->
+		<group ref="dip12"><bounds x="104" y="69" width="40" height="77" /><orientation rotate="90" /></group>
+		<element ref="text_2716"><bounds x="115" y="75" width="17" height="35" /><orientation rotate="90" /></element>
+		<!-- RAM -->
+		<group ref="dip12"><bounds x="158" y="69" width="40" height="77" /><orientation rotate="90" /></group>
+		<element ref="text_6116"><bounds x="169" y="75" width="17" height="35" /><orientation rotate="90" /></element>
+	</group>
+
+	<group name="breadboard">
+		<element ref="bb_color"><bounds left="0" top="0" right="1300" bottom="3720"/></element>
+		<repeat count="47">
+			<param name="y" start="400" increment="62" />
+			<param name="yh" start="405" increment="62" />
+			<repeat count="5">
+				<param name="x" start="330" increment="62" />
+				<param name="xh" start="335" increment="62" />
+				<element ref="gray"><bounds x="~x~" y="~y~" width="40" height="40" /></element>
+				<element ref="black"><bounds x="~xh~" y="~yh~" width="30" height="30" /></element>
+			</repeat>
+			<repeat count="5">
+				<param name="x" start="740" increment="62" />
+				<param name="xh" start="745" increment="62" />
+				<element ref="gray"><bounds x="~x~" y="~y~" width="40" height="40" /></element>
+				<element ref="black"><bounds x="~xh~" y="~yh~" width="30" height="30" /></element>
+			</repeat>
+		</repeat>
+		<repeat count="8">
+			<param name="y" start="400" increment="372" />
+			<param name="yh" start="405" increment="372" />
+			<repeat count="5">
+				<param name="y" start="~y~" increment="62" />
+				<param name="yh" start="~yh~" increment="62" />
+				<element ref="gray"><bounds x="180" y="~y~" width="40" height="40" /></element>
+				<element ref="black"><bounds x="185" y="~yh~" width="30" height="30" /></element>
+				<element ref="gray"><bounds x="1100" y="~y~" width="40" height="40" /></element>
+				<element ref="black"><bounds x="1105" y="~yh~" width="30" height="30" /></element>
+			</repeat>
+		</repeat>
+		<!-- screws -->
+		<param name="x"  value="15" />
+		<param name="xi" value="1" />
+		<param name="y"  value="15" />
+		<param name="yi" value="1" />
+		<param name="c" value="60" />
+		<group ref="screw"><bounds x="180" y="130"   width="160" height="160" /></group>
+		<param name="x"  value="75" />
+		<param name="xi" value="-1" />
+		<group ref="screw"><bounds x="990" y="130"   width="160" height="160" /></group>
+		<param name="c" value="90" />
+		<param name="y"  value="2" />
+		<param name="x"  value="45" />
+		<param name="xi" value="0" />
+		<group ref="screw"><bounds x="990" y="3420" width="160" height="160" /></group>
+		<param name="y"  value="45" />
+		<param name="x"  value="2" />
+		<param name="xi" value="1" />
+		<param name="yi" value="0" />
+		<group ref="screw"><bounds x="180"  y="3420" width="160" height="160" /></group>
+	</group>
+
+	<view name="Base Artwork">
+		<bounds left="0" top="0" right="1211" bottom="551"/>
+		<group ref="keyboard"><bounds x="0" y="31" width="400" height="450" /></group>
+		<group ref="cpuboard"><bounds x="405" y="92" width="540" height="338" /></group>
+		<group ref="breadboard"><bounds x="951" y="0" width="191" height="551" /></group>
+	</view>
+</mamelayout>

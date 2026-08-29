@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+	<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.20" blue="0.22" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.14" green="0.02" blue="0.03" /></disk>
+		<disk state="1"><color red="1.0" green="0.20" blue="0.22" /></disk>
+	</element>
+	<element name="ledr" defstate="0">
+		<rect state="0"><color red="0.14" green="0.02" blue="0.03" /></rect>
+		<rect state="1"><color red="1.0" green="0.20" blue="0.22" /></rect>
+	</element>
+
+
+	<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="100" top="0" bottom="178" />
+
+		<element name="digit2" ref="digit"><bounds x="26" y="4" width="10" height="15" /></element>
+		<element name="digit1" ref="digit"><bounds x="36" y="4" width="10" height="15" /></element>
+		<element name="digit0" ref="digit"><bounds x="46" y="4" width="10" height="15" /></element>
+
+		<element name="3.3" ref="led"><bounds x="32.5" y="39.5" width="4.5" height="4.5" /></element> <!-- 1 -->
+		<element name="3.1" ref="led"><bounds x="41.5" y="39.5" width="4.5" height="4.5" /></element> <!-- 2 -->
+		<element name="3.2" ref="led"><bounds x="50.5" y="39.5" width="4.5" height="4.5" /></element> <!-- 3 -->
+		<element name="4.0" ref="led"><bounds x="41.5" y="51" width="4.5" height="4.5" /></element> <!-- 4 -->
+		<element name="4.1" ref="led"><bounds x="56.5" y="60" width="4.5" height="4.5" /></element> <!-- 5 -->
+		<element name="4.2" ref="led"><bounds x="56.5" y="78" width="4.5" height="4.5" /></element> <!-- 6 -->
+		<element name="4.3" ref="led"><bounds x="41.5" y="87" width="4.5" height="4.5" /></element> <!-- 7 -->
+		<element name="4.4" ref="led"><bounds x="26.5" y="78" width="4.5" height="4.5" /></element> <!-- 8 -->
+		<element name="4.5" ref="led"><bounds x="26.5" y="60" width="4.5" height="4.5" /></element> <!-- 9 -->
+
+		<element name="5.0" ref="led"><bounds x="81" y="46.5" width="4.5" height="4.5" /></element> <!-- 10 -->
+		<element name="5.5" ref="led"><bounds x="70.5" y="69.5" width="4.5" height="4.5" /></element> <!-- 11 -->
+		<element name="5.1" ref="led"><bounds x="81" y="92" width="4.5" height="4.5" /></element> <!-- 12 -->
+		<element name="5.2" ref="led"><bounds x="41.5" y="105" width="4.5" height="4.5" /></element> <!-- 13 -->
+		<element name="5.3" ref="led"><bounds x="2.5" y="92" width="4.5" height="4.5" /></element> <!-- 14 -->
+		<element name="6.0" ref="led"><bounds x="12.5" y="69.5" width="4.5" height="4.5" /></element> <!-- 15 -->
+		<element name="5.4" ref="led"><bounds x="6.5" y="46.5" width="4.5" height="4.5" /></element> <!-- 16 -->
+		<element name="6.1" ref="led"><bounds x="41.5" y="123" width="4.5" height="4.5" /></element> <!-- 17 -->
+		<element name="6.2" ref="led"><bounds x="24" y="133" width="4.5" height="4.5" /></element> <!-- 18 -->
+		<element name="6.3" ref="led"><bounds x="58.5" y="133" width="4.5" height="4.5" /></element> <!-- 19 -->
+
+		<element name="6.4" ref="led"><bounds x="41.5" y="141" width="4.5" height="4.5" /></element> <!-- 20 -->
+		<element name="6.5" ref="led"><bounds x="12.5" y="149" width="4.5" height="4.5" /></element> <!-- 21 -->
+		<element name="7.0" ref="led"><bounds x="70.5" y="149" width="4.5" height="4.5" /></element> <!-- 22 -->
+		<element name="7.1" ref="led"><bounds x="41.5" y="171" width="4.5" height="4.5" /></element> <!-- 23 -->
+		<element name="7.2" ref="led"><bounds x="93" y="136.5" width="4.5" height="4.5" /></element> <!-- 24 -->
+		<element name="7.3" ref="led"><bounds x="93" y="115" width="4.5" height="4.5" /></element> <!-- 25 -->
+		<element name="7.4" ref="led"><bounds x="93" y="86.5" width="4.5" height="4.5" /></element> <!-- 26 -->
+
+		<element name="3.0" ref="led"><bounds x="41.5" y="69.5" width="4.5" height="4.5" /></element> <!-- A -->
+		<element name="3.4" ref="led"><bounds x="20.5" y="105" width="4.5" height="4.5" /></element> <!-- B -->
+		<element name="3.5" ref="led"><bounds x="62.5" y="105" width="4.5" height="4.5" /></element> <!-- C -->
+		<element name="8.0" ref="led"><bounds x="7" y="115" width="4.5" height="4.5" /></element> <!-- D -->
+		<element name="8.1" ref="led"><bounds x="76" y="115" width="4.5" height="4.5" /></element> <!-- E -->
+		<element name="8.2" ref="led"><bounds x="35.5" y="156" width="4.5" height="4.5" /></element> <!-- F -->
+		<element name="8.3" ref="led"><bounds x="47" y="156" width="4.5" height="4.5" /></element> <!-- G -->
+
+		<element name="10.a" ref="ledr"><bounds x="5.75" y="121" width="7" height="3" /></element> <!-- under D -->
+		<element name="9.a" ref="ledr"><bounds x="74.75" y="121" width="7" height="3" /></element> <!-- under E -->
+		<element name="10.a" ref="ledr"><bounds x="34.25" y="162" width="7" height="3" /></element> <!-- under F -->
+		<element name="9.a" ref="ledr"><bounds x="45.75" y="162" width="7" height="3" /></element> <!-- under G -->
+
+	</view>
+</mamelayout>

@@ -1,0 +1,141 @@
+Subject: [PATCH] vesembedded: add experimental Akai S3000XL startup media
+
+Add the S3000XL driver and its selected-device closure, plus generic startup
+image options used by VES Phase 1 floppy mounting.
+
+diff --git a/scripts/target/mame/vesembedded.lua b/scripts/target/mame/vesembedded.lua
+index 18a7a98..ceb6b41 100644
+--- a/scripts/target/mame/vesembedded.lua
++++ b/scripts/target/mame/vesembedded.lua
+@@ -13,6 +13,10 @@ CPUS["M6809"] = true
+ CPUS["M680X0"] = true
+ CPUS["MCS48"] = true
+ CPUS["MCS51"] = true
++CPUS["M37710"] = true
++CPUS["M68HC16"] = true
++CPUS["MC68HC11"] = true
++CPUS["NEC"] = true
+ CPUS["SH"] = true
+ CPUS["SWP30"] = true
+ CPUS["UPD7810"] = true
+@@ -23,7 +27,10 @@ MACHINES["NVRAM"] = true
+ MACHINES["MIDI"] = true
+ MACHINES["ACIA6850"] = true
+ MACHINES["ADC0808"] = true
++MACHINES["AM9517A"] = true
++MACHINES["CXD1185"] = true
+ MACHINES["TTL7474"] = true
++MACHINES["TTL74259"] = true
+ MACHINES["EEPROM28"] = true
+ MACHINES["EEPROMDEV"] = true
+ MACHINES["FDC_PLL"] = true
+@@ -35,10 +42,17 @@ MACHINES["I8255"] = true
+ MACHINES["INPUT_MERGER"] = true
+ MACHINES["68681"] = true
+ MACHINES["MSM6200"] = true
++MACHINES["MB87030"] = true
++MACHINES["NSCSI"] = true
++MACHINES["NCR5380"] = true
++MACHINES["NCR53C90"] = true
+ MACHINES["OUTPUT_LATCH"] = true
+ MACHINES["PIT8253"] = true
++MACHINES["PIC8259"] = true
+ MACHINES["SCI4"] = true
++MACHINES["UPD765"] = true
+ MACHINES["WD_FDC"] = true
++MACHINES["WD33C9X"] = true
+ MACHINES["Z80DAISY"] = true
+ 
+ SOUNDS["SPEAKER"] = true
+@@ -52,12 +66,14 @@ SOUNDS["CEM3320"] = true
+ SOUNDS["CEM3340"] = true
+ SOUNDS["CEM3360"] = true
+ SOUNDS["CEM3394"] = true
++SOUNDS["CDDA"] = true
+ SOUNDS["DAC76"] = true
+ SOUNDS["ES5503"] = true
+ SOUNDS["ES5505"] = true
+ SOUNDS["ESQPUMP"] = true
+ SOUNDS["GEW7"] = true
+ SOUNDS["MEG"] = true
++SOUNDS["L7A1045"] = true
+ SOUNDS["MULTIPCM"] = true
+ SOUNDS["MM5837"] = true
+ SOUNDS["SWP00"] = true
+@@ -76,6 +92,7 @@ SOUNDS["YM3812"] = true
+ SOUNDS["YM3806"] = true
+ 
+ VIDEOS["HD44780"] = true
++VIDEOS["HD61830"] = true
+ VIDEOS["HD61602"] = true
+ VIDEOS["DL1416"] = true
+ VIDEOS["MN1252"] = true
+@@ -83,6 +100,7 @@ VIDEOS["PWM_DISPLAY"] = true
+ VIDEOS["T6963C"] = true
+ 
+ BUSES["GENERIC"] = true
++BUSES["NSCSI"] = true
+ BUSES["PLG1X0"] = true
+ 
+ FORMATS["ESQ16_DSK"] = true
+@@ -126,6 +144,7 @@ function standalone()
+ 		MAME_DIR .. "src/frontend/mame/pluginopts.cpp",
+ 		MAME_DIR .. "src/frontend/mame/pluginopts.h",
+ 		MAME_DIR .. "src/mame/casio/ct8000.cpp",
++		MAME_DIR .. "src/mame/akai/s3000.cpp",
+ 		MAME_DIR .. "src/mame/casio/ct8000_midi.cpp",
+ 		MAME_DIR .. "src/mame/casio/ct8000_midi.h",
+ 		MAME_DIR .. "src/mame/casio/ctk551.cpp",
+diff --git a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+index 0f32a70..1bb0d44 100644
+--- a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
++++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+@@ -62,6 +62,7 @@ GAME_EXTERN(pss21);
+ GAME_EXTERN(pss31);
+ GAME_EXTERN(prophet5r30);
+ GAME_EXTERN(rz1);
++GAME_EXTERN(s3000xl);
+ GAME_EXTERN(sd132);
+ GAME_EXTERN(sixtrak);
+ GAME_EXTERN(tr707);
+@@ -104,6 +105,7 @@ const game_driver *const driver_list::s_drivers_sorted[] =
+ 	&GAME_NAME(pss31),
+ 	&GAME_NAME(pss6),
+ 	&GAME_NAME(rz1),
++	&GAME_NAME(s3000xl),
+ 	&GAME_NAME(sd132),
+ 	&GAME_NAME(sixtrak),
+ 	&GAME_NAME(tg100),
+@@ -1406,7 +1408,14 @@ private:
+ 			args.emplace_back("-artpath");
+ 			args.emplace_back(settings.artwork_path);
+ 		}
+-
++		for (const auto &media : settings.startup_media_options)
++		{
++			if (!media.option_name.empty() && !media.path.empty())
++			{
++				args.emplace_back("-" + media.option_name);
++				args.emplace_back(media.path);
++			}
++		}
+ 		options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
+ 		const auto selected_driver_index = driver_list::find(settings.driver_name.c_str());
+ 		const auto &option_driver = selected_driver_index >= 0 ? driver_list::driver(selected_driver_index) : GAME_NAME(tx81z);
+diff --git a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h
+index 3bc84a2..d7646f6 100644
+--- a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h
++++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h
+@@ -192,6 +192,12 @@ struct EmbeddedEmulatorEngineSettings
+ 	std::string artwork_path;
+ 	std::string driver_name = "tx81z";
+ 	int sample_rate = 48000;
++	struct StartupMediaOption
++	{
++		std::string option_name;
++		std::string path;
++	};
++	std::vector<StartupMediaOption> startup_media_options;
+ };
+ 
+ class EmbeddedEmulatorEngine

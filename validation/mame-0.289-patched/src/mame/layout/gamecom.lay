@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+
+<mamelayout version="2">
+
+	<element name="grid" />
+
+	<view name="Default Grid">
+
+		<repeat count="10">
+			<param name="mask" start="0x01" lshift="1" />
+			<param name="y" start="0" increment="16" />
+			<repeat count="12">
+				<param name="port" start="0" increment="1" />
+				<param name="x" start="0" increment="16" />
+				<element ref="grid" inputtag="GRID.~port~" inputmask="~mask~">
+					<bounds x="~x~" y="~y~" width="16" height="16" />
+				</element>
+			</repeat>
+			<element ref="grid" inputtag="GRID.12" inputmask="~mask~" >
+				<bounds x="192" y="~y~" width="8" height="16" />
+			</element>
+		</repeat>
+
+		<screen index="0">
+			<bounds left="0" top="0" right="200" bottom="160" />
+		</screen>
+
+	</view>
+</mamelayout>

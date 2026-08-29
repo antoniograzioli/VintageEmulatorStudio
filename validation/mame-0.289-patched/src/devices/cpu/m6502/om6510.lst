@@ -1,0 +1,55 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
+# 6510 undocumented instructions in a C64 context
+anc_10_imm
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A &= m_TMP2;
+	set_nz(m_A);
+	if(m_A & 0x80)
+		m_P |= F_C;
+	else
+		m_P &= ~F_C;
+	prefetch();
+
+ane_10_imm
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A = (m_A | 0xee) & m_TMP2 & m_X;
+	set_nz(m_A);
+	prefetch();
+
+asr_10_imm
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A = do_lsr(m_A & m_TMP2);
+	set_nz(m_A);
+	prefetch();
+
+arr_10_imm
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A &= m_TMP2;
+	do_arr();
+	prefetch();
+
+las_10_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	if(page_changing(m_TMP, m_Y)) {
+		read(set_l(m_TMP, m_TMP+m_Y));
+	}
+	m_TMP2 = read(m_TMP+m_Y);
+	m_A = m_X = m_TMP2 & m_SP;
+	m_SP = set_l(m_SP, m_A);
+	set_nz(m_A);
+	prefetch();
+
+lxa_10_imm
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A = m_X = (m_A | 0xee) & m_TMP2;
+	set_nz(m_A);
+	prefetch();

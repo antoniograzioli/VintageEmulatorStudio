@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Basic display of CD-ROM drive LEDs for the Sega MegaCD
+-->
+
+<mamelayout version="2">
+
+	<element name="green_led">
+		<rect state="0">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<text string="READY">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="red_led">
+		<rect state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+
+		<text string="ACCESS">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<view name="Simple Artwork">
+		<bounds left="0" right="400" top="0" bottom="330" />
+		<screen index="0">
+			<bounds left="0" right="400" top="0" bottom="300" />
+		</screen>
+
+		<element name="green_led" ref="green_led">
+			<bounds x="40" y="310" width="50" height="10" />
+		</element>
+
+		<element name="red_led" ref="red_led">
+			<bounds x="130" y="310" width="50" height="10" />
+		</element>
+	</view>
+
+</mamelayout>

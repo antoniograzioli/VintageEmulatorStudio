@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Dirk Best
+-->
+
+<mamelayout version="2">
+	<element name="led" defstate="0">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+	<view name="LCD with square pixels">
+		<bounds x="0" y="0" width="68" height="16" />
+		<screen index="0">
+			<bounds left="0" top="0" right="60" bottom="16" />
+		</screen>
+		<element name="led_0" ref="led">
+			<bounds x="62" y="1" width="4" height="1" />
+		</element>
+		<element name="led_1" ref="led">
+			<bounds x="62" y="3" width="4" height="1" />
+		</element>
+		<element name="led_2" ref="led">
+			<bounds x="62" y="5" width="4" height="1" />
+		</element>
+	</view>
+</mamelayout>
