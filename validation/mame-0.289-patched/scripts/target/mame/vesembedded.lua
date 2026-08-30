@@ -124,6 +124,7 @@ function standalone()
 		MAME_DIR .. "3rdparty/sol2",
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
+		GEN_DIR  .. "mame/layout",
 		ext_includedir("asio"),
 		ext_includedir("expat"),
 		ext_includedir("lua"),
@@ -206,4 +207,52 @@ function standalone()
 		MAME_DIR .. "src/devices/imagedev/midiout.cpp",
 		MAME_DIR .. "src/devices/imagedev/midiout.h",
 	}
+
+	local ves_layout_sources = {
+		{ "src/mame/casio/ct8000.cpp", "ct8000", "ctfk1" },
+		{ "src/mame/akai/s3000.cpp", "s2000", "s3000", "s3000xl", "cd3000i", "cd3000xl" },
+		{ "src/mame/akai/mpc60.cpp", "mpc60" },
+		{ "src/mame/akai/mpc3000.cpp", "mpc3000" },
+		{ "src/mame/casio/ctk551.cpp", "ap10", "ctk530" },
+		{ "src/mame/casio/cz1.cpp", "cz1", "mz1" },
+		{ "src/mame/casio/cz101.cpp", "cz101" },
+		{ "src/mame/casio/cz230s.cpp", "cz230s", "sz1" },
+		{ "src/mame/casio/rz1.cpp", "rz1" },
+		{ "src/mame/ensoniq/esq1.cpp", "esq1" },
+		{ "src/mame/ensoniq/esq5505.cpp", "sd1", "sd132", "vfx", "vfxsd" },
+		{ "src/mame/ensoniq/esqlcd.cpp", "esq2by16" },
+		{ "src/mame/ensoniq/esqvfd.cpp", "esq1by22_eps", "esq2by40", "esq2by40_vfx" },
+		{ "src/mame/paia/fatman.cpp", "paia_fatman" },
+		{ "src/mame/linn/linndrum.cpp", "linn_linndrum" },
+		{ "src/mame/oberheim/dmx.cpp", "oberheim_dmx" },
+		{ "src/mame/roland/roland_tr707.cpp", "roland_tr707" },
+		{ "src/mame/sequential/prophet5.cpp", "sequential_prophet5" },
+		{ "src/mame/sequential/sixtrak.cpp", "sequential_sixtrak" },
+		{ "src/mame/yamaha/fb01.cpp", "fb01" },
+		{ "src/mame/yamaha/mulcd.cpp", "mulcd" },
+		{ "src/mame/yamaha/ymdx100.cpp", "dx100" },
+		{ "src/mame/yamaha/ymmu2000.cpp", "mu128", "mu2000" },
+		{ "src/mame/yamaha/ymmu50.cpp", "mu50" },
+		{ "src/mame/yamaha/ympsr150.cpp", "dd9", "psr110", "psr150", "psr180", "psr75", "psr76", "pss11", "pss12", "pss21", "pss31", "pss6" },
+		{ "src/mame/yamaha/ympsr11.cpp", "psr11" },
+		{ "src/mame/yamaha/ympsr60.cpp", "psr60", "psr70" },
+		{ "src/mame/yamaha/ymtx81z.cpp", "tx81z" },
+	}
+
+	local ves_layout_dependencies = { }
+	local ves_layout_tasks = { }
+	local ves_layout_seen = { }
+	for _, entry in ipairs(ves_layout_sources) do
+		for i = 2, #entry do
+			local layout = entry[i]
+			table.insert(ves_layout_dependencies, { MAME_DIR .. entry[1], GEN_DIR .. "mame/layout/" .. layout .. ".lh" })
+			if not ves_layout_seen[layout] then
+				table.insert(ves_layout_tasks, layoutbuildtask("mame/layout", layout))
+				ves_layout_seen[layout] = true
+			end
+		end
+	end
+
+	dependency(ves_layout_dependencies)
+	custombuildtask(ves_layout_tasks)
 end
