@@ -6,7 +6,7 @@ VES supports Linux x86_64 Standalone and VST3 builds.
 
 - Ubuntu 22.04 x86_64 or a compatible Linux build host.
 - GCC/G++ 11 or compatible toolchain.
-- JUCE/Projucer compatible with JUCE 8.0.13.
+- JUCE/Projucer compatible with JUCE 8.0.13. For normal builds, set `JUCE_ROOT` to the JUCE checkout root (the directory containing `modules/`).
 - Patched MAME 0.289 source under `validation/mame-0.289-patched`.
 
 Install development dependencies on Ubuntu 22.04:
@@ -89,9 +89,17 @@ If neither is set, the script checks `Projucer` on `PATH`. Ensure Projucer's glo
 
 ## VES Build
 
-From a clean checkout:
+From a clean checkout, point `JUCE_ROOT` to the JUCE checkout root. It must be the directory containing the `modules/` folder, not the `modules/` folder itself:
 
 ```bash
+JUCE_ROOT="/path/to/JUCE" \
+platform/linux/build-linux-release.sh
+```
+
+For example, if JUCE is checked out at `$HOME/JUCE`:
+
+```bash
+JUCE_ROOT="$HOME/JUCE" \
 platform/linux/build-linux-release.sh
 ```
 
