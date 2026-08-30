@@ -1,6 +1,6 @@
 # SDL3 Pin
 
-Canonical macOS release builds use SDL 3.4.14 as a static library for both Apple Silicon and Intel.
+macOS release builds use SDL 3.4.14 as a static library for both Apple Silicon and Intel.
 
 - Repository: `https://github.com/libsdl-org/SDL`
 - Commit: `147a8ee32dbf9ac02f3794964490687b6bbda1bc`
@@ -9,7 +9,7 @@ Canonical macOS release builds use SDL 3.4.14 as a static library for both Apple
 - Architectures: `arm64`, `x86_64`
 - Deployment target: `MACOSX_DEPLOYMENT_TARGET=11.0`
 
-The canonical release script accepts the SDL source checkout through
+The macOS release script accepts the SDL source checkout through
 `VES_SDL3_SOURCE_DIR` and the install prefix through `VES_SDL3_PREFIX`.
 When `VES_SDL3_SOURCE_DIR` is not set, it defaults to the pinned in-tree
 source at `third_party/sdl3-src`.

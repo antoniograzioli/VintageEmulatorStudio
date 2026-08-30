@@ -23,13 +23,6 @@ case "$(basename "$series_dir")" in
             exit 1
         }
         ;;
-    mame-0.288)
-        tag=$(git -C "$target" describe --tags --exact-match 2>/dev/null || true)
-        [ "$tag" = "mame0288" ] || {
-            echo "mame-0.288 patches require official tag mame0288 (found: ${tag:-unrecognised})" >&2
-            exit 1
-        }
-        ;;
 esac
 
 while IFS= read -r patch; do
