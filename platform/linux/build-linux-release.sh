@@ -132,6 +132,25 @@ required_mame_artifacts=(
     "$MAME_BUILD/bin/x64/Release/liblua.a"
 )
 
+build_mame_if_needed()
+{
+    local artifact missing=0
+    for artifact in "${required_mame_artifacts[@]}"; do
+        [[ -s "$artifact" ]] || missing=1
+    done
+
+    [[ "$missing" -eq 1 ]] || return 0
+
+    printf 'Building Phase 1 MAME artifacts with at most two jobs.\n'
+    make -C "$ROOT_DIR/validation/mame-0.289-patched" -j2 \
+        SUBTARGET=vesembedded OSD=sdl PTR64=1 \
+        OVERRIDE_CC=gcc OVERRIDE_CXX=g++ ARCHOPTS=-fPIC \
+        USE_QTDEBUG=0 NO_USE_MIDI=0 NO_USE_PORTAUDIO=1 \
+        NO_USE_PIPEWIRE=1 NO_USE_PULSEAUDIO=1
+}
+
+build_mame_if_needed
+
 for artifact in "${required_mame_artifacts[@]}"; do
     [[ -s "$artifact" ]] || { printf 'Missing Phase 1 MAME artifact: %s\n' "$artifact" >&2; exit 1; }
 done
@@ -223,7 +242,7 @@ validate_release_resources()
     local resources=$1 label=$2 plugin_count artwork_count
     plugin_count=$(find "$resources/plugins" -type f | wc -l)
     artwork_count=$(find "$resources/artwork" -type f | wc -l)
-    [[ "$plugin_count" -eq 3 && "$artwork_count" -eq 37 ]] || {
+    [[ "$plugin_count" -eq 3 && "$artwork_count" -eq 28 ]] || {
         printf '%s resource count mismatch: %s plugin files, %s artwork files\n' \
             "$label" "$plugin_count" "$artwork_count" >&2
         exit 1

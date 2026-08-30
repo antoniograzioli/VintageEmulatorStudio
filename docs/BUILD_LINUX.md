@@ -25,7 +25,8 @@ SDL2 and SDL2_ttf are required by the Linux MAME OSD payload. PortAudio, PipeWir
 
 The MAME objects and static archives are linked into both an executable and a VST3 shared object. Every MAME object/archive that can reach the VST3 link must be built with `-fPIC`.
 
-From `validation/mame-0.289-patched`:
+The release script builds these Phase 1 MAME artifacts automatically when they
+are missing. The underlying MAME command is:
 
 ```bash
 make -j2 \
@@ -82,13 +83,13 @@ If neither is set, the script checks `Projucer` on `PATH`. Ensure Projucer's glo
 
 ## VES Build
 
-With the MAME artifacts already present:
+From a clean checkout:
 
 ```bash
 platform/linux/build-linux-release.sh
 ```
 
-The script cleans only JUCE Release outputs, serially builds large Lua frontend objects, builds Standalone and VST3 with a maximum of `-j2`, disables JUCE's automatic `~/.vst3` copy, creates `Dist/Linux/x86_64`, strips debug information only from `Dist` copies, normalizes `moduleinfo.json`, and performs static validation. It does not clean or rebuild MAME.
+The script builds missing Phase 1 MAME artifacts, cleans only JUCE Release outputs, serially builds large Lua frontend objects, builds Standalone and VST3 with a maximum of `-j2`, disables JUCE's automatic `~/.vst3` copy, creates `Dist/Linux/x86_64`, strips debug information only from `Dist` copies, normalizes `moduleinfo.json`, and performs static validation. It does not rebuild MAME when the expected artifacts are already present.
 
 Outputs:
 
