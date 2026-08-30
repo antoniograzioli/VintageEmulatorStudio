@@ -5,7 +5,8 @@ index 0000000..7ec0985
 +++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp	
 @@ -0,0 +1,1585 @@
 +// license:BSD-3-Clause
-+// copyright-holders:OpenAI
++// SPDX-License-Identifier: BSD-3-Clause
++// copyright-holders:Vintage Emulator Studio contributors
 +
 +#include "EmbeddedEmulatorEngine.h"
 +
@@ -1596,7 +1597,8 @@ index 0000000..3bc84a2
 +++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h	
 @@ -0,0 +1,239 @@
 +// license:BSD-3-Clause
-+// copyright-holders:OpenAI
++// SPDX-License-Identifier: BSD-3-Clause
++// copyright-holders:Vintage Emulator Studio contributors
 +
 +#ifndef VES_EMBEDDED_EMULATOR_ENGINE_H
 +#define VES_EMBEDDED_EMULATOR_ENGINE_H
@@ -1841,7 +1843,8 @@ index 0000000..6a8b493
 +++ b/src/ves/embeddedinstruments/main.cpp	
 @@ -0,0 +1,394 @@
 +// license:BSD-3-Clause
-+// copyright-holders:OpenAI
++// SPDX-License-Identifier: BSD-3-Clause
++// copyright-holders:Vintage Emulator Studio contributors
 +
 +#include "EmbeddedEmulatorEngine.h"
 +

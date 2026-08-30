@@ -52,4 +52,6 @@ Do not add ROMs, firmware, NVRAM, personal machine state, or copyrighted machine
 
 VES uses MAME-derived emulation code where required by the applicable upstream licensing and attribution terms.  MAME is not part of the product name, and this project does not claim endorsement by the upstream MAME project.
 
-Third-party license and notice files are retained with their respective source trees and resources.  A VES-specific project license has not yet been selected for public release.
+## Licensing
+
+Vintage Emulator Studio contains components under multiple licenses.  Original VES source code is licensed under AGPL-3.0-only unless a file states another license.  MAME, JUCE, SDL, Inter, artwork, and other third-party components retain their respective licenses and notices.  See `LICENSE` and `LICENSING.md` for details.

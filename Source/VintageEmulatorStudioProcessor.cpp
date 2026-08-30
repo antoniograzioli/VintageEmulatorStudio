@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 #include "VintageEmulatorStudioProcessor.h"
 #include "VintageEmulatorStudioEditor.h"
 

@@ -1,5 +1,6 @@
 -- license:BSD-3-Clause
--- copyright-holders:OpenAI
+-- SPDX-License-Identifier: BSD-3-Clause
+-- copyright-holders:Vintage Emulator Studio contributors
 
 STANDALONE = true
 

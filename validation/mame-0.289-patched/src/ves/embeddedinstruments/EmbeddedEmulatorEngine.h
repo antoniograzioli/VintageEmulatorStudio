@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:OpenAI
+// SPDX-License-Identifier: BSD-3-Clause
+// copyright-holders:Vintage Emulator Studio contributors
 
 #ifndef VES_EMBEDDED_EMULATOR_ENGINE_H
 #define VES_EMBEDDED_EMULATOR_ENGINE_H
