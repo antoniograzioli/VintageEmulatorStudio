@@ -105,11 +105,8 @@ assert_no_plugin_install_phase() {
 
 verify_sdl3_source_pin() {
     test -f "$sdl3_source/CMakeLists.txt"
-    if git -C "$sdl3_source" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        test "$(git -C "$sdl3_source" rev-parse HEAD)" = "$sdl3_commit"
-    else
-        test "$(sed -n '1p' "$sdl3_source/.canonical-source-commit")" = "$sdl3_commit"
-    fi
+    test -f "$sdl3_source/.canonical-source-commit"
+    test "$(sed -n '1p' "$sdl3_source/.canonical-source-commit")" = "$sdl3_commit"
 }
 
 build_sdl3_if_needed() {
