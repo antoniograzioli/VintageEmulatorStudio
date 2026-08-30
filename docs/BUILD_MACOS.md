@@ -5,7 +5,7 @@ VES supports macOS Apple Silicon (`arm64`) and macOS Intel (`x86_64`) builds.
 ## Requirements
 
 - macOS with Xcode and command-line tools.
-- JUCE/Projucer compatible with JUCE 8.0.13.
+- JUCE/Projucer compatible with JUCE 8.0.13. Set `JUCE_MODULES_DIR` to the JUCE `modules` directory if it is not available at the path recorded in `Project/VintageEmulatorStudio.jucer`.
 - CMake for building SDL3 when a prebuilt static SDL3 prefix is not supplied.
 - `jq` for validation performed by the release script.
 - `ripgrep` (`rg`) for validation performed by the release script (`brew install ripgrep`).
@@ -65,6 +65,13 @@ Do not link release products against a Homebrew SDL3 dylib.
 ## VES Build
 
 Run the macOS release build script from the repository root:
+
+```sh
+JUCE_MODULES_DIR=/path/to/JUCE/modules platform/macos/build-macos-release.sh --arch arm64
+JUCE_MODULES_DIR=/path/to/JUCE/modules platform/macos/build-macos-release.sh --arch x86_64
+```
+
+If `JUCE_MODULES_DIR` is omitted, the script tries the module path recorded in `Project/VintageEmulatorStudio.jucer` and fails early if the required JUCE files are not present.
 
 ```sh
 platform/macos/build-macos-release.sh --arch arm64

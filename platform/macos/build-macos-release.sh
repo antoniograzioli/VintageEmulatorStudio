@@ -64,6 +64,31 @@ test -d "$mame"
 test -x "$root/platform/macos/normalize-vst3-moduleinfo.sh"
 command -v rg >/dev/null 2>&1 || { printf 'ripgrep (rg) is required. Install it before running this script.\n' >&2; exit 1; }
 
+resolve_juce_modules_dir() {
+    if [ -z "$juce_modules_dir" ]; then
+        jucer_modules_dir=$(sed -n 's#.*<MODULEPATH id="juce_core" path="\([^"]*\)".*#\1#p' "$root/Project/VintageEmulatorStudio.jucer" | sed -n '1p')
+        case "$jucer_modules_dir" in
+            /*) jucer_modules_path=$jucer_modules_dir ;;
+            *) jucer_modules_path=$root/Project/$jucer_modules_dir ;;
+        esac
+        if [ -n "$jucer_modules_dir" ] && [ -d "$jucer_modules_path" ]; then
+            juce_modules_dir=$(CDPATH= cd -- "$jucer_modules_path" && pwd)
+        fi
+    fi
+
+    if [ -z "$juce_modules_dir" ] || [ ! -d "$juce_modules_dir" ]; then
+        printf 'JUCE_MODULES_DIR must point to JUCE 8.0.13-compatible modules.\n' >&2
+        printf 'Example: JUCE_MODULES_DIR=/path/to/JUCE/modules %s --arch %s\n' "$0" "$arch" >&2
+        exit 1
+    fi
+
+    if [ ! -f "$juce_modules_dir/juce_audio_plugin_client/juce_audio_plugin_client.h" ] || \
+       [ ! -f "$juce_modules_dir/juce_audio_plugin_client/VST3/juce_VST3ManifestHelper.cpp" ]; then
+        printf 'JUCE_MODULES_DIR does not contain the required JUCE audio plugin client files: %s\n' "$juce_modules_dir" >&2
+        exit 1
+    fi
+}
+
 work=$(mktemp -d "${TMPDIR:-/tmp}/ves-macos-release-check.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 
@@ -149,11 +174,6 @@ prepare_xcode_project() {
     cp -R "$source_xcode_dir/Vintage Emulator Studio.xcodeproj" "$project"
 
     pbxproj="$project/project.pbxproj"
-    if [ -z "$juce_modules_dir" ]; then
-        juce_modules_dir=$(sed -n 's#.*path = \(/.*JUCE/modules\)/juce_core;.*#\1#p' "$source_xcode_dir/Vintage Emulator Studio.xcodeproj/project.pbxproj" | sed -n '1p')
-    fi
-    test -n "$juce_modules_dir"
-    test -d "$juce_modules_dir"
     perl -0pi -e 's#\.\./\.\./validation/mame-0\.289-patched/build/#../../validation/mame-0.289-patched/build-macos-x86_64/#g' "$pbxproj"
     perl -0pi -e 's#VALID_ARCHS = "arm64";#VALID_ARCHS = "x86_64";#g' "$pbxproj"
     perl -0pi -e 's#EXCLUDED_ARCHS = "i386 x86_64 arm64e";#EXCLUDED_ARCHS = "arm64 arm64e i386";#g' "$pbxproj"
@@ -258,6 +278,7 @@ validate_bundles() {
     ! find "$stage/Release" -name '.DS_Store' -o -name '._*' -o -name '*.psd' | grep .
 }
 
+resolve_juce_modules_dir
 build_sdl3_if_needed
 prepare_xcode_project
 
