@@ -45,7 +45,13 @@ make -j2 \
 
 `USE_QTDEBUG=0` avoids the Qt debugger dependency. `NO_USE_MIDI=0` keeps MAME MIDI enabled; PortMidi is statically linked and uses ALSA on Linux. Do not omit `ARCHOPTS=-fPIC`.
 
-On limited-memory hosts, use at most `-j2`. If Lua/frontend translation units exhaust memory, build those units with `-j1`. The release script serially prebuilds the detected Lua frontend objects before the normal `-j2` JUCE build.
+MAME compilation is memory-heavy. Keep `-j2` as the maximum recommended
+parallelism for this project. Systems with around 8 GB RAM may need additional
+swap, especially while compiling `src/frontend/mame/luaengine.cpp`; the default
+8 GB RAM plus 2 GB swap can be insufficient. If memory pressure occurs, retry
+the heavy MAME compilation with `-j1` and provide more total RAM+swap as needed.
+The release script serially prebuilds the detected Lua frontend objects before
+the normal `-j2` JUCE build.
 
 ## Projucer Regeneration
 
