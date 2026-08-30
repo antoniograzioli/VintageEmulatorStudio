@@ -234,17 +234,20 @@ collect_mame_link_inputs() {
     pbxproj=$1
     rg -o "../../validation/mame-0\.289-patched/$mame_builddir/osx_clang/[^\"[:space:];]+\\.(a|o)" \
         "$pbxproj" | sort -u > "$work/mame-link-inputs"
-    test "$(wc -l < "$work/mame-link-inputs" | tr -d ' ')" = 71
+    count=$(wc -l < "$work/mame-link-inputs" | tr -d ' ')
+    [ "$count" = 71 ] || { printf 'Expected 71 MAME linker inputs, found %s.\n' "$count" >&2; exit 1; }
 }
 
 validate_mame_inputs() {
     while IFS= read -r path; do
-        test -s "$xcode_dir/$path"
+        [ -s "$xcode_dir/$path" ] || { printf 'Missing MAME linker input: %s\n' "$path" >&2; exit 1; }
         assert_arch_archive_or_binary "$xcode_dir/$path"
         assert_minos_11_archive_or_binary "$xcode_dir/$path"
     done < "$work/mame-link-inputs"
-    test "$(grep -c '\.o$' "$work/mame-link-inputs")" = 43
-    test "$(grep -c '\.a$' "$work/mame-link-inputs")" = 28
+    object_count=$(grep -c '\.o$' "$work/mame-link-inputs")
+    archive_count=$(grep -c '\.a$' "$work/mame-link-inputs")
+    [ "$object_count" = 43 ] || { printf 'Expected 43 MAME object linker inputs, found %s.\n' "$object_count" >&2; exit 1; }
+    [ "$archive_count" = 28 ] || { printf 'Expected 28 MAME archive linker inputs, found %s.\n' "$archive_count" >&2; exit 1; }
 }
 
 validate_bundles() {
@@ -265,8 +268,10 @@ validate_bundles() {
         done < "$work/expected-machines"
 
         resources="$bundle/Contents/Resources"
-        test "$(find "$resources/artwork" -type f | wc -l | tr -d ' ')" = 37
-        test "$(find "$resources/plugins" -type f | wc -l | tr -d ' ')" = 3
+        artwork_count=$(find "$resources/artwork" -type f | wc -l | tr -d ' ')
+        plugin_count=$(find "$resources/plugins" -type f | wc -l | tr -d ' ')
+        [ "$artwork_count" = 28 ] || { printf 'Expected 28 bundled artwork files in %s, found %s.\n' "$bundle" "$artwork_count" >&2; exit 1; }
+        [ "$plugin_count" = 3 ] || { printf 'Expected 3 bundled plugin files in %s, found %s.\n' "$bundle" "$plugin_count" >&2; exit 1; }
         ! find "$resources" -type f \( -iname '*.rom' -o -iname '*.nvram' -o \
             -iname '*.iso' -o -iname '*.dsk' -o -iname '*.img' -o -iname '*.sav' -o \
             -iname '*.state' \) | grep .

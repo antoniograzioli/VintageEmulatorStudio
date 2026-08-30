@@ -13,6 +13,19 @@ VES supports macOS Apple Silicon (`arm64`) and macOS Intel (`x86_64`) builds.
 
 Both macOS architectures use deployment target macOS 11.0 and static SDL3 from the pinned in-tree SDL source.
 
+Use a local build path outside iCloud Drive or other File Provider-managed
+locations. Extended attributes such as FinderInfo/FileProvider metadata can
+break codesign. Also avoid spaces in the repository/build path because the
+MAME/GENie-generated Makefiles do not reliably quote SDL/include paths
+containing spaces.
+
+Safe path examples:
+
+```text
+/Volumes/Autodafe/VES-CleanBuild/VintageEmulatorStudio
+$HOME/Developer/VES-CleanBuild/VintageEmulatorStudio
+```
+
 ## Build MAME Artifacts
 
 Use the macOS release script for normal builds:
@@ -67,8 +80,11 @@ Do not link release products against a Homebrew SDL3 dylib.
 Run the macOS release build script from the repository root:
 
 ```sh
-JUCE_MODULES_DIR=/path/to/JUCE/modules platform/macos/build-macos-release.sh --arch arm64
-JUCE_MODULES_DIR=/path/to/JUCE/modules platform/macos/build-macos-release.sh --arch x86_64
+JUCE_MODULES_DIR="/path/to/JUCE/modules" \
+platform/macos/build-macos-release.sh --arch arm64
+
+JUCE_MODULES_DIR="/path/to/JUCE/modules" \
+platform/macos/build-macos-release.sh --arch x86_64
 ```
 
 If `JUCE_MODULES_DIR` is omitted, the script tries the module path recorded in `Project/VintageEmulatorStudio.jucer` and fails early if the required JUCE files are not present.
