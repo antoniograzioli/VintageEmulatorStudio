@@ -63,30 +63,10 @@ normalize_vst3_moduleinfo()
     python3 -m json.tool "$manifest" >/dev/null
 }
 
-apply_configured_juce_root()
-{
-    if ! grep -F '/media/antonio/Archivio/JUCE' "$MAKEFILE" >/dev/null; then
-        return
-    fi
-
-    [[ -n "${JUCE_ROOT:-}" ]] || {
-        printf 'Generated Makefile contains a nonportable JUCE path. Set JUCE_ROOT or regenerate with a configured Projucer.\n' >&2
-        exit 1
-    }
-    [[ -d "$JUCE_ROOT/modules" ]] || {
-        printf 'JUCE_ROOT does not contain a modules directory: %s\n' "$JUCE_ROOT" >&2
-        exit 1
-    }
-
-    perl -0pi -e 's/\/media\/antonio\/Archivio\/JUCE/\$\(JUCE_ROOT\)/g' "$MAKEFILE"
-}
-
 apply_linux_integration()
 {
     [[ -f "$MAKEFILE" ]] || { printf 'Missing generated Makefile: %s\n' "$MAKEFILE" >&2; exit 1; }
     [[ -f "$INTEGRATION_FILE" ]] || { printf 'Missing integration file: %s\n' "$INTEGRATION_FILE" >&2; exit 1; }
-
-    apply_configured_juce_root
 
     local temporary
     temporary=$(mktemp "$MAKE_DIR/.Makefile.integrate.XXXXXX")

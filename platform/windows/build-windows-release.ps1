@@ -32,7 +32,7 @@ function Assert-CanonicalRoot {
     Assert-File (Join-Path $projectRoot 'Builds\VisualStudio2022\VESMameIntegration.props') 'canonical Windows MAME integration'
     Assert-File (Join-Path $scriptRoot 'VintageEmulatorStudio.windows.jucer') 'canonical Windows Projucer project'
     if ($projectRoot -match 'VintageEmulatorStudioMAME289_Win') {
-        throw "Refusing to run from Windows RC tree: $projectRoot"
+        throw "Refusing to run from obsolete Windows source tree: $projectRoot"
     }
 }
 
@@ -380,7 +380,7 @@ function Stage-And-Validate([string] $MSBuild) {
     $vst3Info = Get-Item -LiteralPath $stagedVst3Binary
     Write-Host "Standalone: $($standaloneInfo.FullName) ($($standaloneInfo.Length) bytes)"
     Write-Host "VST3 binary: $($vst3Info.FullName) ($($vst3Info.Length) bytes)"
-    Write-Host "Release candidate ready: $distRoot"
+    Write-Host "Release output ready: $distRoot"
 }
 
 Assert-CanonicalRoot
