@@ -2,3 +2,4 @@
 bin
 build/*/obj
 src/host/scripts.c
+!src/host/scripts.c
