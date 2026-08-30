@@ -62,6 +62,7 @@ juce_modules_dir=${JUCE_MODULES_DIR:-}
 
 test -d "$mame"
 test -x "$root/platform/macos/normalize-vst3-moduleinfo.sh"
+command -v rg >/dev/null 2>&1 || { printf 'ripgrep (rg) is required. Install it before running this script.\n' >&2; exit 1; }
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/ves-macos-release-check.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM

@@ -8,6 +8,7 @@ VES supports macOS Apple Silicon (`arm64`) and macOS Intel (`x86_64`) builds.
 - JUCE/Projucer compatible with JUCE 8.0.13.
 - CMake for building SDL3 when a prebuilt static SDL3 prefix is not supplied.
 - `jq` for validation performed by the release script.
+- `ripgrep` (`rg`) for validation performed by the release script (`brew install ripgrep`).
 - Patched MAME 0.289 source under `validation/mame-0.289-patched`.
 
 Both macOS architectures use deployment target macOS 11.0 and static SDL3 from the pinned in-tree SDL source.
