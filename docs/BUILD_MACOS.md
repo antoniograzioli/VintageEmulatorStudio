@@ -14,12 +14,15 @@ Both macOS architectures use deployment target macOS 11.0 and static SDL3 from t
 
 ## Build MAME Artifacts
 
-Apple Silicon uses the generated solution-level MAME Makefile:
+Use the macOS release script for normal builds:
 
 ```sh
-MACOSX_DEPLOYMENT_TARGET=11.0 make -C validation/mame-0.289-patched/build/projects/sdl3/mamevesembedded/gmake-osx-clang config=release64 -j2 all
+platform/macos/build-macos-release.sh --arch arm64
+platform/macos/build-macos-release.sh --arch x86_64
 ```
 
+On a clean checkout, the script generates the required MAME project files from
+tracked source before invoking the generated solution-level Makefile.
 Do not invoke `mamevesembedded.make` directly for this step. The solution Makefile builds the selected objects and dependent archives required by the final link.
 
 Intel MAME output must be isolated from Apple Silicon output. The release script uses `BUILDDIR=build-macos-x86_64`, `PLATFORM=x86`, `PTR64=1`, `USE_LIBSDL=1`, `PKG_CONFIG_PATH="$VES_SDL3_PREFIX/lib/pkgconfig"`, and explicit x86_64 architecture options:

@@ -169,6 +169,15 @@ prepare_xcode_project() {
 build_mame_if_needed() {
     mame_solution="$mame/$mame_builddir/projects/sdl3/mamevesembedded/gmake-osx-clang"
 
+    if [ "$arch" = arm64 ] && [ ! -f "$mame_solution/Makefile" ]; then
+        (
+            cd "$mame"
+            PKG_CONFIG_PATH="$sdl3_prefix/lib/pkgconfig" MACOSX_DEPLOYMENT_TARGET=11.0 \
+            make REGENIE=1 SUBTARGET=vesembedded OSD=sdl3 TARGETOS=macosx USE_LIBSDL=1 \
+                "$mame_builddir/projects/sdl3/mamevesembedded/gmake-osx-clang/Makefile"
+        )
+    fi
+
     if [ "$arch" = x86_64 ] && [ ! -f "$mame_solution/Makefile" ]; then
         (
             cd "$mame"
