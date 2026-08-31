@@ -53,6 +53,14 @@ make REGENIE=1 SUBTARGET=vesembedded OSD=sdl3 TARGETOS=macosx PLATFORM=x86 PTR64
   -j2
 ```
 
+For Intel builds, use a modern Xcode/macOS toolchain. Xcode 13.2.1 / Apple Clang 13 on Big Sur has been observed to crash while compiling MAME 0.289. Cross-building `x86_64` from Apple Silicon is supported and recommended:
+
+```sh
+platform/macos/build-macos-release.sh --arch x86_64
+```
+
+Native Intel builds on newer Intel Macs/toolchains are also valid. Do not treat the 2013 Big Sur/Xcode 13 environment as supported or required.
+
 ## SDL3
 
 macOS builds use SDL 3.4.14 from `third_party/sdl3-src`, commit `147a8ee32dbf9ac02f3794964490687b6bbda1bc`.
