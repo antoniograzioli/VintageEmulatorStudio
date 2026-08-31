@@ -200,16 +200,15 @@ build_mame_if_needed() {
         (
             cd "$mame"
             PKG_CONFIG_PATH="$sdl3_prefix/lib/pkgconfig" MACOSX_DEPLOYMENT_TARGET=11.0 \
-            make -n REGENIE=1 SUBTARGET=vesembedded OSD=sdl3 TARGETOS=macosx PLATFORM=x86 PTR64=1 USE_LIBSDL=1 \
+            make REGENIE=1 SUBTARGET=vesembedded OSD=sdl3 TARGETOS=macosx PLATFORM=x86 PTR64=1 USE_LIBSDL=1 \
                 BUILDDIR="$mame_builddir" \
                 ARCHOPTS="-arch x86_64 -mmacosx-version-min=11.0" \
                 ARCHOPTS_C="-arch x86_64 -mmacosx-version-min=11.0" \
                 ARCHOPTS_CXX="-arch x86_64 -mmacosx-version-min=11.0" \
                 ARCHOPTS_OBJC="-arch x86_64 -mmacosx-version-min=11.0" \
                 ARCHOPTS_OBJCXX="-arch x86_64 -mmacosx-version-min=11.0" \
-                -j2 > "$work/mame-x86_64-dry-run"
+                "$mame_builddir/projects/sdl3/mamevesembedded/gmake-osx-clang/Makefile"
         )
-        rg -q -- 'build-macos-x86_64' "$work/mame-x86_64-dry-run"
     fi
 
     if [ "$arch" = arm64 ]; then
