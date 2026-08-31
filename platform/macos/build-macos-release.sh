@@ -214,18 +214,7 @@ build_mame_if_needed() {
     if [ "$arch" = arm64 ]; then
         MACOSX_DEPLOYMENT_TARGET=11.0 make -C "$mame_solution" config=release64 -j2 all
     else
-        (
-            cd "$mame"
-            PKG_CONFIG_PATH="$sdl3_prefix/lib/pkgconfig" MACOSX_DEPLOYMENT_TARGET=11.0 \
-            make REGENIE=1 SUBTARGET=vesembedded OSD=sdl3 TARGETOS=macosx PLATFORM=x86 PTR64=1 USE_LIBSDL=1 \
-                BUILDDIR="$mame_builddir" \
-                ARCHOPTS="-arch x86_64 -mmacosx-version-min=11.0" \
-                ARCHOPTS_C="-arch x86_64 -mmacosx-version-min=11.0" \
-                ARCHOPTS_CXX="-arch x86_64 -mmacosx-version-min=11.0" \
-                ARCHOPTS_OBJC="-arch x86_64 -mmacosx-version-min=11.0" \
-                ARCHOPTS_OBJCXX="-arch x86_64 -mmacosx-version-min=11.0" \
-                -j2
-        )
+        MACOSX_DEPLOYMENT_TARGET=11.0 make -C "$mame_solution" config=release64 -j2 all
     fi
 }
 
