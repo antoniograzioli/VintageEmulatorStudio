@@ -7,7 +7,6 @@
 /validation/mame-0.289-patched/mamevesembedded.exp
 /validation/mame-0.289-patched/mamevesembedded.lib
 /validation/mame-0.289-patched/3rdparty/genie/bin/
-/validation/mame-0.289-patched/3rdparty/genie/build/gmake.windows/
 /validation/mame-0.289-patched/scripts/build/__pycache__/
 
 # VES generated platform build outputs
