@@ -2,7 +2,7 @@
 param(
     [switch] $Regenerate,
     [switch] $IntegrateOnly,
-    [string] $JuceRoot = 'C:\JUCE',
+    [string] $JuceRoot = '',
     [string] $MSBuildPath = ''
 )
 
@@ -13,6 +13,7 @@ $scriptRoot = $PSScriptRoot
 $projectRoot = [System.IO.Path]::GetFullPath((Join-Path $scriptRoot '..\..'))
 $buildRoot = Join-Path $projectRoot 'Builds\VisualStudio2022'
 $jucerFile = Join-Path $scriptRoot 'VintageEmulatorStudio.windows.jucer'
+$juceRootProps = Join-Path $buildRoot 'VESJuceRoot.props'
 $integrationFile = Join-Path $buildRoot 'VESMameIntegration.props'
 $sharedProject = Join-Path $buildRoot 'Vintage Emulator Studio_SharedCode.vcxproj'
 $standaloneProject = Join-Path $buildRoot 'Vintage Emulator Studio_StandalonePlugin.vcxproj'
@@ -25,6 +26,35 @@ function Assert-File([string] $Path, [string] $Description) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         throw "Missing ${Description}: $Path"
     }
+}
+
+function Resolve-JuceRoot([string] $Path) {
+    $candidate = $Path
+    if (-not $candidate) {
+        $candidate = $env:VES_JUCE_ROOT
+    }
+    if (-not $candidate) {
+        throw 'JUCE root is not configured. Use -JuceRoot C:\path\to\JUCE-8.0.13 or set VES_JUCE_ROOT.'
+    }
+
+    $resolved = [System.IO.Path]::GetFullPath($candidate)
+    Assert-File (Join-Path $resolved 'modules\juce_core\juce_core.h') 'JUCE core module'
+    Assert-File (Join-Path $resolved 'modules\juce_audio_plugin_client\VST3\juce_VST3ManifestHelper.cpp') 'JUCE VST3 manifest helper source'
+    return $resolved
+}
+
+function Find-Projucer([string] $Root) {
+    $candidates = @(
+        (Join-Path $Root 'Projucer.exe'),
+        (Join-Path $Root 'extras\Projucer\Builds\VisualStudio2022\x64\Release\App\Projucer.exe'),
+        (Join-Path $Root 'extras\Projucer\Builds\VisualStudio2022\x64\Release\Projucer.exe')
+    )
+    foreach ($candidate in $candidates) {
+        if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+            return (Resolve-Path -LiteralPath $candidate).Path
+        }
+    }
+    throw "Projucer executable was not found under JUCE root: $Root"
 }
 
 function Assert-CanonicalRoot {
@@ -44,6 +74,43 @@ function Write-TextIfChanged([string] $Path, [string] $Text) {
     } else {
         Write-Host "Already integrated: $Path"
     }
+}
+
+function Add-JuceRootImport([string] $ProjectPath) {
+    $text = [System.IO.File]::ReadAllText($ProjectPath)
+    $text = [regex]::Replace(
+        $text,
+        '(?m)^\s*<Import Project="VESJuceRoot\.props"\s*/>\r?\n?',
+        '')
+
+    $cppProps = '  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>'
+    $replacement = $cppProps + "`r`n" + '  <Import Project="VESJuceRoot.props" />'
+    if ([regex]::Matches($text, [regex]::Escape($cppProps)).Count -ne 1) {
+        throw "Expected one Microsoft.Cpp.props import in $ProjectPath"
+    }
+
+    Write-TextIfChanged $ProjectPath ($text.Replace($cppProps, $replacement))
+}
+
+function Normalize-JuceProjectPaths([string] $ProjectPath) {
+    $text = [System.IO.File]::ReadAllText($ProjectPath)
+    $legacyAbsoluteJuceRoot = 'C:' + '\JUCE'
+    $legacyRelativeJuceRoot = '..\..' + '\..\..\..\..\..\JUCE'
+    $text = $text.Replace($legacyAbsoluteJuceRoot, '$(VesJuceRoot)')
+    $text = $text.Replace($legacyRelativeJuceRoot, '$(VesJuceRoot)')
+    Write-TextIfChanged $ProjectPath $text
+}
+
+function Normalize-JucerJucePaths {
+    $text = [System.IO.File]::ReadAllText($jucerFile)
+    $text = [regex]::Replace(
+        $text,
+        '(<MODULEPATH id="juce_[^"]+"\s+path=")[^"]*("/>)',
+        {
+            param($match)
+            $match.Groups[1].Value + '$(VES_JUCE_ROOT)' + $match.Groups[2].Value
+        })
+    Write-TextIfChanged $jucerFile $text
 }
 
 function Add-IntegrationImport([string] $ProjectPath) {
@@ -81,9 +148,16 @@ function Set-SharedCodeFlacOverride {
 }
 
 function Apply-ProjucerIntegration {
+    Normalize-JucerJucePaths
+    Assert-File $juceRootProps 'JUCE root property sheet'
     Assert-File $integrationFile 'authoritative MAME integration property sheet'
     foreach ($project in @($sharedProject, $standaloneProject, $vst3Project, $helperProject)) {
         Assert-File $project 'generated Visual Studio project'
+        Normalize-JuceProjectPaths $project
+        Add-JuceRootImport $project
+    }
+    foreach ($filter in @(Get-ChildItem -LiteralPath $buildRoot -Filter '*.vcxproj.filters' -File)) {
+        Normalize-JuceProjectPaths $filter.FullName
     }
 
     Set-SharedCodeFlacOverride
@@ -100,6 +174,26 @@ function Apply-ProjucerIntegration {
     if (-not $sharedText.Contains('JUCE_INCLUDE_FLAC_CODE=0') -or
         -not $sharedText.Contains('3rdparty\flac\include')) {
         throw 'The Shared Code FLAC override was not restored.'
+    }
+    foreach ($project in @($sharedProject, $standaloneProject, $vst3Project, $helperProject)) {
+        $projectText = [System.IO.File]::ReadAllText($project)
+        $legacyAbsoluteJuceRoot = 'C:' + '\JUCE'
+        $legacyRelativeJuceRoot = '..\..' + '\..\..\..\..\..\JUCE'
+        if ($projectText.Contains($legacyAbsoluteJuceRoot) -or $projectText.Contains($legacyRelativeJuceRoot)) {
+            throw "Non-portable JUCE path remains in $project"
+        }
+        if (-not $projectText.Contains('VESJuceRoot.props')) {
+            throw "JUCE root property sheet import missing from $project"
+        }
+    }
+    foreach ($file in @($jucerFile) + @(Get-ChildItem -LiteralPath $buildRoot -Filter '*.vcxproj.filters' -File | ForEach-Object { $_.FullName })) {
+        $text = [System.IO.File]::ReadAllText($file)
+        $legacyAbsoluteJuceRoot = 'C:' + '\JUCE'
+        $legacyRelativeJuceRoot = '..\..' + '\..\..\..\..\..\JUCE'
+        $legacyJucerModulePath = '../..' + '/juce'
+        if ($text.Contains($legacyAbsoluteJuceRoot) -or $text.Contains($legacyRelativeJuceRoot) -or $text.Contains($legacyJucerModulePath)) {
+            throw "Non-portable JUCE path remains in $file"
+        }
     }
 
     Write-Host 'Projucer integration verified for Shared Code, Standalone, and VST3.'
@@ -123,9 +217,9 @@ function Find-MSBuild {
     return $candidate
 }
 
-function Invoke-Build([string] $MSBuild, [string] $Project, [string] $Platform) {
+function Invoke-Build([string] $MSBuild, [string] $Project, [string] $Platform, [string] $JuceRootPath) {
     Write-Host "Building $(Split-Path -Leaf $Project): Release|$Platform"
-    & $MSBuild $Project /t:Build /m /v:minimal /nologo /p:Configuration=Release "/p:Platform=$Platform"
+    & $MSBuild $Project /t:Build /m /v:minimal /nologo /p:Configuration=Release "/p:Platform=$Platform" "/p:VesJuceRoot=$JuceRootPath"
     if ($LASTEXITCODE -ne 0) {
         throw "Build failed ($LASTEXITCODE): $Project"
     }
@@ -385,9 +479,10 @@ function Stage-And-Validate([string] $MSBuild) {
 
 Assert-CanonicalRoot
 Assert-File $jucerFile 'Windows Projucer project'
+$juceRootResolved = Resolve-JuceRoot $JuceRoot
+$env:VES_JUCE_ROOT = $juceRootResolved
 if ($Regenerate) {
-    $projucer = Join-Path $JuceRoot 'Projucer.exe'
-    Assert-File $projucer 'Projucer executable'
+    $projucer = Find-Projucer $juceRootResolved
     Write-Host "Regenerating Visual Studio projects with $projucer"
     $projucerProcess = Start-Process -FilePath $projucer -ArgumentList @('--resave', $jucerFile) -Wait -PassThru -NoNewWindow
     if ($projucerProcess.ExitCode -ne 0) { throw "Projucer regeneration failed ($($projucerProcess.ExitCode))." }
@@ -398,8 +493,8 @@ if ($IntegrateOnly) { return }
 
 Assert-MameArtifacts
 $msbuild = Find-MSBuild
-Invoke-Build $msbuild $sharedProject 'x64'
-Invoke-Build $msbuild $standaloneProject 'x64'
-Invoke-Build $msbuild $helperProject 'Win32'
-Invoke-Build $msbuild $vst3Project 'x64'
+Invoke-Build $msbuild $sharedProject 'x64' $juceRootResolved
+Invoke-Build $msbuild $standaloneProject 'x64' $juceRootResolved
+Invoke-Build $msbuild $helperProject 'Win32' $juceRootResolved
+Invoke-Build $msbuild $vst3Project 'x64' $juceRootResolved
 Stage-And-Validate $msbuild

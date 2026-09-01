@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <VesJuceRoot Condition="'$(VesJuceRoot)'=='' and '$(VES_JUCE_ROOT)'!=''">$(VES_JUCE_ROOT)</VesJuceRoot>
+    <VesJuceModulesDir>$(VesJuceRoot)\modules</VesJuceModulesDir>
+  </PropertyGroup>
+
+  <Target Name="ValidateVESJuceRoot" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(VesJuceRoot)'==''"
+           Text="JUCE root is not configured. Pass /p:VesJuceRoot=C:\path\to\JUCE-8.0.13 to MSBuild, set VES_JUCE_ROOT, or use platform\windows\build-windows-release.ps1 -JuceRoot C:\path\to\JUCE-8.0.13." />
+    <Error Condition="'$(VesJuceRoot)'!='' and !Exists('$(VesJuceModulesDir)\juce_core\juce_core.h')"
+           Text="VesJuceRoot does not point to a JUCE checkout with modules: $(VesJuceRoot)" />
+    <Error Condition="'$(VesJuceRoot)'!='' and !Exists('$(VesJuceModulesDir)\juce_audio_plugin_client\VST3\juce_VST3ManifestHelper.cpp')"
+           Text="VesJuceRoot is missing the JUCE VST3 manifest helper source expected by JUCE 8.0.13: $(VesJuceRoot)" />
+  </Target>
+</Project>

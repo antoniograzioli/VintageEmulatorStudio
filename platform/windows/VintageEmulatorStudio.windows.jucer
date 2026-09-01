@@ -78,19 +78,19 @@
         <CONFIGURATION isDebug="0" name="Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
-        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
-        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../juce"/>
-        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
-        <MODULEPATH id="juce_audio_processors_headless" path="../../juce"/>
-        <MODULEPATH id="juce_audio_utils" path="../../juce"/>
-        <MODULEPATH id="juce_core" path="../../juce"/>
-        <MODULEPATH id="juce_data_structures" path="../../juce"/>
-        <MODULEPATH id="juce_events" path="../../juce"/>
-        <MODULEPATH id="juce_graphics" path="../../juce"/>
-        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
-        <MODULEPATH id="juce_gui_extra" path="../../juce"/>
+        <MODULEPATH id="juce_audio_basics" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_audio_devices" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_audio_formats" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_audio_processors" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_audio_utils" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_core" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_data_structures" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_events" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_graphics" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_gui_basics" path="$(VES_JUCE_ROOT)"/>
+        <MODULEPATH id="juce_gui_extra" path="$(VES_JUCE_ROOT)"/>
       </MODULEPATHS>
     </VS2022>
   </EXPORTFORMATS>
