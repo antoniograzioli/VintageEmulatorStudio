@@ -26,9 +26,10 @@ The checked-in JUCE-generated project files are part of the supported build work
 The following paths are source-bearing and must remain trackable:
 
 - `validation/mame-0.289-patched/scripts/build/`
+- `validation/mame-0.289-patched/3rdparty/genie/build/gmake.windows/`
 - `validation/mame-0.289-patched/3rdparty/softfloat3/build/MAME/platform.h`
 
-Generated MAME build output under `validation/mame-0.289-patched/build/` is intentionally ignored.
+Generated MAME build output under `validation/mame-0.289-patched/build/` and local GENie bootstrap binaries under `validation/mame-0.289-patched/3rdparty/genie/bin/` are intentionally ignored.
 
 ## Patch Series
 

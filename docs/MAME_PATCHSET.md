@@ -63,6 +63,7 @@ The runtime launches MAME with VES-controlled audio/MIDI paths.  PortAudio, Port
 Some source-bearing MAME directories look like generated-output directories but are required inputs:
 
 - `validation/mame-0.289-patched/scripts/build/`
+- `validation/mame-0.289-patched/3rdparty/genie/build/gmake.windows/`
 - `validation/mame-0.289-patched/3rdparty/softfloat3/build/MAME/platform.h`
 
 Do not remove or ignore those paths when preparing source packages.  Generated MAME project files, compiler output, archives, executables, local GENie bootstrap binaries, ROMs, NVRAM, and user media are not part of the source distribution.

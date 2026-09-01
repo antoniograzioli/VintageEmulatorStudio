@@ -22,7 +22,6 @@ containing spaces.
 Safe path examples:
 
 ```text
-/Volumes/Autodafe/VES-CleanBuild/VintageEmulatorStudio
 $HOME/Developer/VES-CleanBuild/VintageEmulatorStudio
 ```
 
