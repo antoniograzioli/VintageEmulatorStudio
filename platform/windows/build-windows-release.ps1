@@ -318,7 +318,7 @@ function Assert-ReleaseResources([string] $ResourceRoot, [string] $Description) 
     $plugins = @(Get-ChildItem -LiteralPath (Join-Path $ResourceRoot 'plugins') -Recurse -File)
     $artwork = @(Get-ChildItem -LiteralPath (Join-Path $ResourceRoot 'artwork') -Recurse -File)
     if ($plugins.Count -ne 3) { throw "$Description expected 3 plugin files; found $($plugins.Count)" }
-    if ($artwork.Count -ne 37) { throw "$Description expected 37 artwork files; found $($artwork.Count)" }
+    if ($artwork.Count -ne 28) { throw "$Description expected 28 artwork files; found $($artwork.Count)" }
 
     $forbidden = @(
         Get-ChildItem -LiteralPath $ResourceRoot -Recurse -File |
