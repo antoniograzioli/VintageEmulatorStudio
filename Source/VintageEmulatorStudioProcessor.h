@@ -19,8 +19,7 @@ enum class EmbeddedEngineState : int
     Booting,
     Ready,
     Stopping,
-    Failed,
-    InstanceConflict
+    Failed
 };
 
 struct EmbeddedDiagnosticSnapshot
@@ -31,7 +30,6 @@ struct EmbeddedDiagnosticSnapshot
     uint64_t bootElapsedMs = 0;
     bool ready = false;
     bool mameThreadRunning = false;
-    bool instanceConflict = false;
     uint64_t hostSampleRate = 0;
     uint64_t mameSampleRate = 0;
     uint64_t currentQueuedAudioFrames = 0;
@@ -155,7 +153,6 @@ public:
     juce::String getLastError() const;
     uint64_t getBootElapsedMs() const;
     bool isReady() const;
-    bool hasInstanceConflict() const;
     juce::String getSelectedMachineDriverName() const;
     juce::String getSelectedMachineName() const;
     juce::String getMachineNameForDisplayPosition (int displayPosition) const;
@@ -222,7 +219,7 @@ private:
     void startEngineIfNeeded (double sampleRate);
     void stopEngine();
     void restartSelectedMachine();
-    bool prepareNvramState();
+    bool prepareNvramState (const juce::File& runtimeNvramDirectory);
     juce::File getRomsDirectory() const;
     juce::File getNvramSeedFile() const;
     juce::File getPluginDataDirectory() const;

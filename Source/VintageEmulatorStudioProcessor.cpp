@@ -12,7 +12,6 @@
 
 namespace
 {
-std::atomic<bool> activeEmbeddedInstance { false };
 constexpr auto romDirectoryProperty = "romDirectory";
 constexpr auto legacyRomPathProperty = "romPath";
 constexpr auto artworkDirectoryProperty = "artworkDirectory";
@@ -608,7 +607,7 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     buffer.clear();
 
     auto localEngine = std::atomic_load (&engine);
-    if (localEngine == nullptr || state.load (std::memory_order_relaxed) == static_cast<int> (EmbeddedEngineState::InstanceConflict))
+    if (localEngine == nullptr)
         return;
 
     updateBootState();
@@ -811,7 +810,7 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate)
     if (sampleRate <= 0.0 || maxBlockSize <= 0)
         return;
 
-    if (std::atomic_load (&engine) != nullptr || state.load (std::memory_order_relaxed) == static_cast<int> (EmbeddedEngineState::InstanceConflict))
+    if (std::atomic_load (&engine) != nullptr)
         return;
 
     lastError.clear();
@@ -820,33 +819,16 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate)
     const auto& profile = findMachineProfileByDriverName (selectedDriver) != nullptr
                             ? *findMachineProfileByDriverName (selectedDriver)
                             : defaultMachineProfile();
-    bool expected = false;
-    if (! activeEmbeddedInstance.compare_exchange_strong (expected, true, std::memory_order_acq_rel))
-    {
-        state.store (static_cast<int> (EmbeddedEngineState::InstanceConflict), std::memory_order_relaxed);
-        lastError = "Another embedded MAME instance is already running";
-        return;
-    }
-
     state.store (static_cast<int> (EmbeddedEngineState::Starting), std::memory_order_relaxed);
-
-    if (! prepareNvramState())
-    {
-        activeEmbeddedInstance.store (false, std::memory_order_release);
-        state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
-        return;
-    }
 
     auto roms = getRomsDirectory();
     if (! hasPrimaryRom (roms, profile))
     {
-        activeEmbeddedInstance.store (false, std::memory_order_release);
         lastError = "Missing primary ROM set for " + juce::String (profile.driverName) + " in " + roms.getFullPathName();
         state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
         return;
     }
 
-    auto dataDir = getPluginDataDirectory();
     const auto pluginsDir = resolveMamePluginsDirectory();
     const auto artworkPath = getEffectiveMameArtworkPath();
     std::vector<ves::EmbeddedEmulatorEngineSettings::StartupMediaOption> startupMediaOptions;
@@ -865,17 +847,29 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate)
     }
     if (! pluginsDir.isDirectory())
     {
-        activeEmbeddedInstance.store (false, std::memory_order_release);
         lastError = "MAME plugins directory containing boot.lua and layout/init.lua was not found";
         state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
         return;
     }
 
-    const auto transientCfgDir = juce::File::getSpecialLocation (juce::File::tempDirectory)
+    const auto transientRootDir = juce::File::getSpecialLocation (juce::File::tempDirectory)
         .getChildFile ("VintageEmulatorStudio")
-        .getChildFile ("cfg-" + juce::String::toHexString (static_cast<juce::int64> (reinterpret_cast<std::uintptr_t> (this))));
-    transientCfgDir.deleteRecursively();
-    transientCfgDir.createDirectory();
+        .getChildFile ("instance-" + juce::String::toHexString (static_cast<juce::int64> (reinterpret_cast<std::uintptr_t> (this))));
+    transientRootDir.deleteRecursively();
+    const auto transientCfgDir = transientRootDir.getChildFile ("cfg");
+    const auto transientNvramDir = transientRootDir.getChildFile ("nvram");
+    if (! transientCfgDir.createDirectory() || ! transientNvramDir.createDirectory())
+    {
+        lastError = "Could not create per-instance MAME runtime directory: " + transientRootDir.getFullPathName();
+        state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
+        return;
+    }
+
+    if (! prepareNvramState (transientNvramDir))
+    {
+        state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
+        return;
+    }
 
     const auto nativeMidiInputOption = profile.nativeMidiOptions != nullptr
         ? profile.nativeMidiOptions->inputOptionName
@@ -888,7 +882,7 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate)
     auto newEngine = std::make_shared<ves::EmbeddedEmulatorEngine> (ves::EmbeddedEmulatorEngineSettings {
         roms.getFullPathName().toStdString(),
         transientCfgDir.getFullPathName().toStdString(),
-        dataDir.getChildFile ("nvram").getFullPathName().toStdString(),
+        transientNvramDir.getFullPathName().toStdString(),
         pluginsDir.getFullPathName().toStdString(),
         artworkPath.toStdString(),
         profile.driverName,
@@ -914,19 +908,11 @@ void VintageEmulatorStudioProcessor::stopEngine()
 {
     floppyHotSwapPending.store (false, std::memory_order_release);
     floppyHotSwapMessage.clear();
-    auto previousState = static_cast<EmbeddedEngineState> (state.load (std::memory_order_relaxed));
-    if (previousState == EmbeddedEngineState::InstanceConflict)
-    {
-        state.store (static_cast<int> (EmbeddedEngineState::Stopped), std::memory_order_relaxed);
-        return;
-    }
-
     auto oldEngine = std::atomic_exchange (&engine, std::shared_ptr<ves::EmbeddedEmulatorEngine> {});
     if (oldEngine != nullptr)
     {
         state.store (static_cast<int> (EmbeddedEngineState::Stopping), std::memory_order_relaxed);
         oldEngine->stopAndJoin (std::chrono::seconds (5));
-        activeEmbeddedInstance.store (false, std::memory_order_release);
     }
 
     state.store (static_cast<int> (EmbeddedEngineState::Stopped), std::memory_order_relaxed);
@@ -940,7 +926,7 @@ void VintageEmulatorStudioProcessor::restartSelectedMachine()
         startEngineIfNeeded (currentSampleRate);
 }
 
-bool VintageEmulatorStudioProcessor::prepareNvramState()
+bool VintageEmulatorStudioProcessor::prepareNvramState (const juce::File& runtimeNvramDirectory)
 {
     const auto selectedDriver = getSelectedMachineDriverName();
     const auto& profile = findMachineProfileByDriverName (selectedDriver) != nullptr
@@ -949,7 +935,7 @@ bool VintageEmulatorStudioProcessor::prepareNvramState()
     if (! profile.requiresSeededNvram)
         return true;
 
-    auto nvramDir = getPluginDataDirectory().getChildFile ("nvram").getChildFile (selectedDriver);
+    auto nvramDir = runtimeNvramDirectory.getChildFile (selectedDriver);
     if (! nvramDir.createDirectory())
     {
         lastError = "Could not create NVRAM directory: " + nvramDir.getFullPathName();
@@ -969,7 +955,6 @@ bool VintageEmulatorStudioProcessor::prepareNvramState()
     // clean first boot.  MAME creates the initial in-memory NVRAM state when no
     // previously initialized file is available.
 
-    getPluginDataDirectory().getChildFile ("cfg").createDirectory();
     return true;
 }
 
@@ -1146,7 +1131,6 @@ juce::String VintageEmulatorStudioProcessor::getEngineStateText() const
         case EmbeddedEngineState::Ready: return "Ready";
         case EmbeddedEngineState::Stopping: return "Stopping";
         case EmbeddedEngineState::Failed: return "Failed";
-        case EmbeddedEngineState::InstanceConflict: return "InstanceConflict";
     }
     return "Unknown";
 }
@@ -1167,11 +1151,6 @@ bool VintageEmulatorStudioProcessor::isReady() const
     return getEngineState() == EmbeddedEngineState::Ready;
 }
 
-bool VintageEmulatorStudioProcessor::hasInstanceConflict() const
-{
-    return getEngineState() == EmbeddedEngineState::InstanceConflict;
-}
-
 const ves::EngineDiagnostics* VintageEmulatorStudioProcessor::getEngineDiagnostics() const
 {
     return engine != nullptr ? &engine->diagnostics() : nullptr;
@@ -1185,7 +1164,6 @@ EmbeddedDiagnosticSnapshot VintageEmulatorStudioProcessor::getDiagnosticSnapshot
     snapshot.machineName = getSelectedMachineName();
     snapshot.bootElapsedMs = getBootElapsedMs();
     snapshot.ready = snapshot.engineState == EmbeddedEngineState::Ready;
-    snapshot.instanceConflict = snapshot.engineState == EmbeddedEngineState::InstanceConflict;
     snapshot.midiMessagesReceived = midiMessagesReceived.load (std::memory_order_relaxed);
     snapshot.midiDroppedBeforeReady = midiDroppedBeforeReady.load (std::memory_order_relaxed);
     snapshot.romPath = getRomsDirectory().getFullPathName();
@@ -1734,11 +1712,7 @@ juce::String VintageEmulatorStudioProcessor::getNvramStatusText() const
     if (! profile.requiresSeededNvram)
         return "Not required";
 
-    const auto seed = getNvramSeedFile();
-    const auto active = getPluginDataDirectory().getChildFile ("nvram").getChildFile (selectedDriver).getChildFile ("nvram");
-    if (active.existsAsFile())
-        return "Initialized NVRAM available";
-    if (seed.existsAsFile())
+    if (getNvramSeedFile().existsAsFile())
         return "Seed NVRAM available";
     return "Clean NVRAM will be initialized";
 }
