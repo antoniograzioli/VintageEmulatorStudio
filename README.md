@@ -34,6 +34,72 @@ VES is a JUCE-based audio plug-in/application that embeds a selected MAME target
 
 MAME-derived code is vendored under `validation/mame-0.289-patched`.  The upstream MAME baseline is 0.289 at commit `f34f02505e32c1993c6a782b6814232cbfc74e36`.
 
+## Included Machines
+
+VES currently includes a curated selection of vintage synthesizers, samplers, drum machines, and sound modules emulated by MAME.
+
+**Akai**
+- CD3000i
+- CD3000XL
+- MPC60
+- MPC3000
+- S2000
+- S3000
+- S3000XL
+
+**Casio**
+- AP-10
+- CT-8000
+- CT-FK1
+- CZ-101
+- CZ-1
+- CZ-230S
+- RZ-1
+
+**Ensoniq**
+- ESQ-1
+- VFX
+- VFX-SD
+- SD-1 32 Voice
+
+**Linn**
+- LinnDrum
+
+**Oberheim**
+- DMX
+
+**Roland**
+- TR-707
+- TR-727
+
+**Sequential**
+- Prophet-5
+- Six-Trak
+
+**Yamaha**
+- DD-9
+- DX100
+- FB-01
+- TG100
+- TX81Z
+- MU-50
+- MU-2000
+- PSR-11
+- PSR-60
+- PSR-70
+- PSR-75
+- PSR-76
+- PSR-110
+- PSR-150
+- PSR-180
+- PSS-6
+- PSS-11
+- PSS-12
+- PSS-21
+- PSS-31
+
+Machine availability, accuracy, and completeness depend on the current state of the corresponding MAME drivers. Some machines may have incomplete features, imperfect emulation, or limitations that are outside the scope of VES.
+
 ## Repository Layout
 
 - `Source/` - VES JUCE processor/editor and host integration code.
