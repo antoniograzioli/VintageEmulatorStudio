@@ -10,7 +10,7 @@ or other third-party content.
 | Component | Location | License stated for this repository | Notes |
 |---|---|---|---|
 | Original VES application/plugin source | `Source/` | AGPL-3.0-only unless a file states another license | Main JUCE processor/editor code and VES host logic. |
-| JUCE | External JUCE checkout referenced by project files; generated wrappers under `JuceLibraryCode/` and platform project output | JUCE AGPLv3/open-source option; upstream JUCE terms apply | JUCE source modules are not vendored as a complete third-party source tree. Existing JUCE-generated notices are preserved. |
+| JUCE | External JUCE checkout referenced by project files; generated wrappers under `JuceLibraryCode/` and platform project output | JUCE 8 dual licensing applies: AGPLv3 or the applicable JUCE commercial licence; upstream JUCE terms apply.| JUCE source modules are not vendored as a complete third-party source tree. Existing JUCE-generated notices are preserved. |
 | MAME 0.289 | `validation/mame-0.289-patched/` | MAME as a whole is GPL-2.0-or-later per MAME documentation; individual file licenses are retained | Upstream baseline is tag `mame0289`, commit `f34f02505e32c1993c6a782b6814232cbfc74e36`. |
 | VES-specific MAME integration files | `validation/mame-0.289-patched/src/ves/embeddedinstruments/`, `validation/mame-0.289-patched/scripts/target/mame/vesembedded.lua` | BSD-3-Clause where marked | These files are intentionally kept under their stated BSD-3-Clause metadata. |
 | SDL3 | `third_party/sdl3-src/` | Zlib license text in `third_party/sdl3-src/LICENSE.txt` | Pinned SDL 3.4.14 source, commit `147a8ee32dbf9ac02f3794964490687b6bbda1bc`; macOS builds link static SDL3. |
