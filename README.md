@@ -8,7 +8,7 @@ This repository contains the VES host code, artwork/layout resources, JUCE proje
 
 ## Status
 
-VES 0.9.289 is a source baseline for four supported build configurations:
+VES 0.9.289 is a source baseline for four validated build configurations:
 
 - macOS Apple Silicon (`arm64`)
 - macOS Intel (`x86_64`)
