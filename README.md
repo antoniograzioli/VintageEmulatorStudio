@@ -6,6 +6,8 @@ Vintage Emulator Studio is an instrument plug-in project for vintage synthesizer
 
 This repository contains the VES host code, artwork/layout resources, JUCE project files, platform build integration, a patched MAME 0.289 source tree, and a reproducible patch series describing the VES modifications to MAME.
 
+[![Download Vintage Emulator Studio](https://img.shields.io/badge/Download-Vintage%20Emulator%20Studio-brightgreen?style=for-the-badge)](https://www.autodafe.net/vintage-emulator-studio.html)
+
 ## Status
 
 VES 0.9.289 is a source baseline for four validated build configurations:
