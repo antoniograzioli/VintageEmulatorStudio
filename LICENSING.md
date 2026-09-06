@@ -15,7 +15,7 @@ or other third-party content.
 | VES-specific MAME integration files | `validation/mame-0.289-patched/src/ves/embeddedinstruments/`, `validation/mame-0.289-patched/scripts/target/mame/vesembedded.lua` | BSD-3-Clause where marked | These files are intentionally kept under their stated BSD-3-Clause metadata. |
 | SDL3 | `third_party/sdl3-src/` | Zlib license text in `third_party/sdl3-src/LICENSE.txt` | Pinned SDL 3.4.14 source, commit `147a8ee32dbf9ac02f3794964490687b6bbda1bc`; macOS builds link static SDL3. |
 | Inter font | `Resources/Fonts/` | SIL Open Font License 1.1 | License text is retained in `Resources/Fonts/OFL.txt`. |
-| Bundled free artwork/layout resources | `artwork/` | CC0-1.0 where explicitly marked or listed below | Explicit CC0 declarations remain in the layout files. Additional project-owned free artwork files listed below are documented as CC0-1.0. |
+| Bundled free artwork/layout resources | `artwork/` | CC0-1.0 where explicitly marked or listed below | Explicit CC0 declarations remain in the layout files. Additional project-owned free artwork files listed below are documented as CC0-1.0. The CC0 dedication covers only copyright interests owned by the VES project. Third-party trademarks, logos, product names and trade dress remain the property of their respective owners. |
 | VES logo and branding | `Resources/ves-logo.png`, project name, product name, visual branding | Excluded from the AGPL software license grant and the CC0 artwork dedication | No trademark registration claim is made here. |
 | Other third-party files | Vendored/generated locations throughout the repository | Respective upstream licenses/notices | Third-party license and notice files are retained with their source trees or resources. |
 
