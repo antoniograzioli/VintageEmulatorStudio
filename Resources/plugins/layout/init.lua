@@ -15,6 +15,22 @@ local frame_subscription, stop_subscription
 
 function layout.startplugin()
 	local scripts = {}
+	local has_frame_hooks = false
+	local function register_frame_notifier()
+		if has_frame_hooks and not frame_subscription then
+			frame_subscription = emu.add_machine_frame_notifier(function ()
+				if manager.machine.paused then
+					return
+				end
+				for num, scr in pairs(scripts) do
+					if scr.frame then
+						scr.frame()
+					end
+				end
+			end)
+		end
+	end
+
 	local function prepare_layout(file, script)
 		local env = {
 			machine = manager.machine,
@@ -57,20 +73,14 @@ function layout.startplugin()
 		local hooks = script()
 		if hooks ~= nil then
 			table.insert(scripts, hooks)
+			if type(hooks) == "table" and type(hooks.frame) == "function" then
+				has_frame_hooks = true
+				register_frame_notifier()
+			end
 		end
 	end
 
 	emu.register_callback(prepare_layout, "layout")
-	frame_subscription = emu.add_machine_frame_notifier(function ()
-		if manager.machine.paused then
-			return
-		end
-		for num, scr in pairs(scripts) do
-			if scr.frame then
-				scr.frame()
-			end
-		end
-	end)
 	emu.register_prestart(function ()
 		for num, scr in pairs(scripts) do
 			if scr.reset then
@@ -79,7 +89,12 @@ function layout.startplugin()
 		end
 	end)
 	stop_subscription = emu.add_machine_stop_notifier(function ()
+		if frame_subscription then
+			frame_subscription:unsubscribe()
+			frame_subscription = nil
+		end
 		scripts = {}
+		has_frame_hooks = false
 	end)
 end
 

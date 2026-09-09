@@ -25,7 +25,6 @@
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VesPackagedResourcesDir Condition="'$(ConfigurationType)'=='Application'">$(TargetDir)Resources</VesPackagedResourcesDir>
     <VesPackagedResourcesDir Condition="'$(ConfigurationType)'=='DynamicLibrary'">$(TargetDir)$(TargetName).vst3\Contents\Resources</VesPackagedResourcesDir>
   </PropertyGroup>
 

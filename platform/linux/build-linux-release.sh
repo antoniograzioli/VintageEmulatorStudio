@@ -9,6 +9,7 @@ INTEGRATION_FILE="$MAKE_DIR/LinuxMameIntegration.mk"
 JUCER_FILE="$ROOT_DIR/platform/linux/VintageEmulatorStudio.linux.jucer"
 MAME_BUILD="$ROOT_DIR/validation/mame-0.289-patched/build/linux_gcc"
 DIST_ROOT="$ROOT_DIR/Dist/Linux/x86_64"
+EMBEDDED_RUNTIME_SOURCE="$ROOT_DIR/Source/EmbeddedStandaloneRuntimeResources.cpp"
 
 integrate_only=0
 regenerate=0
@@ -101,16 +102,49 @@ apply_linux_integration()
         mv "$temporary" "$MAKEFILE"
     fi
 
+    if ! grep -F 'EmbeddedStandaloneRuntimeResources_7b33a2e5.o' "$MAKEFILE" >/dev/null; then
+        temporary=$(mktemp "$MAKE_DIR/.Makefile.integrate.XXXXXX")
+        awk '
+            /^[[:space:]]*\$\(JUCE_OBJDIR\)\/include_juce_audio_plugin_client_Standalone_1a871192\.o/ {
+                print
+                print "  $(JUCE_OBJDIR)/EmbeddedStandaloneRuntimeResources_7b33a2e5.o \\"
+                inserted_object = 1
+                next
+            }
+            /^\$\(JUCE_OBJDIR\)\/include_juce_audio_basics_8a4e984a\.o:/ && ! inserted_rule {
+                print "$(JUCE_OBJDIR)/EmbeddedStandaloneRuntimeResources_7b33a2e5.o: ../../Source/EmbeddedStandaloneRuntimeResources.cpp"
+                print "\t-$(V_AT)mkdir -p $(@D)"
+                print "\t@echo \"Compiling EmbeddedStandaloneRuntimeResources.cpp\""
+                print "\t$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_STANDALONE_PLUGIN) -o \"$@\" -c \"$<\""
+                print ""
+                inserted_rule = 1
+            }
+            { print }
+            END { if (! inserted_object || ! inserted_rule) exit 44 }
+        ' "$MAKEFILE" > "$temporary"
+        mv "$temporary" "$MAKEFILE"
+    fi
+
     local include_line objects_line helper_hooks
     include_line=$(grep -n '^include LinuxMameIntegration.mk$' "$MAKEFILE" | cut -d: -f1)
     objects_line=$(grep -n '^OBJECTS_ALL :=' "$MAKEFILE" | cut -d: -f1)
     helper_hooks=$(grep -Fc '$(JUCE_LDFLAGS_VST3_MANIFEST_HELPER)' "$MAKEFILE")
+    grep -F 'EmbeddedStandaloneRuntimeResources_7b33a2e5.o' "$MAKEFILE" >/dev/null
     [[ "$include_line" -lt "$objects_line" && "$helper_hooks" -eq 1 ]] || {
         printf 'Linux integration verification failed after patching Makefile.\n' >&2
         exit 1
     }
 
     printf 'Linux integration active in %s\n' "$MAKEFILE"
+}
+
+update_standalone_runtime_resources()
+{
+    command -v python3 >/dev/null 2>&1 || { printf 'python3 is required to generate embedded standalone runtime resources.\n' >&2; exit 1; }
+    python3 "$ROOT_DIR/tools/generate-standalone-runtime-resources.py" \
+        --root "$ROOT_DIR" \
+        --output "$EMBEDDED_RUNTIME_SOURCE"
+    [[ -s "$EMBEDDED_RUNTIME_SOURCE" ]] || { printf 'Embedded standalone runtime resources source was not generated.\n' >&2; exit 1; }
 }
 
 if [[ "$regenerate" -eq 1 ]]; then
@@ -121,6 +155,8 @@ fi
 
 apply_linux_integration
 [[ "$integrate_only" -eq 1 ]] && exit 0
+
+update_standalone_runtime_resources
 
 required_mame_artifacts=(
     "$MAME_BUILD/obj/x64/Release/src/mame/yamaha/ymtx81z.o"
@@ -192,10 +228,8 @@ normalize_vst3_moduleinfo "$MAKE_DIR/build/juce_vst3_helper" "$vst3_build/Conten
 
 printf 'Creating clean Dist tree.\n'
 rm -rf "$DIST_ROOT"
-mkdir -p "$DIST_ROOT/Standalone/Resources" "$DIST_ROOT/VST3"
+mkdir -p "$DIST_ROOT/Standalone" "$DIST_ROOT/VST3"
 cp "$standalone_build" "$DIST_ROOT/Standalone/Vintage Emulator Studio"
-cp -R "$MAKE_DIR/build/Resources/plugins" "$DIST_ROOT/Standalone/Resources/"
-cp -R "$MAKE_DIR/build/Resources/artwork" "$DIST_ROOT/Standalone/Resources/"
 cp -R "$vst3_build" "$DIST_ROOT/VST3/"
 find "$DIST_ROOT" -type f \( -name '.DS_Store' -o -name '._*' -o -name '*.psd' -o -name '*~' \) -delete
 
@@ -255,12 +289,15 @@ validate_machines "$standalone_dist"
 validate_machines "$vst3_so_dist"
 [[ -s "$vst3_dist/Contents/Resources/moduleinfo.json" ]]
 python3 -m json.tool "$vst3_dist/Contents/Resources/moduleinfo.json" >/dev/null
-[[ -s "$DIST_ROOT/Standalone/Resources/plugins/boot.lua" ]]
-[[ -s "$DIST_ROOT/Standalone/Resources/plugins/layout/init.lua" ]]
+[[ ! -e "$DIST_ROOT/Standalone/Resources" ]]
 [[ -s "$vst3_dist/Contents/Resources/plugins/boot.lua" ]]
 [[ -s "$vst3_dist/Contents/Resources/plugins/layout/init.lua" ]]
-validate_release_resources "$DIST_ROOT/Standalone/Resources" "Standalone"
 validate_release_resources "$vst3_dist/Contents/Resources" "VST3"
+payload_hash=$(grep -Eom1 '[0-9a-f]{64}' "$EMBEDDED_RUNTIME_SOURCE")
+[[ -n "$payload_hash" ]] || { printf 'Could not locate embedded runtime payload hash.\n' >&2; exit 1; }
+grep -aF 'plugins/boot.lua' "$standalone_dist" >/dev/null
+grep -aF 'plugins/layout/init.lua' "$standalone_dist" >/dev/null
+grep -aF "$payload_hash" "$standalone_dist" >/dev/null
 
 if find "$DIST_ROOT" -type f \( \
     -iname '*.rom' -o -iname '*.chd' -o -iname '*.iso' -o -iname '*.nv' -o \
@@ -275,9 +312,7 @@ fi
 
 printf 'Standalone bytes: %s unstripped, %s stripped\n' "$standalone_before" "$standalone_after"
 printf 'VST3 .so bytes: %s unstripped, %s stripped\n' "$vst3_before" "$vst3_after"
-printf 'Standalone resources: %s plugin files, %s artwork files\n' \
-    "$(find "$DIST_ROOT/Standalone/Resources/plugins" -type f | wc -l)" \
-    "$(find "$DIST_ROOT/Standalone/Resources/artwork" -type f | wc -l)"
+printf 'Standalone embedded runtime resources: %s\n' "$payload_hash"
 printf 'VST3 resources: %s plugin files, %s artwork files\n' \
     "$(find "$vst3_dist/Contents/Resources/plugins" -type f | wc -l)" \
     "$(find "$vst3_dist/Contents/Resources/artwork" -type f | wc -l)"

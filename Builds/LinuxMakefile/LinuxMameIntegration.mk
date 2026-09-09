@@ -126,6 +126,7 @@ JUCE_LDFLAGS_STANDALONE_PLUGIN += $(VES_MAME_LINK_PAYLOAD)
 JUCE_LDFLAGS_VST3 += $(VES_MAME_LINK_PAYLOAD)
 JUCE_LDFLAGS_VST3_MANIFEST_HELPER += $(VES_MAME_LINK_PAYLOAD)
 
+ifeq ($(CONFIG),Debug)
 .PHONY: ves_standalone_resources
 Standalone: ves_standalone_resources
 
@@ -136,6 +137,7 @@ ves_standalone_resources:
 	$(V_AT)cp -R ../../Resources/plugins $(JUCE_OUTDIR)/Resources/
 	$(V_AT)cp -R ../../artwork $(JUCE_OUTDIR)/Resources/
 	$(V_AT)find $(JUCE_OUTDIR)/Resources -type f \( -name '.DS_Store' -o -name '._*' -o -name '*.psd' \) -delete
+endif
 
 VES_VST3_RESOURCE_DIR := $(JUCE_OUTDIR)/$(JUCE_VST3DIR)/Contents/Resources
 

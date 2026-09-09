@@ -120,12 +120,14 @@ OBJECTS_VST3 := \
 
 OBJECTS_STANDALONE_PLUGIN := \
   $(JUCE_OBJDIR)/include_juce_audio_plugin_client_Standalone_1a871192.o \
+  $(JUCE_OBJDIR)/EmbeddedStandaloneRuntimeResources_7b33a2e5.o \
 
 OBJECTS_SHARED_CODE := \
   $(JUCE_OBJDIR)/VintageEmulatorStudioProcessor_30ee8d0a.o \
   $(JUCE_OBJDIR)/VintageEmulatorStudioEditor_f789cdbf.o \
   $(JUCE_OBJDIR)/EmbeddedEmulatorFrontendStubs_66705e75.o \
   $(JUCE_OBJDIR)/EmbeddedEmulatorEngine_a9a87624.o \
+  $(JUCE_OBJDIR)/audit_86e8d179.o \
   $(JUCE_OBJDIR)/luaengine_2a991d93.o \
   $(JUCE_OBJDIR)/luaengine_render_8daf3e4c.o \
   $(JUCE_OBJDIR)/pluginopts_4fe0e7e4.o \
@@ -237,6 +239,11 @@ $(JUCE_OBJDIR)/EmbeddedEmulatorEngine_a9a87624.o: ../../validation/mame-0.289-pa
 	@echo "Compiling EmbeddedEmulatorEngine.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
 
+$(JUCE_OBJDIR)/audit_86e8d179.o: ../../validation/mame-0.289-patched/src/frontend/mame/audit.cpp
+	-$(V_AT)mkdir -p $(@D)
+	@echo "Compiling audit.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
+
 $(JUCE_OBJDIR)/luaengine_2a991d93.o: ../../validation/mame-0.289-patched/src/frontend/mame/luaengine.cpp
 	-$(V_AT)mkdir -p $(@D)
 	@echo "Compiling luaengine.cpp"
@@ -256,6 +263,11 @@ $(JUCE_OBJDIR)/BinaryData_ce4232d4.o: ../../JuceLibraryCode/BinaryData.cpp
 	-$(V_AT)mkdir -p $(@D)
 	@echo "Compiling BinaryData.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/EmbeddedStandaloneRuntimeResources_7b33a2e5.o: ../../Source/EmbeddedStandaloneRuntimeResources.cpp
+	-$(V_AT)mkdir -p $(@D)
+	@echo "Compiling EmbeddedStandaloneRuntimeResources.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_STANDALONE_PLUGIN) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/include_juce_audio_basics_8a4e984a.o: ../../JuceLibraryCode/include_juce_audio_basics.cpp
 	-$(V_AT)mkdir -p $(@D)

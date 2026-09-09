@@ -2,6 +2,7 @@
 
 #include "VintageEmulatorStudioProcessor.h"
 #include "VintageEmulatorStudioEditor.h"
+#include "EmbeddedStandaloneRuntimeResources.h"
 
 #include <algorithm>
 #include <array>
@@ -25,6 +26,110 @@ constexpr int maximumRecentMediaEntries = 10;
 constexpr auto recentPreferencesVersionProperty = "recent.persistence.version";
 constexpr auto recentPreferencesCountSuffix = ".count";
 constexpr auto recentPreferencesEntrySeparator = ".";
+constexpr auto runtimeResourcesLockName = "net.autodafe.VintageEmulatorStudio.runtime.resources";
+constexpr auto runtimeResourcesReadyMarker = ".ves-runtime-resources-ready";
+constexpr auto guiPerformanceModePreferenceKey = "gui.performanceMode";
+#if JucePlugin_Build_Standalone
+constexpr auto standaloneMasterVolumePreferenceKey = "standalone.masterVolume";
+#endif
+
+ves::standalone_resources::Payload standaloneRuntimeResourcesPayload;
+
+const char* guiPerformanceModeToString (GuiPerformanceMode mode)
+{
+    switch (mode)
+    {
+        case GuiPerformanceMode::Normal:   return "Normal";
+        case GuiPerformanceMode::Reduced:  return "Reduced";
+        case GuiPerformanceMode::Static:   return "Static";
+        case GuiPerformanceMode::Disabled: return "Disabled";
+    }
+
+    return "Normal";
+}
+
+GuiPerformanceMode guiPerformanceModeFromString (const juce::String& text)
+{
+    if (text.equalsIgnoreCase ("Reduced"))
+        return GuiPerformanceMode::Reduced;
+    if (text.equalsIgnoreCase ("Static"))
+        return GuiPerformanceMode::Static;
+    if (text.equalsIgnoreCase ("Disabled"))
+        return GuiPerformanceMode::Disabled;
+    return GuiPerformanceMode::Normal;
+}
+
+struct RuntimeResourceResolution
+{
+    juce::File directory;
+    StartupDiagnostic diagnostic;
+};
+
+bool hasStartupDiagnostic (const StartupDiagnostic& diagnostic)
+{
+    return diagnostic.category != StartupError::None;
+}
+
+StartupDiagnostic makeRuntimeResourcesDiagnostic (const juce::String& technicalDetails)
+{
+    StartupDiagnostic diagnostic;
+    diagnostic.category = StartupError::RuntimeResources;
+    diagnostic.summary = "VES runtime resources could not be loaded.";
+    diagnostic.recovery = "Please reinstall VES.\nIf the problem persists, check that your user application data folder is writable.";
+    diagnostic.technicalDetails = technicalDetails;
+    return diagnostic;
+}
+
+StartupError mapEmbeddedStartupError (ves::EmbeddedStartupError category)
+{
+    switch (category)
+    {
+        case ves::EmbeddedStartupError::None:                 return StartupError::None;
+        case ves::EmbeddedStartupError::RuntimeResources:     return StartupError::RuntimeResources;
+        case ves::EmbeddedStartupError::PrimaryRomMissing:    return StartupError::PrimaryRomMissing;
+        case ves::EmbeddedStartupError::MissingRom:           return StartupError::MissingRom;
+        case ves::EmbeddedStartupError::RomChecksumMismatch:  return StartupError::RomChecksumMismatch;
+        case ves::EmbeddedStartupError::InvalidRomSet:        return StartupError::InvalidRomSet;
+        case ves::EmbeddedStartupError::MediaLoad:            return StartupError::MediaLoad;
+        case ves::EmbeddedStartupError::Configuration:        return StartupError::Configuration;
+        case ves::EmbeddedStartupError::Nvram:                return StartupError::Nvram;
+        case ves::EmbeddedStartupError::LuaPlugin:            return StartupError::LuaPlugin;
+        case ves::EmbeddedStartupError::DeviceInitialization: return StartupError::DeviceInitialization;
+        case ves::EmbeddedStartupError::AudioInitialization:  return StartupError::AudioInitialization;
+        case ves::EmbeddedStartupError::EngineFailure:        return StartupError::EngineFailure;
+        case ves::EmbeddedStartupError::StartupTimeout:       return StartupError::StartupTimeout;
+        case ves::EmbeddedStartupError::Unknown:              return StartupError::Unknown;
+    }
+
+    return StartupError::Unknown;
+}
+
+StartupDiagnostic convertEmbeddedStartupDiagnostic (const ves::EmbeddedStartupDiagnostic& source)
+{
+    StartupDiagnostic diagnostic;
+    diagnostic.category = mapEmbeddedStartupError (source.category);
+    diagnostic.summary = juce::String::fromUTF8 (source.summary.c_str());
+    diagnostic.details = juce::String::fromUTF8 (source.details.c_str());
+    diagnostic.recovery = juce::String::fromUTF8 (source.recovery.c_str());
+    diagnostic.technicalDetails = juce::String::fromUTF8 (source.technical_details.c_str());
+
+    diagnostic.issues.reserve (source.issues.size());
+    for (const auto& sourceIssue : source.issues)
+    {
+        StartupIssue issue;
+        issue.name = juce::String::fromUTF8 (sourceIssue.name.c_str());
+        issue.owner = juce::String::fromUTF8 (sourceIssue.owner.c_str());
+        issue.expectedCrc = juce::String::fromUTF8 (sourceIssue.expected_crc.c_str());
+        issue.expectedSha1 = juce::String::fromUTF8 (sourceIssue.expected_sha1.c_str());
+        issue.actualCrc = juce::String::fromUTF8 (sourceIssue.actual_crc.c_str());
+        issue.actualSha1 = juce::String::fromUTF8 (sourceIssue.actual_sha1.c_str());
+        issue.expectedLength = sourceIssue.expected_length;
+        issue.actualLength = sourceIssue.actual_length;
+        diagnostic.issues.push_back (std::move (issue));
+    }
+
+    return diagnostic;
+}
 
 int recentMediaIndex (VintageEmulatorStudioProcessor::RecentMediaType type)
 {
@@ -486,33 +591,225 @@ bool hasPrimaryRom (const juce::File& romsDirectory, const EmbeddedMachineProfil
         || romsDirectory.getChildFile (driverName).isDirectory();
 }
 
-juce::File resolvePackagedResourcesDirectory()
+bool hasValidPackagedResources (const juce::File& directory)
+{
+    const auto plugins = directory.getChildFile ("plugins");
+    const auto artwork = directory.getChildFile ("artwork");
+    return plugins.getChildFile ("boot.lua").existsAsFile()
+        && plugins.getChildFile ("layout").getChildFile ("init.lua").existsAsFile()
+        && artwork.isDirectory()
+        && artwork.getNumberOfChildFiles (juce::File::findFilesAndDirectories) > 0;
+}
+
+juce::File standaloneRuntimeResourcesRoot()
+{
+    return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
+        .getChildFile ("VintageEmulatorStudio")
+        .getChildFile ("runtime")
+        .getChildFile ("resources");
+}
+
+bool zipEntryPathIsSafe (const juce::String& path)
+{
+    if (path.isEmpty() || path.startsWithChar ('/') || path.startsWithChar ('\\'))
+        return false;
+
+    if (path.contains (":"))
+        return false;
+
+    const auto normalised = path.replaceCharacter ('\\', '/');
+    juce::StringArray parts;
+    parts.addTokens (normalised, "/", {});
+
+    for (const auto& part : parts)
+        if (part == "..")
+            return false;
+
+    return true;
+}
+
+bool zipHasExpectedRuntimePayload (const juce::ZipFile& zip)
+{
+    bool hasBootLua = false;
+    bool hasLayoutLua = false;
+    bool hasArtwork = false;
+
+    for (int i = 0; i < zip.getNumEntries(); ++i)
+    {
+        const auto* entry = zip.getEntry (i);
+        if (entry == nullptr)
+            return false;
+
+        const auto filename = entry->filename.replaceCharacter ('\\', '/');
+        if (! zipEntryPathIsSafe (filename) || entry->isSymbolicLink)
+            return false;
+
+        if (filename == "plugins/boot.lua")
+            hasBootLua = true;
+        else if (filename == "plugins/layout/init.lua")
+            hasLayoutLua = true;
+        else if (filename.startsWith ("artwork/") && ! filename.endsWithChar ('/'))
+            hasArtwork = true;
+    }
+
+    return hasBootLua && hasLayoutLua && hasArtwork;
+}
+
+bool isRuntimeResourceStagingDirectoryName (const juce::String& name)
+{
+    return name.startsWith (".extracting-");
+}
+
+void cleanupAbandonedStandaloneRuntimeResourceStagingDirectories (const juce::File& activeDirectory)
+{
+    const auto root = activeDirectory.getParentDirectory();
+    for (const auto& entry : juce::RangedDirectoryIterator (root, false, "*", juce::File::findDirectories))
+    {
+        const auto directory = entry.getFile();
+        if (directory != activeDirectory && isRuntimeResourceStagingDirectoryName (directory.getFileName()))
+            directory.deleteRecursively();
+    }
+}
+
+RuntimeResourceResolution resolveEmbeddedStandaloneRuntimeResourcesDirectory()
+{
+#if (JUCE_WINDOWS || JUCE_LINUX)
+    const auto payload = ves::standalone_resources::getPayload();
+    if (payload.zipData == nullptr || payload.zipSize == 0 || payload.sha256 == nullptr || payload.sha256[0] == '\0')
+        return {};
+
+    const auto root = standaloneRuntimeResourcesRoot();
+    const auto payloadDirectory = root.getChildFile (payload.sha256);
+    const auto readyMarker = payloadDirectory.getChildFile (runtimeResourcesReadyMarker);
+    if (readyMarker.existsAsFile() && hasValidPackagedResources (payloadDirectory))
+        return { payloadDirectory, {} };
+
+    juce::InterProcessLock lock (runtimeResourcesLockName);
+    if (! lock.enter())
+    {
+        juce::Logger::writeToLog ("VintageEmulatorStudio could not acquire runtime resources extraction lock");
+        return { {}, makeRuntimeResourcesDiagnostic ("Could not acquire runtime resources extraction lock: " + juce::String (runtimeResourcesLockName)) };
+    }
+
+    struct LockExit
+    {
+        juce::InterProcessLock& lock;
+        ~LockExit() { lock.exit(); }
+    } lockExit { lock };
+
+    if (readyMarker.existsAsFile() && hasValidPackagedResources (payloadDirectory))
+        return { payloadDirectory, {} };
+
+    if (! root.createDirectory())
+    {
+        juce::Logger::writeToLog ("VintageEmulatorStudio could not create runtime resources directory: " + root.getFullPathName());
+        return { {}, makeRuntimeResourcesDiagnostic ("Could not create runtime resources directory: " + root.getFullPathName()) };
+    }
+
+    juce::MemoryInputStream zipStream (payload.zipData, payload.zipSize, false);
+    juce::ZipFile zip (zipStream);
+    if (! zipHasExpectedRuntimePayload (zip))
+    {
+        juce::Logger::writeToLog ("VintageEmulatorStudio embedded runtime resources ZIP failed validation");
+        return { {}, makeRuntimeResourcesDiagnostic ("Embedded runtime resources ZIP failed validation.") };
+    }
+
+    const auto stagingDirectory = root.getChildFile (".extracting-" + juce::String (payload.sha256)
+        + "-" + juce::String::toHexString (static_cast<juce::int64> (juce::Time::getHighResolutionTicks())));
+    stagingDirectory.deleteRecursively();
+    if (! stagingDirectory.createDirectory())
+    {
+        juce::Logger::writeToLog ("VintageEmulatorStudio could not create runtime resources staging directory: " + stagingDirectory.getFullPathName());
+        return { {}, makeRuntimeResourcesDiagnostic ("Could not create runtime resources staging directory: " + stagingDirectory.getFullPathName()) };
+    }
+
+    const auto result = zip.uncompressTo (stagingDirectory, true);
+    if (result.failed())
+    {
+        juce::Logger::writeToLog ("VintageEmulatorStudio could not extract embedded runtime resources: " + result.getErrorMessage());
+        stagingDirectory.deleteRecursively();
+        return { {}, makeRuntimeResourcesDiagnostic ("Could not extract embedded runtime resources to " + stagingDirectory.getFullPathName()
+            + ": " + result.getErrorMessage()) };
+    }
+
+    if (! hasValidPackagedResources (stagingDirectory))
+    {
+        juce::Logger::writeToLog ("VintageEmulatorStudio extracted runtime resources are incomplete");
+        stagingDirectory.deleteRecursively();
+        return { {}, makeRuntimeResourcesDiagnostic ("Extracted runtime resources are incomplete: " + stagingDirectory.getFullPathName()) };
+    }
+
+    if (payloadDirectory.exists())
+        payloadDirectory.deleteRecursively();
+
+    if (! stagingDirectory.moveFileTo (payloadDirectory))
+    {
+        juce::Logger::writeToLog ("VintageEmulatorStudio could not activate extracted runtime resources: " + payloadDirectory.getFullPathName());
+        stagingDirectory.deleteRecursively();
+        return { {}, makeRuntimeResourcesDiagnostic ("Could not activate extracted runtime resources: " + payloadDirectory.getFullPathName()) };
+    }
+
+    if (! payloadDirectory.getChildFile (runtimeResourcesReadyMarker).replaceWithText (juce::String (payload.sha256) + "\n"))
+    {
+        juce::Logger::writeToLog ("VintageEmulatorStudio could not mark runtime resources ready");
+        payloadDirectory.deleteRecursively();
+        return { {}, makeRuntimeResourcesDiagnostic ("Could not mark runtime resources ready: " + readyMarker.getFullPathName()) };
+    }
+
+    cleanupAbandonedStandaloneRuntimeResourceStagingDirectories (payloadDirectory);
+    return { payloadDirectory, {} };
+#else
+    return {};
+#endif
+}
+
+RuntimeResourceResolution resolvePackagedResourcesDirectory()
 {
     const auto module = juce::File::getSpecialLocation (juce::File::currentExecutableFile);
 #if JUCE_MAC
-    return module.getParentDirectory().getParentDirectory().getChildFile ("Resources");
+    return { module.getParentDirectory().getParentDirectory().getChildFile ("Resources"), {} };
 #elif JUCE_WINDOWS
     if (module.hasFileExtension (".vst3"))
-        return module.getParentDirectory().getParentDirectory().getChildFile ("Resources");
+        return { module.getParentDirectory().getParentDirectory().getChildFile ("Resources"), {} };
 
-    return module.getParentDirectory().getChildFile ("Resources");
+   #if JucePlugin_Build_Standalone
+    const auto embeddedResources = resolveEmbeddedStandaloneRuntimeResourcesDirectory();
+    if (embeddedResources.directory.isDirectory() || hasStartupDiagnostic (embeddedResources.diagnostic))
+        return embeddedResources;
+   #endif
+
+   #ifndef NDEBUG
+    return { module.getParentDirectory().getChildFile ("Resources"), {} };
+   #else
+    return { {}, makeRuntimeResourcesDiagnostic ("Embedded standalone runtime resources are unavailable.") };
+   #endif
 #elif JUCE_LINUX
-    const auto standaloneResources = module.getParentDirectory().getChildFile ("Resources");
-    if (standaloneResources.isDirectory())
-        return standaloneResources;
+   #if JucePlugin_Build_Standalone
+    const auto embeddedResources = resolveEmbeddedStandaloneRuntimeResourcesDirectory();
+    if (embeddedResources.directory.isDirectory() || hasStartupDiagnostic (embeddedResources.diagnostic))
+        return embeddedResources;
+   #endif
 
     const auto vst3Resources = module.getParentDirectory()
         .getParentDirectory()
         .getChildFile ("Resources");
-    return vst3Resources.isDirectory() ? vst3Resources : juce::File {};
+    if (vst3Resources.isDirectory())
+        return { vst3Resources, {} };
+
+   #ifndef NDEBUG
+    const auto standaloneResources = module.getParentDirectory().getChildFile ("Resources");
+    return { standaloneResources.isDirectory() ? standaloneResources : juce::File {}, {} };
+   #else
+    return { {}, makeRuntimeResourcesDiagnostic ("Embedded standalone runtime resources are unavailable.") };
+   #endif
 #else
-    return module.getParentDirectory().getChildFile ("Resources");
+    return { module.getParentDirectory().getChildFile ("Resources"), {} };
 #endif
 }
 
 juce::File resolveMamePluginsDirectory()
 {
-    const auto bundled = resolvePackagedResourcesDirectory().getChildFile ("plugins");
+    const auto bundled = resolvePackagedResourcesDirectory().directory.getChildFile ("plugins");
     if (bundled.getChildFile ("boot.lua").existsAsFile()
         && bundled.getChildFile ("layout").getChildFile ("init.lua").existsAsFile())
         return bundled;
@@ -528,7 +825,7 @@ juce::File resolveMameArtworkDirectory()
             && directory.getNumberOfChildFiles (juce::File::findFilesAndDirectories) > 0;
     };
 
-    const auto bundled = resolvePackagedResourcesDirectory().getChildFile ("artwork");
+    const auto bundled = resolvePackagedResourcesDirectory().directory.getChildFile ("artwork");
     if (hasArtworkResources (bundled))
         return bundled;
 
@@ -542,6 +839,19 @@ uint64_t nowMs()
 
 }
 
+namespace ves::standalone_resources
+{
+void registerPayload (Payload payload)
+{
+    standaloneRuntimeResourcesPayload = payload;
+}
+
+Payload getPayload()
+{
+    return standaloneRuntimeResourcesPayload;
+}
+}
+
 VintageEmulatorStudioProcessor::VintageEmulatorStudioProcessor()
     : AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true))
 {
@@ -549,6 +859,11 @@ VintageEmulatorStudioProcessor::VintageEmulatorStudioProcessor()
     (void) globalRecentMediaPreferences();
     configuredRomsPath = loadPersistedRomsPath();
     configuredArtworkPath = loadPersistedArtworkPath();
+    guiPerformanceMode.store (static_cast<int> (loadPersistedGuiPerformanceMode()), std::memory_order_release);
+#if JucePlugin_Build_Standalone
+    standaloneMasterVolume.store (loadPersistedStandaloneMasterVolume(), std::memory_order_release);
+    standaloneMasterGain.setCurrentAndTargetValue (standaloneMasterVolume.load (std::memory_order_acquire));
+#endif
     startTimerHz (20);
 }
 
@@ -576,6 +891,11 @@ void VintageEmulatorStudioProcessor::prepareToPlay (double sampleRate, int sampl
     startEngineIfNeeded (currentSampleRate);
     if (auto localEngine = std::atomic_load (&engine))
         localEngine->noteHostAudioConfiguration (currentSampleRate, maxBlockSize);
+
+#if JucePlugin_Build_Standalone
+    standaloneMasterGain.reset (currentSampleRate > 0.0 ? currentSampleRate : 44100.0, 0.02);
+    standaloneMasterGain.setCurrentAndTargetValue (standaloneMasterVolume.load (std::memory_order_acquire));
+#endif
 }
 
 void VintageEmulatorStudioProcessor::releaseResources()
@@ -660,6 +980,8 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
 
     const auto channels = buffer.getNumChannels();
     const auto samples = buffer.getNumSamples();
+    auto* const leftChannel = channels > 0 ? buffer.getWritePointer (0) : nullptr;
+    auto* const rightChannel = channels > 1 ? buffer.getWritePointer (1) : nullptr;
     int offset = 0;
     while (offset < samples)
     {
@@ -682,10 +1004,11 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
                 waitingForMidiAudioOnset.store (false, std::memory_order_relaxed);
             }
 
-            if (channels > 0)
-                buffer.setSample (0, offset + static_cast<int> (i), audioScratch[i].left);
-            if (channels > 1)
-                buffer.setSample (1, offset + static_cast<int> (i), audioScratch[i].right);
+            const auto targetSample = offset + static_cast<int> (i);
+            if (leftChannel != nullptr)
+                leftChannel[targetSample] = audioScratch[i].left;
+            if (rightChannel != nullptr)
+                rightChannel[targetSample] = audioScratch[i].right;
         }
 
         if (read < request)
@@ -693,6 +1016,27 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
 
         offset += static_cast<int> (read);
     }
+
+#if JucePlugin_Build_Standalone
+    standaloneMasterGain.setTargetValue (standaloneMasterVolume.load (std::memory_order_acquire));
+    if (standaloneMasterGain.isSmoothing())
+    {
+        auto* const standaloneLeftChannel = channels > 0 ? buffer.getWritePointer (0) : nullptr;
+        auto* const standaloneRightChannel = channels > 1 ? buffer.getWritePointer (1) : nullptr;
+        for (int sample = 0; sample < samples; ++sample)
+        {
+            const auto gain = standaloneMasterGain.getNextValue();
+            if (standaloneLeftChannel != nullptr)
+                standaloneLeftChannel[sample] *= gain;
+            if (standaloneRightChannel != nullptr)
+                standaloneRightChannel[sample] *= gain;
+        }
+    }
+    else
+    {
+        buffer.applyGain (standaloneMasterGain.getCurrentValue());
+    }
+#endif
 }
 
 juce::AudioProcessorEditor* VintageEmulatorStudioProcessor::createEditor()
@@ -814,6 +1158,7 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate)
         return;
 
     lastError.clear();
+    clearStartupDiagnostic();
     bootStartMs.store (0, std::memory_order_relaxed);
     const auto selectedDriver = getSelectedMachineDriverName();
     const auto& profile = findMachineProfileByDriverName (selectedDriver) != nullptr
@@ -825,12 +1170,37 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate)
     if (! hasPrimaryRom (roms, profile))
     {
         lastError = "Missing primary ROM set for " + juce::String (profile.driverName) + " in " + roms.getFullPathName();
+        StartupDiagnostic diagnostic;
+        diagnostic.category = StartupError::PrimaryRomMissing;
+        diagnostic.summary = "The selected machine ROM was not found.";
+        diagnostic.details = "Missing primary ROM set for " + juce::String (profile.driverName) + " in " + roms.getFullPathName();
+        diagnostic.recovery = "Please add the ROM ZIP/file for this machine to your VES ROMs folder.";
+        diagnostic.technicalDetails = lastError;
+        setStartupDiagnostic (std::move (diagnostic));
         state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
         return;
     }
 
-    const auto pluginsDir = resolveMamePluginsDirectory();
-    const auto artworkPath = getEffectiveMameArtworkPath();
+    const auto packagedResources = resolvePackagedResourcesDirectory();
+    if (hasStartupDiagnostic (packagedResources.diagnostic))
+    {
+        setStartupDiagnostic (packagedResources.diagnostic);
+        lastError = packagedResources.diagnostic.summary;
+        state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
+        return;
+    }
+
+    const auto pluginsDir = packagedResources.directory.getChildFile ("plugins");
+    juce::StringArray artworkSearchPaths;
+    if (configuredArtworkPath.isNotEmpty())
+        artworkSearchPaths.add (configuredArtworkPath);
+
+    const auto bundledArtwork = packagedResources.directory.getChildFile ("artwork");
+    if (bundledArtwork.isDirectory()
+        && bundledArtwork.getNumberOfChildFiles (juce::File::findFilesAndDirectories) > 0)
+        artworkSearchPaths.addIfNotAlreadyThere (bundledArtwork.getFullPathName());
+
+    const auto artworkPath = artworkSearchPaths.joinIntoString (";");
     std::vector<ves::EmbeddedEmulatorEngineSettings::StartupMediaOption> startupMediaOptions;
     for (int i = 0; i < profile.mediaDeviceCount; ++i)
     {
@@ -847,7 +1217,21 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate)
     }
     if (! pluginsDir.isDirectory())
     {
-        lastError = "MAME plugins directory containing boot.lua and layout/init.lua was not found";
+        StartupDiagnostic diagnostic = makeRuntimeResourcesDiagnostic ("MAME plugins directory containing boot.lua and layout/init.lua was not available: "
+            + pluginsDir.getFullPathName());
+        lastError = diagnostic.summary;
+        setStartupDiagnostic (std::move (diagnostic));
+        state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
+        return;
+    }
+    if (! pluginsDir.getChildFile ("boot.lua").existsAsFile()
+        || ! pluginsDir.getChildFile ("layout").getChildFile ("init.lua").existsAsFile()
+        || artworkPath.isEmpty())
+    {
+        StartupDiagnostic diagnostic = makeRuntimeResourcesDiagnostic ("Packaged runtime resources failed startup validation: "
+            + packagedResources.directory.getFullPathName());
+        lastError = diagnostic.summary;
+        setStartupDiagnostic (std::move (diagnostic));
         state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
         return;
     }
@@ -861,6 +1245,12 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate)
     if (! transientCfgDir.createDirectory() || ! transientNvramDir.createDirectory())
     {
         lastError = "Could not create per-instance MAME runtime directory: " + transientRootDir.getFullPathName();
+        StartupDiagnostic diagnostic;
+        diagnostic.category = StartupError::Configuration;
+        diagnostic.summary = "VES could not create its per-user runtime files.";
+        diagnostic.recovery = "Check that your temporary directory is writable and has enough free space.";
+        diagnostic.technicalDetails = lastError;
+        setStartupDiagnostic (std::move (diagnostic));
         state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
         return;
     }
@@ -894,11 +1284,11 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate)
         engineGeneration
     });
 
-    newEngine->setVideoDisplayActive (true);
-    newEngine->requestVideoCaptureWidth (requestedVideoCaptureWidth.load (std::memory_order_acquire));
+    newEngine->requestVideoCaptureWidth (getEffectiveVideoCaptureWidth (requestedVideoCaptureWidth.load (std::memory_order_acquire)));
     newEngine->start();
     newEngine->noteHostAudioConfiguration (sampleRate, maxBlockSize);
     std::atomic_store (&engine, std::move (newEngine));
+    applyGuiPerformanceModeToEngine();
     videoEngineGeneration.fetch_add (1, std::memory_order_acq_rel);
     bootStartMs.store (nowMs(), std::memory_order_relaxed);
     state.store (static_cast<int> (EmbeddedEngineState::Booting), std::memory_order_relaxed);
@@ -939,6 +1329,12 @@ bool VintageEmulatorStudioProcessor::prepareNvramState (const juce::File& runtim
     if (! nvramDir.createDirectory())
     {
         lastError = "Could not create NVRAM directory: " + nvramDir.getFullPathName();
+        StartupDiagnostic diagnostic;
+        diagnostic.category = StartupError::Nvram;
+        diagnostic.summary = "VES could not create its per-machine NVRAM directory.";
+        diagnostic.recovery = "Check that your user application data folder is writable and has enough free space.";
+        diagnostic.technicalDetails = lastError;
+        setStartupDiagnostic (std::move (diagnostic));
         return false;
     }
 
@@ -947,6 +1343,12 @@ bool VintageEmulatorStudioProcessor::prepareNvramState (const juce::File& runtim
     if (! destination.existsAsFile() && seed.existsAsFile() && ! seed.copyFileTo (destination))
     {
         lastError = "Could not copy required NVRAM seed";
+        StartupDiagnostic diagnostic;
+        diagnostic.category = StartupError::Nvram;
+        diagnostic.summary = "VES could not prepare the machine NVRAM state.";
+        diagnostic.recovery = "Check that your user application data folder is writable and has enough free space.";
+        diagnostic.technicalDetails = lastError + ": " + destination.getFullPathName();
+        setStartupDiagnostic (std::move (diagnostic));
         return false;
     }
 
@@ -1034,6 +1436,111 @@ void VintageEmulatorStudioProcessor::persistArtworkPath() const
         settings.replaceWithText (configuredArtworkPath + "\n");
 }
 
+GuiPerformanceMode VintageEmulatorStudioProcessor::loadPersistedGuiPerformanceMode() const
+{
+    juce::PropertiesFile::Options options;
+    options.applicationName = "VintageEmulatorStudio";
+    options.filenameSuffix = "settings";
+    options.folderName = "VintageEmulatorStudio";
+    options.osxLibrarySubFolder = "Application Support";
+    options.storageFormat = juce::PropertiesFile::storeAsXML;
+    options.ignoreCaseOfKeyNames = false;
+    options.millisecondsBeforeSaving = 0;
+
+    juce::ApplicationProperties properties;
+    properties.setStorageParameters (options);
+    auto* settings = properties.getUserSettings();
+    return settings != nullptr ? guiPerformanceModeFromString (settings->getValue (guiPerformanceModePreferenceKey, "Normal"))
+                               : GuiPerformanceMode::Normal;
+}
+
+void VintageEmulatorStudioProcessor::persistGuiPerformanceMode() const
+{
+    juce::PropertiesFile::Options options;
+    options.applicationName = "VintageEmulatorStudio";
+    options.filenameSuffix = "settings";
+    options.folderName = "VintageEmulatorStudio";
+    options.osxLibrarySubFolder = "Application Support";
+    options.storageFormat = juce::PropertiesFile::storeAsXML;
+    options.ignoreCaseOfKeyNames = false;
+    options.millisecondsBeforeSaving = 0;
+
+    juce::ApplicationProperties properties;
+    properties.setStorageParameters (options);
+    auto* settings = properties.getUserSettings();
+    if (settings == nullptr)
+        return;
+
+    settings->setValue (guiPerformanceModePreferenceKey,
+                        guiPerformanceModeToString (getGuiPerformanceMode()));
+    if (! settings->save())
+        juce::Logger::writeToLog ("VintageEmulatorStudio could not save GUI performance mode preference");
+}
+
+#if JucePlugin_Build_Standalone
+float VintageEmulatorStudioProcessor::loadPersistedStandaloneMasterVolume() const
+{
+    juce::PropertiesFile::Options options;
+    options.applicationName = "VintageEmulatorStudio";
+    options.filenameSuffix = "settings";
+    options.folderName = "VintageEmulatorStudio";
+    options.osxLibrarySubFolder = "Application Support";
+    options.storageFormat = juce::PropertiesFile::storeAsXML;
+    options.ignoreCaseOfKeyNames = false;
+    options.millisecondsBeforeSaving = 0;
+
+    juce::ApplicationProperties properties;
+    properties.setStorageParameters (options);
+    auto* settings = properties.getUserSettings();
+    return settings != nullptr ? juce::jlimit (0.0f, 1.0f, static_cast<float> (settings->getDoubleValue (standaloneMasterVolumePreferenceKey, 1.0)))
+                               : 1.0f;
+}
+
+void VintageEmulatorStudioProcessor::persistStandaloneMasterVolume() const
+{
+    juce::PropertiesFile::Options options;
+    options.applicationName = "VintageEmulatorStudio";
+    options.filenameSuffix = "settings";
+    options.folderName = "VintageEmulatorStudio";
+    options.osxLibrarySubFolder = "Application Support";
+    options.storageFormat = juce::PropertiesFile::storeAsXML;
+    options.ignoreCaseOfKeyNames = false;
+    options.millisecondsBeforeSaving = 0;
+
+    juce::ApplicationProperties properties;
+    properties.setStorageParameters (options);
+    auto* settings = properties.getUserSettings();
+    if (settings == nullptr)
+        return;
+
+    settings->setValue (standaloneMasterVolumePreferenceKey,
+                        static_cast<double> (getStandaloneMasterVolume()));
+    if (! settings->save())
+        juce::Logger::writeToLog ("VintageEmulatorStudio could not save standalone master volume preference");
+}
+#endif
+
+int VintageEmulatorStudioProcessor::getEffectiveVideoCaptureWidth (int requestedWidth) const
+{
+    const auto mode = getGuiPerformanceMode();
+    const auto minimum = mode == GuiPerformanceMode::Normal ? 1024 : 512;
+    const auto maximum = mode == GuiPerformanceMode::Normal ? 4096 : 1024;
+    return juce::jlimit (minimum, maximum, ((juce::jmax (requestedWidth, 1) + 63) / 64) * 64);
+}
+
+void VintageEmulatorStudioProcessor::applyGuiPerformanceModeToEngine()
+{
+    auto localEngine = std::atomic_load (&engine);
+    if (localEngine == nullptr)
+        return;
+
+    const auto mode = getGuiPerformanceMode();
+    const auto intervalMs = mode == GuiPerformanceMode::Reduced ? 500 : 200;
+    localEngine->setVideoCaptureIntervalMs (intervalMs);
+    localEngine->requestVideoCaptureWidth (getEffectiveVideoCaptureWidth (requestedVideoCaptureWidth.load (std::memory_order_acquire)));
+    localEngine->setVideoDisplayActive (mode != GuiPerformanceMode::Disabled);
+}
+
 juce::String VintageEmulatorStudioProcessor::getEffectiveMameArtworkPath() const
 {
     // MAME's path_iterator uses ';' for multipath options on every platform.
@@ -1053,6 +1560,9 @@ juce::String VintageEmulatorStudioProcessor::getEffectiveMameArtworkPath() const
 
 void VintageEmulatorStudioProcessor::updateBootState()
 {
+    constexpr uint64_t startupReadyProbeMs = 10000;
+    constexpr uint64_t startupTimeoutMs = 30000;
+
     if (state.load (std::memory_order_relaxed) != static_cast<int> (EmbeddedEngineState::Booting))
         return;
 
@@ -1061,22 +1571,50 @@ void VintageEmulatorStudioProcessor::updateBootState()
         const auto& diag = localEngine->diagnostics();
         if (diag.machine_exited.load (std::memory_order_relaxed) != 0)
         {
-            lastError = "MAME exited before the first video frame (result " + juce::String (localEngine->mameResult()) + ")";
+            auto engineDiagnostic = convertEmbeddedStartupDiagnostic (localEngine->startupDiagnostic());
+            if (! hasStartupDiagnostic (engineDiagnostic))
+            {
+                engineDiagnostic.category = StartupError::EngineFailure;
+                engineDiagnostic.summary = "The emulator failed to start.";
+                engineDiagnostic.technicalDetails = "MAME exited before the first video frame (result "
+                    + juce::String (localEngine->mameResult()) + ")";
+            }
+
+            lastError = engineDiagnostic.summary;
+            setStartupDiagnostic (std::move (engineDiagnostic));
             state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
             return;
         }
 
-        if (getBootElapsedMs() < 10000)
-            return;
-
+        const auto mode = getGuiPerformanceMode();
+        const bool videoRequiredForReady = mode != GuiPerformanceMode::Disabled;
         const bool healthy = juce::String (localEngine->driverName()) == getSelectedMachineDriverName()
                           && diag.machine_started.load (std::memory_order_relaxed) != 0
-                          && diag.video_frames_produced.load (std::memory_order_relaxed) != 0;
-        if (! healthy)
+                          && (! videoRequiredForReady || diag.video_frames_produced.load (std::memory_order_relaxed) != 0);
+        if (healthy && getBootElapsedMs() >= startupReadyProbeMs)
+        {
+            handleReadyTransition (*localEngine);
+            state.store (static_cast<int> (EmbeddedEngineState::Ready), std::memory_order_relaxed);
+            return;
+        }
+
+        if (getBootElapsedMs() < startupTimeoutMs)
             return;
 
-        handleReadyTransition (*localEngine);
-        state.store (static_cast<int> (EmbeddedEngineState::Ready), std::memory_order_relaxed);
+        if (! healthy)
+        {
+            StartupDiagnostic diagnostic;
+            diagnostic.category = StartupError::StartupTimeout;
+            diagnostic.summary = "The emulator did not produce a video frame during startup.";
+            diagnostic.technicalDetails = "No first video frame after " + juce::String (startupTimeoutMs / 1000)
+                + " seconds. machine_started=" + juce::String (static_cast<juce::int64> (diag.machine_started.load (std::memory_order_relaxed)))
+                + ", video_frames_produced=" + juce::String (static_cast<juce::int64> (diag.video_frames_produced.load (std::memory_order_relaxed)))
+                + ", video_render_target_available=" + juce::String (diag.video_render_target_available.load (std::memory_order_relaxed) ? "true" : "false");
+            lastError = diagnostic.summary;
+            setStartupDiagnostic (std::move (diagnostic));
+            state.store (static_cast<int> (EmbeddedEngineState::Failed), std::memory_order_relaxed);
+            return;
+        }
     }
 }
 
@@ -1095,6 +1633,7 @@ void VintageEmulatorStudioProcessor::handleReadyTransition (ves::EmbeddedEmulato
     diag.audio_underruns.store (0, std::memory_order_relaxed);
     diag.audio_overflows.store (0, std::memory_order_relaxed);
     waitingForMidiAudioOnset.store (false, std::memory_order_relaxed);
+    clearStartupDiagnostic();
 }
 
 void VintageEmulatorStudioProcessor::trimAudioBacklog (ves::EmbeddedEmulatorEngine& localEngine)
@@ -1140,6 +1679,18 @@ juce::String VintageEmulatorStudioProcessor::getLastError() const
     return lastError;
 }
 
+void VintageEmulatorStudioProcessor::clearStartupDiagnostic()
+{
+    const juce::ScopedLock lock (startupDiagnosticLock);
+    startupDiagnostic = {};
+}
+
+void VintageEmulatorStudioProcessor::setStartupDiagnostic (StartupDiagnostic diagnostic)
+{
+    const juce::ScopedLock lock (startupDiagnosticLock);
+    startupDiagnostic = std::move (diagnostic);
+}
+
 uint64_t VintageEmulatorStudioProcessor::getBootElapsedMs() const
 {
     const auto start = bootStartMs.load (std::memory_order_relaxed);
@@ -1170,10 +1721,19 @@ EmbeddedDiagnosticSnapshot VintageEmulatorStudioProcessor::getDiagnosticSnapshot
     snapshot.selectedMachineRomFound = hasMachineRomByDriverName (getSelectedMachineDriverName());
     snapshot.nvramStatus = getNvramStatusText();
     snapshot.lastError = getLastError();
+    snapshot.guiPerformanceMode = getGuiPerformanceMode();
+    {
+        const juce::ScopedLock lock (startupDiagnosticLock);
+        snapshot.startupDiagnostic = startupDiagnostic;
+    }
 
     auto localEngine = std::atomic_load (&engine);
     if (localEngine != nullptr)
     {
+        const auto engineDiagnostic = convertEmbeddedStartupDiagnostic (localEngine->startupDiagnostic());
+        if (hasStartupDiagnostic (engineDiagnostic))
+            snapshot.startupDiagnostic = engineDiagnostic;
+
         const auto& diag = localEngine->diagnostics();
         snapshot.mameThreadRunning = diag.machine_started.load (std::memory_order_relaxed) != 0
             && diag.machine_exited.load (std::memory_order_relaxed) == 0;
@@ -1746,6 +2306,48 @@ bool VintageEmulatorStudioProcessor::copyLatestVideoFrame (EmbeddedVideoFrameFor
     return true;
 }
 
+void VintageEmulatorStudioProcessor::setGuiPerformanceMode (GuiPerformanceMode mode)
+{
+    const auto previous = static_cast<GuiPerformanceMode> (guiPerformanceMode.exchange (static_cast<int> (mode), std::memory_order_acq_rel));
+    if (previous == mode)
+        return;
+
+    persistGuiPerformanceMode();
+    applyGuiPerformanceModeToEngine();
+}
+
+GuiPerformanceMode VintageEmulatorStudioProcessor::getGuiPerformanceMode() const
+{
+    const auto value = guiPerformanceMode.load (std::memory_order_acquire);
+    switch (static_cast<GuiPerformanceMode> (value))
+    {
+        case GuiPerformanceMode::Normal:
+        case GuiPerformanceMode::Reduced:
+        case GuiPerformanceMode::Static:
+        case GuiPerformanceMode::Disabled:
+            return static_cast<GuiPerformanceMode> (value);
+    }
+
+    return GuiPerformanceMode::Normal;
+}
+
+#if JucePlugin_Build_Standalone
+void VintageEmulatorStudioProcessor::setStandaloneMasterVolume (float volume)
+{
+    const auto clamped = juce::jlimit (0.0f, 1.0f, volume);
+    const auto previous = standaloneMasterVolume.exchange (clamped, std::memory_order_acq_rel);
+    if (std::abs (previous - clamped) < 0.0001f)
+        return;
+
+    persistStandaloneMasterVolume();
+}
+
+float VintageEmulatorStudioProcessor::getStandaloneMasterVolume() const
+{
+    return juce::jlimit (0.0f, 1.0f, standaloneMasterVolume.load (std::memory_order_acquire));
+}
+#endif
+
 void VintageEmulatorStudioProcessor::setVideoDisplayActive (bool active)
 {
     if (auto localEngine = std::atomic_load (&engine))
@@ -1754,7 +2356,7 @@ void VintageEmulatorStudioProcessor::setVideoDisplayActive (bool active)
 
 void VintageEmulatorStudioProcessor::requestVideoCaptureWidth (int width)
 {
-    const auto quantized = juce::jlimit (1024, 4096, ((juce::jmax (width, 1) + 63) / 64) * 64);
+    const auto quantized = getEffectiveVideoCaptureWidth (width);
     requestedVideoCaptureWidth.store (quantized, std::memory_order_release);
     if (auto localEngine = std::atomic_load (&engine))
         localEngine->requestVideoCaptureWidth (quantized);

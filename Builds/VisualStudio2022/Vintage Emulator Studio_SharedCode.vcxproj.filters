@@ -700,6 +700,9 @@
     <ClCompile Include="..\..\validation\mame-0.289-patched\src\ves\embeddedinstruments\EmbeddedEmulatorEngine.cpp">
       <Filter>Vintage Emulator Studio\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\validation\mame-0.289-patched\src\frontend\mame\audit.cpp">
+      <Filter>Vintage Emulator Studio\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\validation\mame-0.289-patched\src\frontend\mame\luaengine.cpp">
       <Filter>Vintage Emulator Studio\Source</Filter>
     </ClCompile>

@@ -144,6 +144,8 @@ function standalone()
 		MAME_DIR .. "src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp",
 		MAME_DIR .. "src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h",
 		MAME_DIR .. "src/ves/embeddedinstruments/main.cpp",
+		MAME_DIR .. "src/frontend/mame/audit.cpp",
+		MAME_DIR .. "src/frontend/mame/audit.h",
 		MAME_DIR .. "src/frontend/mame/luaengine.cpp",
 		MAME_DIR .. "src/frontend/mame/luaengine.h",
 		MAME_DIR .. "src/frontend/mame/luaengine_render.cpp",

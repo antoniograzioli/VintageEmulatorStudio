@@ -96,6 +96,47 @@ enum class EmbeddedVideoState : std::uint8_t
 	Error
 };
 
+enum class EmbeddedStartupError : std::uint8_t
+{
+	None,
+	RuntimeResources,
+	PrimaryRomMissing,
+	MissingRom,
+	RomChecksumMismatch,
+	InvalidRomSet,
+	MediaLoad,
+	Configuration,
+	Nvram,
+	LuaPlugin,
+	DeviceInitialization,
+	AudioInitialization,
+	EngineFailure,
+	StartupTimeout,
+	Unknown
+};
+
+struct EmbeddedStartupIssue
+{
+	std::string name;
+	std::string owner;
+	std::string expected_crc;
+	std::string expected_sha1;
+	std::string actual_crc;
+	std::string actual_sha1;
+	std::uint64_t expected_length = 0;
+	std::uint64_t actual_length = 0;
+};
+
+struct EmbeddedStartupDiagnostic
+{
+	EmbeddedStartupError category = EmbeddedStartupError::None;
+	std::string summary;
+	std::string details;
+	std::string recovery;
+	std::string technical_details;
+	std::vector<EmbeddedStartupIssue> issues;
+};
+
 struct EngineDiagnostics
 {
 	std::atomic<std::uint64_t> audio_ring_capacity_frames { 0 };
@@ -201,6 +242,7 @@ struct EngineDiagnostics
 	std::atomic<std::uint64_t> video_frames_skipped_inactive { 0 };
 	std::atomic<std::uint64_t> video_frames_skipped_paused { 0 };
 	std::atomic<std::uint64_t> video_frame_generation { 0 };
+	std::atomic<std::uint64_t> video_capture_interval_ms { 200 };
 	std::atomic<std::uint64_t> video_target_frame_rate { 5 };
 	std::atomic<std::uint64_t> video_measured_frame_rate_x1000 { 0 };
 	std::atomic<std::uint64_t> video_last_frame_timestamp_ms { 0 };
@@ -256,6 +298,7 @@ public:
 	void noteHostAudioConfiguration(double sample_rate, int block_size);
 	bool copyLatestVideoFrame(VideoFrameSnapshot &snapshot);
 	void setVideoDisplayActive(bool active);
+	void setVideoCaptureIntervalMs(std::uint64_t interval_ms);
 	void requestVideoCaptureWidth(int width);
 	bool enqueueMouseEvent(EmbeddedMouseEventType type, std::int32_t x, std::int32_t y);
 	void requestMouseRelease();
@@ -271,6 +314,7 @@ public:
 	EngineDiagnostics &diagnostics();
 	int mameResult() const;
 	const std::string &driverName() const;
+	EmbeddedStartupDiagnostic startupDiagnostic() const;
 
 private:
 	struct Impl;

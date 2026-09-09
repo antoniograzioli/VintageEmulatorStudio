@@ -57,6 +57,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     bool updateFrame();
+    void refreshGuiPerformanceMode();
 
     void mouseMove (const juce::MouseEvent&) override;
     void mouseEnter (const juce::MouseEvent&) override;
@@ -73,15 +74,22 @@ private:
     void updateCaptureWidthForCurrentDisplay();
     void publishStableCaptureWidth();
     void recordMouseEvent (const juce::MouseEvent&, const juce::String&, int buttonOverride = 0);
+    void applyGuiPerformanceMode (GuiPerformanceMode mode);
 
     VintageEmulatorStudioProcessor& processor;
     juce::Image image;
     juce::Rectangle<int> sourceBounds;
+    int sourceBoundsFrameWidth = 0;
+    int sourceBoundsFrameHeight = 0;
+    uint64_t sourceBoundsEngineGeneration = 0;
     int pendingCaptureWidth = 1024;
     int publishedCaptureWidth = 0;
     juce::uint32 captureWidthDeadlineMs = 0;
     uint64_t displayedGeneration = 0;
     uint64_t displayedEngineGeneration = 0;
+    GuiPerformanceMode appliedGuiPerformanceMode = GuiPerformanceMode::Normal;
+    bool staticFrameAcquired = false;
+    uint64_t staticFrameMinimumGeneration = 0;
     juce::String lastError;
     juce::Point<float> lastJuceMouse;
     juce::Point<int> lastMameMouse { -1, -1 };
@@ -120,11 +128,18 @@ private:
     void updateFitToScreenButtonVisibility();
     void setEditorSizeFittedToCurrentDisplay (int requestedWidth, int requestedHeight, bool preserveSavedSize);
     void saveSettledEditorSize();
+    void showOptionsMenu();
+    void setGuiPerformanceModeFromMenu (GuiPerformanceMode mode);
+    void updateOptionsPresentation();
+#if JucePlugin_Build_Standalone
+    void updateStandaloneVolumePresentation();
+#endif
     void showToolbarPopup (ToolbarPopupType type, juce::Component& anchor);
     void launchToolbarPopup (ToolbarPopupType type, juce::Component& anchor);
     void dismissUnsupportedToolbarPopup();
     void refreshActiveToolbarPopup();
     void browseRoms();
+    void rescanRoms();
     void browseArtworks();
     void browseFloppy();
     void clearFloppy();
@@ -137,6 +152,11 @@ private:
     uint64_t lastFloppyHotSwapRevision = 0;
     EmbeddedMissingRomLookAndFeel lookAndFeel;
     EmbeddedEmulatorDisplayComponent mameDisplay;
+    juce::TextButton optionsButton { "Settings" };
+#if JucePlugin_Build_Standalone
+    juce::Label volumeLabel;
+    juce::Slider volumeSlider;
+#endif
 
     juce::Label synthLabel;
     juce::Label statusLabel;
@@ -176,6 +196,7 @@ private:
     bool statusOnSecondaryRow = false;
     int secondaryHeaderBottom = 100;
     juce::Rectangle<int> statusSeparatorBounds;
+    juce::Rectangle<int> optionsBarBounds;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VintageEmulatorStudioEditor)
 };

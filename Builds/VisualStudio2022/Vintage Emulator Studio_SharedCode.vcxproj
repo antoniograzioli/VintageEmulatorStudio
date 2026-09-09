@@ -149,6 +149,7 @@
     <ClCompile Include="..\..\Source\VintageEmulatorStudioEditor.cpp"/>
     <ClCompile Include="..\..\Source\EmbeddedEmulatorFrontendStubs.cpp"/>
     <ClCompile Include="..\..\validation\mame-0.289-patched\src\ves\embeddedinstruments\EmbeddedEmulatorEngine.cpp"/>
+    <ClCompile Include="..\..\validation\mame-0.289-patched\src\frontend\mame\audit.cpp"/>
     <ClCompile Include="..\..\validation\mame-0.289-patched\src\frontend\mame\luaengine.cpp"/>
     <ClCompile Include="..\..\validation\mame-0.289-patched\src\frontend\mame\luaengine_debug.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>

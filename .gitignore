@@ -19,6 +19,9 @@
 /Builds/MacOSX-Intel/release-validation-x86_64/
 /Builds/LinuxMakefile/build/
 
+# Generated standalone runtime payload source
+/Source/EmbeddedStandaloneRuntimeResources.cpp
+
 # Distribution products
 /Dist/
 

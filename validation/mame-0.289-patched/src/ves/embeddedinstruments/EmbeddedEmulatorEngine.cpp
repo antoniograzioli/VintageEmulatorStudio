@@ -17,6 +17,7 @@
 #include "uiinput.h"
 #include "fileio.h"
 
+#include "frontend/mame/audit.h"
 #include "frontend/mame/luaengine.h"
 #include "frontend/mame/pluginopts.h"
 
@@ -28,8 +29,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <memory>
 #include <limits>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -135,6 +138,89 @@ namespace ves {
 
 namespace {
 
+std::string crcString(const util::hash_collection &hashes)
+{
+	uint32_t crc = 0;
+	return hashes.crc(crc) ? util::string_format("%08x", crc) : std::string();
+}
+
+std::string sha1String(const util::hash_collection &hashes)
+{
+	util::sha1_t sha1;
+	return hashes.sha1(sha1) ? sha1.as_string() : std::string();
+}
+
+EmbeddedStartupIssue makeStartupIssue(const media_auditor::audit_record &record)
+{
+	EmbeddedStartupIssue issue;
+	issue.name = record.name();
+	if (auto const shared_device = record.shared_device())
+		issue.owner = shared_device->shortname();
+	issue.expected_crc = crcString(record.expected_hashes());
+	issue.expected_sha1 = sha1String(record.expected_hashes());
+	issue.actual_crc = crcString(record.actual_hashes());
+	issue.actual_sha1 = sha1String(record.actual_hashes());
+	issue.expected_length = record.expected_length();
+	issue.actual_length = record.actual_length();
+	return issue;
+}
+
+void appendStartupIssue(EmbeddedStartupDiagnostic &diagnostic, const media_auditor::audit_record &record)
+{
+	diagnostic.issues.emplace_back(makeStartupIssue(record));
+}
+
+EmbeddedStartupDiagnostic auditDriverRomSet(emu_options &options, const game_driver &driver)
+{
+	driver_enumerator enumerator(options, driver);
+	if (!enumerator.next())
+	{
+		EmbeddedStartupDiagnostic diagnostic;
+		diagnostic.category = EmbeddedStartupError::InvalidRomSet;
+		diagnostic.summary = "The selected ROM set is incomplete or invalid.";
+		diagnostic.recovery = "Please check that you are using a complete MAME 0.289 ROM set for this machine.";
+		diagnostic.technical_details = "MAME driver enumerator could not select the requested driver.";
+		return diagnostic;
+	}
+
+	media_auditor auditor(enumerator);
+	const auto summary = auditor.audit_media(AUDIT_VALIDATE_FULL);
+
+	EmbeddedStartupDiagnostic missing;
+	missing.category = EmbeddedStartupError::MissingRom;
+	missing.summary = "Required ROM files are missing.";
+	missing.details = "Missing:";
+	missing.recovery = "Please check that you are using a complete MAME 0.289 ROM set for this machine.";
+
+	for (const auto &record : auditor.records())
+	{
+		switch (record.substatus())
+		{
+		case media_auditor::audit_substatus::NOT_FOUND:
+			appendStartupIssue(missing, record);
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	if (!missing.issues.empty())
+		return missing;
+
+	if ((summary == media_auditor::NOTFOUND || summary == media_auditor::INCORRECT) && auditor.records().empty())
+	{
+		EmbeddedStartupDiagnostic invalid;
+		invalid.category = EmbeddedStartupError::InvalidRomSet;
+		invalid.summary = "The selected ROM set is incomplete or invalid.";
+		invalid.recovery = "Please check that you are using a complete MAME 0.289 ROM set for this machine.";
+		invalid.technical_details = util::string_format("MAME ROM audit summary: %d", static_cast<int>(summary));
+		return invalid;
+	}
+
+	return {};
+}
+
 template <typename T, std::size_t Capacity>
 class spsc_ring
 {
@@ -151,6 +237,27 @@ public:
 		return true;
 	}
 
+	template <typename Writer>
+	std::size_t push_bulk(std::size_t requested, Writer writer)
+	{
+		const auto head = m_head.load(std::memory_order_relaxed);
+		const auto tail = m_tail.load(std::memory_order_acquire);
+		const auto writable = writable_from(head, tail);
+		const auto count = std::min(requested, writable);
+		if (count == 0)
+			return 0;
+
+		const auto first = std::min(count, Capacity - head);
+		writer(&m_items[head], first, std::size_t(0));
+
+		const auto second = count - first;
+		if (second != 0)
+			writer(&m_items[0], second, first);
+
+		m_head.store((head + count) % Capacity, std::memory_order_release);
+		return count;
+	}
+
 	bool pop(T &item)
 	{
 		const auto tail = m_tail.load(std::memory_order_relaxed);
@@ -164,9 +271,21 @@ public:
 
 	std::size_t pop(T *items, std::size_t max_count)
 	{
-		std::size_t count = 0;
-		while (count < max_count && pop(items[count]))
-			++count;
+		const auto tail = m_tail.load(std::memory_order_relaxed);
+		const auto head = m_head.load(std::memory_order_acquire);
+		const auto readable = readable_from(head, tail);
+		const auto count = std::min(max_count, readable);
+		if (count == 0)
+			return 0;
+
+		const auto first = std::min(count, Capacity - tail);
+		std::copy_n(&m_items[tail], first, items);
+
+		const auto second = count - first;
+		if (second != 0)
+			std::copy_n(&m_items[0], second, items + first);
+
+		m_tail.store((tail + count) % Capacity, std::memory_order_release);
 		return count;
 	}
 
@@ -202,6 +321,16 @@ private:
 	static constexpr std::size_t increment(std::size_t value)
 	{
 		return (value + 1) % Capacity;
+	}
+
+	static constexpr std::size_t readable_from(std::size_t head, std::size_t tail)
+	{
+		return (head >= tail) ? (head - tail) : (Capacity + head - tail);
+	}
+
+	static constexpr std::size_t writable_from(std::size_t head, std::size_t tail)
+	{
+		return tail > head ? (tail - head - 1) : (Capacity - head + tail - 1);
 	}
 
 	std::array<T, Capacity> m_items {};
@@ -418,6 +547,9 @@ void update_audio_queue_diagnostics(EngineDiagnostics &diag, std::size_t queued)
 		std::memory_order_relaxed);
 }
 
+constexpr std::uint32_t k_audio_sink_diagnostics_interval = 32;
+constexpr std::uint32_t k_audio_read_diagnostics_interval = 32;
+
 class memory_midi_input_port : public osd::midi_input_port
 {
 public:
@@ -494,7 +626,7 @@ public:
 		m_diag.video_initialized.store(true, std::memory_order_relaxed);
 		m_diag.video_render_target_available.store(false, std::memory_order_relaxed);
 		m_diag.video_capture_enabled.store(true, std::memory_order_relaxed);
-		m_diag.video_target_frame_rate.store(5, std::memory_order_relaxed);
+		m_diag.video_target_frame_rate.store(1000 / std::max<std::uint64_t>(1, m_diag.video_capture_interval_ms.load(std::memory_order_relaxed)), std::memory_order_relaxed);
 		m_diag.mouse_forwarding_enabled.store(true, std::memory_order_relaxed);
 		m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::WaitingForMachine), std::memory_order_relaxed);
 	}
@@ -508,7 +640,13 @@ public:
 		m_diag.osd_updates.fetch_add(1, std::memory_order_relaxed);
 		if (machine().phase() >= machine_phase::RESET)
 		{
-			if (ensure_video_target())
+			if (!m_diag.video_editor_display_active.load(std::memory_order_relaxed)
+				|| !m_diag.video_capture_enabled.load(std::memory_order_relaxed))
+			{
+				release_video_target();
+				m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::Disabled), std::memory_order_relaxed);
+			}
+			else if (ensure_video_target())
 				capture_video_frame(skip_redraw);
 			else
 				m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::Unavailable), std::memory_order_relaxed);
@@ -579,28 +717,60 @@ public:
 		m_diag.mame_audio_callback_count.fetch_add(1, std::memory_order_relaxed);
 		m_diag.mame_audio_callback_block_size.store(static_cast<std::uint64_t>(std::max(samples_this_frame, 0)), std::memory_order_relaxed);
 
+		if (samples_this_frame <= 0)
+			return;
+
 		static constexpr float scale = 1.0f / 32768.0f;
-		for (int i = 0; i < samples_this_frame; ++i)
+		float block_peak = 0.0f;
+		const auto requested = static_cast<std::size_t>(samples_this_frame);
+		const auto written = m_audio_queue.push_bulk(requested, [&](StereoFrame *dest, std::size_t count, std::size_t source_offset)
 		{
-			const StereoFrame frame {
-				static_cast<float>(buffer[i * 2]) * scale,
-				static_cast<float>(buffer[i * 2 + 1]) * scale };
-
-			const float peak = std::max(std::fabs(frame.left), std::fabs(frame.right));
-			auto current_peak = m_diag.peak_abs.load(std::memory_order_relaxed);
-			while (peak > current_peak && !m_diag.peak_abs.compare_exchange_weak(current_peak, peak, std::memory_order_relaxed))
+			const auto *src = buffer + (source_offset * 2);
+			for (std::size_t i = 0; i < count; ++i)
 			{
+				const StereoFrame frame {
+					static_cast<float>(src[i * 2]) * scale,
+					static_cast<float>(src[i * 2 + 1]) * scale };
+
+				block_peak = std::max(block_peak, std::max(std::fabs(frame.left), std::fabs(frame.right)));
+				dest[i] = frame;
 			}
+		});
 
-			if (m_audio_queue.push(frame))
-				m_diag.audio_frames_written.fetch_add(1, std::memory_order_relaxed);
-			else
+		if (written != 0)
+			m_diag.audio_frames_written.fetch_add(written, std::memory_order_relaxed);
+
+		const auto dropped = requested - written;
+		if (dropped != 0)
+		{
+			const auto *src = buffer + (written * 2);
+			for (std::size_t i = 0; i < dropped; ++i)
 			{
-				m_diag.audio_frames_dropped.fetch_add(1, std::memory_order_relaxed);
-				m_diag.audio_overflows.fetch_add(1, std::memory_order_relaxed);
+				const auto left = static_cast<float>(src[i * 2]) * scale;
+				const auto right = static_cast<float>(src[i * 2 + 1]) * scale;
+				block_peak = std::max(block_peak, std::max(std::fabs(left), std::fabs(right)));
 			}
 		}
-		update_audio_queue_diagnostics(m_diag, m_audio_queue.size());
+
+		if (block_peak > 0.0f)
+		{
+			auto current_peak = m_diag.peak_abs.load(std::memory_order_relaxed);
+			while (block_peak > current_peak && !m_diag.peak_abs.compare_exchange_weak(current_peak, block_peak, std::memory_order_relaxed))
+			{
+			}
+		}
+
+		if (dropped != 0)
+		{
+			m_diag.audio_frames_dropped.fetch_add(dropped, std::memory_order_relaxed);
+			m_diag.audio_overflows.fetch_add(dropped, std::memory_order_relaxed);
+		}
+
+		if (++m_audio_sink_diagnostics_counter >= k_audio_sink_diagnostics_interval || dropped != 0)
+		{
+			m_audio_sink_diagnostics_counter = 0;
+			update_audio_queue_diagnostics(m_diag, m_audio_queue.size());
+		}
 	}
 
 	void sound_stream_source_update(std::uint32_t, std::int16_t *, int) override {}
@@ -911,7 +1081,7 @@ private:
 		if (m_diag.video_deadline_reset_requests.exchange(0, std::memory_order_acq_rel) != 0)
 			m_next_video_deadline_ms = 0;
 
-		constexpr std::uint64_t interval_ms = 200;
+		const auto interval_ms = std::max<std::uint64_t>(1, m_diag.video_capture_interval_ms.load(std::memory_order_acquire));
 		if (m_next_video_deadline_ms == 0)
 			m_next_video_deadline_ms = now;
 		if (now < m_next_video_deadline_ms)
@@ -937,7 +1107,7 @@ private:
 				screen.update_quads();
 			}
 
-			const auto width = std::clamp(static_cast<s32>(m_diag.video_requested_width.load(std::memory_order_acquire)), 1024, 4096);
+			const auto width = std::clamp(static_cast<s32>(m_diag.video_requested_width.load(std::memory_order_acquire)), 256, 4096);
 			s32 minimum_width = 0;
 			s32 minimum_height = 0;
 			m_video_target->compute_minimum_size(minimum_width, minimum_height);
@@ -1016,6 +1186,7 @@ private:
 	render_target *m_video_target = nullptr;
 	std::uint64_t m_last_video_capture_ms = 0;
 	std::uint64_t m_next_video_deadline_ms = 0;
+	std::uint32_t m_audio_sink_diagnostics_counter = 0;
 	int m_failed_video_width = 0;
 	static constexpr int k_video_width = 1024;
 	static constexpr int k_video_height = 576;
@@ -1120,9 +1291,10 @@ private:
 class embedded_machine_manager : public machine_manager
 {
 public:
-		embedded_machine_manager(emu_options &options, osd_interface &osd, EngineDiagnostics &diag, std::string driver_name)
+		embedded_machine_manager(emu_options &options, osd_interface &osd, EngineDiagnostics &diag, std::string driver_name,
+				std::function<void(EmbeddedStartupDiagnostic)> publish_diagnostic)
 		: machine_manager(options, osd), m_driver_name(std::move(driver_name))
-		, m_diag(diag), m_plugin_host(*this)
+		, m_diag(diag), m_plugin_host(*this), m_publish_diagnostic(std::move(publish_diagnostic))
 	{
 	}
 
@@ -1134,6 +1306,12 @@ public:
 		}
 		catch (std::exception const &error)
 		{
+			EmbeddedStartupDiagnostic diagnostic;
+			diagnostic.category = EmbeddedStartupError::LuaPlugin;
+			diagnostic.summary = "VES could not initialize the embedded MAME layout plugin.";
+			diagnostic.recovery = "Please reinstall VES.";
+			diagnostic.technical_details = error.what();
+			m_publish_diagnostic(std::move(diagnostic));
 			osd_printf_error("Unable to initialize embedded Layout Plugin host: %s\n", error.what());
 			m_diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
 			return EMU_ERR_FATALERROR;
@@ -1178,6 +1356,7 @@ private:
 	std::string m_driver_name;
 	EngineDiagnostics &m_diag;
 	embedded_plugin_host m_plugin_host;
+	std::function<void(EmbeddedStartupDiagnostic)> m_publish_diagnostic;
 	std::unique_ptr<ui_manager> m_ui;
 };
 
@@ -1309,15 +1488,17 @@ struct EmbeddedEmulatorEngine::Impl
 		diag.audio_frames_read.fetch_add(count, std::memory_order_relaxed);
 		if (count < max_frames)
 			diag.audio_underruns.fetch_add(1, std::memory_order_relaxed);
-		update_audio_queue_diagnostics(diag, audio_queue.size());
+		if (++audio_read_diagnostics_counter >= k_audio_read_diagnostics_interval || count < max_frames)
+		{
+			audio_read_diagnostics_counter = 0;
+			update_audio_queue_diagnostics(diag, audio_queue.size());
+		}
 		return count;
 	}
 
 	std::size_t queuedAudioFrames()
 	{
-		const auto queued = audio_queue.size();
-		update_audio_queue_diagnostics(diag, queued);
-		return queued;
+		return audio_queue.size();
 	}
 
 	std::size_t discardQueuedAudio()
@@ -1363,6 +1544,17 @@ struct EmbeddedEmulatorEngine::Impl
 	EngineDiagnostics &diagnostics() { return diag; }
 	int mameResult() const { return mame_result.load(std::memory_order_relaxed); }
 	const std::string &driverName() const { return settings.driver_name; }
+	EmbeddedStartupDiagnostic startupDiagnostic() const
+	{
+		std::lock_guard<std::mutex> guard(startup_diagnostic_mutex);
+		return startup_diagnostic;
+	}
+
+	void publishStartupDiagnostic(EmbeddedStartupDiagnostic diagnostic)
+	{
+		std::lock_guard<std::mutex> guard(startup_diagnostic_mutex);
+		startup_diagnostic = std::move(diagnostic);
+	}
 
 	bool copyLatestVideoFrame(VideoFrameSnapshot &snapshot)
 	{
@@ -1381,9 +1573,17 @@ struct EmbeddedEmulatorEngine::Impl
 		}
 	}
 
+	void setVideoCaptureIntervalMs(std::uint64_t interval_ms)
+	{
+		const auto clamped = std::clamp<std::uint64_t>(interval_ms, 50, 10'000);
+		diag.video_capture_interval_ms.store(clamped, std::memory_order_release);
+		diag.video_target_frame_rate.store(1000 / clamped, std::memory_order_relaxed);
+		diag.video_deadline_reset_requests.fetch_add(1, std::memory_order_release);
+	}
+
 	void requestVideoCaptureWidth(int width)
 	{
-			diag.video_requested_width.store(static_cast<std::uint64_t>(std::clamp(width, 1024, 4096)), std::memory_order_release);
+			diag.video_requested_width.store(static_cast<std::uint64_t>(std::clamp(width, 256, 4096)), std::memory_order_release);
 	}
 
 	bool enqueueMouseEvent(EmbeddedMouseEventType type, std::int32_t x, std::int32_t y)
@@ -1537,12 +1737,22 @@ private:
 		}
 		catch (const options_exception &error)
 		{
+			EmbeddedStartupDiagnostic diagnostic;
+			diagnostic.category = EmbeddedStartupError::Configuration;
+			diagnostic.summary = "The emulator startup options are invalid.";
+			diagnostic.technical_details = error.what();
+			publishStartupDiagnostic(std::move(diagnostic));
 			osd_printf_error("VintageEmulatorStudio startup option error: %s\\n", error.what());
 			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
 			return EMU_ERR_INVALID_CONFIG;
 		}
 		catch (const emu_fatalerror &error)
 		{
+			EmbeddedStartupDiagnostic diagnostic;
+			diagnostic.category = EmbeddedStartupError::Configuration;
+			diagnostic.summary = "The emulator startup configuration is invalid.";
+			diagnostic.technical_details = error.what();
+			publishStartupDiagnostic(std::move(diagnostic));
 			osd_printf_error("VintageEmulatorStudio startup configuration error: %s\\n", error.what());
 			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
 			return error.exitcode();
@@ -1557,10 +1767,84 @@ private:
 		diag.mame_audio_latency_us.store(static_cast<std::uint64_t>(std::max(options.audio_latency(), 0.0f) * 1000.0f), std::memory_order_relaxed);
 		diag.effective_mame_sample_rate.store(static_cast<std::uint64_t>(std::max(options.sample_rate(), 0)), std::memory_order_relaxed);
 
-		embedded_machine_manager manager(options, osd, diag, settings.driver_name);
-		manager.start_http_server();
-		const int result = manager.execute();
-		return result;
+		EmbeddedStartupDiagnostic auditDiagnostic;
+		try
+		{
+			auditDiagnostic = auditDriverRomSet(options, option_driver);
+		}
+		catch (const std::exception &error)
+		{
+			auditDiagnostic.category = EmbeddedStartupError::EngineFailure;
+			auditDiagnostic.summary = "The emulator failed to start.";
+			auditDiagnostic.technical_details = std::string("MAME ROM audit failed: ") + error.what();
+		}
+		catch (...)
+		{
+			auditDiagnostic.category = EmbeddedStartupError::Unknown;
+			auditDiagnostic.summary = "The emulator failed to start.";
+			auditDiagnostic.technical_details = "MAME ROM audit failed with an unknown exception.";
+		}
+
+		if (auditDiagnostic.category != EmbeddedStartupError::None)
+		{
+			const bool romSpecificFailure = auditDiagnostic.category == EmbeddedStartupError::MissingRom
+				|| auditDiagnostic.category == EmbeddedStartupError::RomChecksumMismatch
+				|| auditDiagnostic.category == EmbeddedStartupError::InvalidRomSet;
+			publishStartupDiagnostic(std::move(auditDiagnostic));
+			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
+			return romSpecificFailure ? EMU_ERR_MISSING_FILES : EMU_ERR_FATALERROR;
+		}
+
+		try
+		{
+			embedded_machine_manager manager(
+					options,
+					osd,
+					diag,
+					settings.driver_name,
+					[this] (EmbeddedStartupDiagnostic diagnostic) { publishStartupDiagnostic(std::move(diagnostic)); });
+			manager.start_http_server();
+			const int result = manager.execute();
+			if (result != 0 && startupDiagnostic().category == EmbeddedStartupError::None)
+			{
+				EmbeddedStartupDiagnostic diagnostic;
+				diagnostic.category = EmbeddedStartupError::EngineFailure;
+				diagnostic.summary = "The emulator failed to start.";
+				diagnostic.technical_details = util::string_format("MAME returned result %d", result);
+				publishStartupDiagnostic(std::move(diagnostic));
+			}
+			return result;
+		}
+		catch (const emu_fatalerror &error)
+		{
+			EmbeddedStartupDiagnostic diagnostic;
+			diagnostic.category = EmbeddedStartupError::EngineFailure;
+			diagnostic.summary = "The emulator failed to start.";
+			diagnostic.technical_details = error.what();
+			publishStartupDiagnostic(std::move(diagnostic));
+			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
+			return error.exitcode();
+		}
+		catch (const std::exception &error)
+		{
+			EmbeddedStartupDiagnostic diagnostic;
+			diagnostic.category = EmbeddedStartupError::EngineFailure;
+			diagnostic.summary = "The emulator failed to start.";
+			diagnostic.technical_details = error.what();
+			publishStartupDiagnostic(std::move(diagnostic));
+			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
+			return EMU_ERR_FATALERROR;
+		}
+		catch (...)
+		{
+			EmbeddedStartupDiagnostic diagnostic;
+			diagnostic.category = EmbeddedStartupError::Unknown;
+			diagnostic.summary = "The emulator failed to start.";
+			diagnostic.technical_details = "Unknown exception in embedded MAME startup.";
+			publishStartupDiagnostic(std::move(diagnostic));
+			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
+			return EMU_ERR_FATALERROR;
+		}
 	}
 
 	template <typename Predicate>
@@ -1584,6 +1868,9 @@ private:
 	floppy_result_queue floppy_results;
 	embedded_video_bridge video_bridge;
 	EngineDiagnostics diag;
+	mutable std::mutex startup_diagnostic_mutex;
+	EmbeddedStartupDiagnostic startup_diagnostic;
+	std::uint32_t audio_read_diagnostics_counter = 0;
 	std::thread mame_thread;
 	std::atomic<std::uint64_t> mouse_sequence { 0 };
 	std::atomic<bool> floppy_change_pending { false };
@@ -1667,6 +1954,11 @@ void EmbeddedEmulatorEngine::setVideoDisplayActive(bool active)
 	m_impl->setVideoDisplayActive(active);
 }
 
+void EmbeddedEmulatorEngine::setVideoCaptureIntervalMs(std::uint64_t interval_ms)
+{
+	m_impl->setVideoCaptureIntervalMs(interval_ms);
+}
+
 void EmbeddedEmulatorEngine::requestVideoCaptureWidth(int width)
 {
 	m_impl->requestVideoCaptureWidth(width);
@@ -1735,6 +2027,11 @@ int EmbeddedEmulatorEngine::mameResult() const
 const std::string &EmbeddedEmulatorEngine::driverName() const
 {
 	return m_impl->driverName();
+}
+
+EmbeddedStartupDiagnostic EmbeddedEmulatorEngine::startupDiagnostic() const
+{
+	return m_impl->startupDiagnostic();
 }
 
 std::uint64_t steadyMs()

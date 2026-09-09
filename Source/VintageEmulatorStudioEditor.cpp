@@ -24,17 +24,142 @@ constexpr float fieldLabelFontSize = 16.0f;
 const auto bootingStatusColour = juce::Colour::fromRGB (255, 210, 63);
 const auto readyStatusColour = juce::Colour::fromRGB (69, 227, 90);
 const auto failedStatusColour = juce::Colour::fromRGB (255, 69, 69);
-constexpr int statusLabelWidth = 50;
+constexpr int statusLabelWidth = 118;
 constexpr int statusSeparatorWidth = 8;
 constexpr int statusRomWidth = 86;
 constexpr int statusGroupGap = 4;
 constexpr int statusGroupRightMargin = 18;
+constexpr int optionsBarHeight = 30;
+constexpr int optionsButtonWidth = 82;
+constexpr int optionsButtonHeight = 22;
+#if JucePlugin_Build_Standalone
+constexpr int volumeLabelWidth = 52;
+constexpr int volumeSliderWidth = 128;
+constexpr int volumeControlGap = 8;
+#endif
+constexpr int optionsMenuNormalId = 1;
+constexpr int optionsMenuReducedId = 2;
+constexpr int optionsMenuStaticId = 3;
+constexpr int optionsMenuDisabledId = 4;
 
 juce::String formatMachineNameForSelector (const juce::String& displayName)
 {
     const auto firstSpace = displayName.indexOfChar (' ');
     return firstSpace > 0 ? displayName.substring (0, firstSpace) + " — " + displayName.substring (firstSpace + 1)
                           : displayName;
+}
+
+juce::String guiPerformanceModeToDisplayString (GuiPerformanceMode mode)
+{
+    switch (mode)
+    {
+        case GuiPerformanceMode::Normal:   return "Normal";
+        case GuiPerformanceMode::Reduced:  return "Reduced";
+        case GuiPerformanceMode::Static:   return "Static";
+        case GuiPerformanceMode::Disabled: return "Disabled";
+    }
+
+    return "Normal";
+}
+
+GuiPerformanceMode guiPerformanceModeForMenuId (int menuId)
+{
+    switch (menuId)
+    {
+        case optionsMenuReducedId:  return GuiPerformanceMode::Reduced;
+        case optionsMenuStaticId:   return GuiPerformanceMode::Static;
+        case optionsMenuDisabledId: return GuiPerformanceMode::Disabled;
+        default:                    return GuiPerformanceMode::Normal;
+    }
+}
+
+juce::String compactStatusForStartupError (StartupError category)
+{
+    switch (category)
+    {
+        case StartupError::MissingRom:          return "Missing ROMs";
+        case StartupError::RomChecksumMismatch: return "Wrong ROM";
+        case StartupError::RuntimeResources:    return "Runtime Error";
+        case StartupError::StartupTimeout:      return "Startup Timeout";
+        case StartupError::PrimaryRomMissing:   return "Missing ROMs";
+        case StartupError::InvalidRomSet:       return "Missing ROMs";
+        case StartupError::None:                return {};
+        default:                                return "Failed";
+    }
+}
+
+juce::String boundedTechnicalDetails (juce::String details)
+{
+    details = details.trim();
+    constexpr int maxTechnicalDetailChars = 600;
+    return details.length() > maxTechnicalDetailChars ? details.substring (0, maxTechnicalDetailChars) + "\n..." : details;
+}
+
+juce::String formatStartupDiagnosticForDisplay (const EmbeddedDiagnosticSnapshot& snapshot)
+{
+    const auto& diagnostic = snapshot.startupDiagnostic;
+    juce::String text;
+
+    if (diagnostic.category != StartupError::RuntimeResources)
+    {
+        text << "Loading " << snapshot.machineName << "...\n";
+        text << (snapshot.selectedMachineRomFound ? "ROM Found" : "ROM Not Found") << "\n\n";
+    }
+
+    text << "ERROR\n" << diagnostic.summary << "\n";
+
+    const auto maxVisibleIssues = 8;
+    if (! diagnostic.issues.empty())
+    {
+        text << "\n";
+        if (diagnostic.category == StartupError::MissingRom)
+            text << "Missing:\n";
+
+        const auto visibleIssues = std::min<int> (maxVisibleIssues, static_cast<int> (diagnostic.issues.size()));
+        for (int i = 0; i < visibleIssues; ++i)
+        {
+            const auto& issue = diagnostic.issues[static_cast<std::size_t> (i)];
+            text << "  " << issue.name;
+            if (issue.owner.isNotEmpty())
+                text << " (" << issue.owner << ")";
+            text << "\n";
+
+            if (diagnostic.category == StartupError::RomChecksumMismatch)
+            {
+                if (issue.expectedCrc.isNotEmpty())
+                    text << "    Expected CRC: " << issue.expectedCrc << "\n";
+                if (issue.actualCrc.isNotEmpty())
+                    text << "    Found CRC: " << issue.actualCrc << "\n";
+                if (issue.expectedSha1.isNotEmpty())
+                    text << "    Expected SHA1: " << issue.expectedSha1 << "\n";
+                if (issue.actualSha1.isNotEmpty())
+                    text << "    Found SHA1: " << issue.actualSha1 << "\n";
+                if (issue.expectedLength != 0 || issue.actualLength != 0)
+                    text << "    Length: expected " << juce::String (static_cast<juce::int64> (issue.expectedLength))
+                         << ", found " << juce::String (static_cast<juce::int64> (issue.actualLength)) << "\n";
+            }
+        }
+
+        const auto remaining = static_cast<int> (diagnostic.issues.size()) - visibleIssues;
+        if (remaining > 0)
+        {
+            text << "  ...and " << remaining << " more ";
+            text << (diagnostic.category == StartupError::MissingRom ? "missing files" : "ROM issues") << "\n";
+        }
+    }
+    else if (diagnostic.details.isNotEmpty())
+    {
+        text << "\n" << diagnostic.details << "\n";
+    }
+
+    if (diagnostic.recovery.isNotEmpty())
+        text << "\n" << diagnostic.recovery << "\n";
+
+    if ((diagnostic.category == StartupError::EngineFailure || diagnostic.category == StartupError::Unknown)
+        && diagnostic.technicalDetails.isNotEmpty())
+        text << "\nTechnical details:\n" << boundedTechnicalDetails (diagnostic.technicalDetails);
+
+    return text.trimEnd();
 }
 
 }
@@ -185,11 +310,13 @@ public:
                      RecentPathProvider recentPaths = {},
                      RecentSelectionAction recentSelection = {},
                      std::function<bool()> operationPending = {},
-                     bool showBusyIndicatorForPendingLoad = false)
+                     bool showBusyIndicatorForPendingLoad = false,
+                     Action rescanAction = {})
         : pathProvider (std::move (currentPath)),
           statusProvider (std::move (currentStatus)),
           onBrowse (std::move (browseAction)),
           onClear (std::move (clearAction)),
+          onRescan (std::move (rescanAction)),
           recentPathsProvider (std::move (recentPaths)),
           onRecentSelection (std::move (recentSelection)),
           operationPendingProvider (std::move (operationPending)),
@@ -197,7 +324,8 @@ public:
           emptyPath (emptyPathText),
           detail (detailText),
           browseButton ("Browse..."),
-          clearButton (clearButtonText)
+          clearButton (clearButtonText),
+          rescanButton ("Rescan")
     {
         setLookAndFeel (&popupLookAndFeel);
         titleLabel.setText (popupTitle, juce::dontSendNotification);
@@ -221,12 +349,16 @@ public:
         browseButton.setColour (juce::TextButton::textColourOnId, juce::Colours::white);
         clearButton.setColour (juce::TextButton::textColourOffId, juce::Colours::white);
         clearButton.setColour (juce::TextButton::textColourOnId, juce::Colours::white);
+        rescanButton.setColour (juce::TextButton::textColourOffId, juce::Colours::white);
+        rescanButton.setColour (juce::TextButton::textColourOnId, juce::Colours::white);
 
         addAndMakeVisible (titleLabel);
         addAndMakeVisible (pathLabel);
         addAndMakeVisible (browseButton);
         if (onClear)
             addAndMakeVisible (clearButton);
+        if (onRescan)
+            addAndMakeVisible (rescanButton);
         if (statusProvider)
             addAndMakeVisible (statusLabel);
         if (detail.isNotEmpty())
@@ -256,6 +388,12 @@ public:
         {
             if (onClear)
                 onClear();
+            refreshFromProcessor();
+        };
+        rescanButton.onClick = [this]
+        {
+            if (onRescan)
+                onRescan();
             refreshFromProcessor();
         };
 
@@ -309,6 +447,11 @@ public:
             buttons.removeFromLeft (8);
             clearButton.setBounds (buttons.removeFromLeft (112));
         }
+        if (onRescan)
+        {
+            buttons.removeFromLeft (8);
+            rescanButton.setBounds (buttons.removeFromLeft (112));
+        }
 
         if (hasStatusLine())
         {
@@ -350,6 +493,8 @@ public:
         browseButton.setEnabled (! operationPending);
         if (onClear)
             clearButton.setEnabled (path.isNotEmpty() && ! operationPending);
+        if (onRescan)
+            rescanButton.setEnabled (! operationPending);
 
         auto status = statusProvider ? statusProvider() : juce::String();
         busyIndicatorVisible = showBusyIndicatorForPendingLoad && operationPending
@@ -448,6 +593,7 @@ public:
     StringProvider statusProvider;
     Action onBrowse;
     Action onClear;
+    Action onRescan;
     RecentPathProvider recentPathsProvider;
     RecentSelectionAction onRecentSelection;
     std::function<bool()> operationPendingProvider;
@@ -466,6 +612,7 @@ public:
     juce::Label recentLabel;
     juce::TextButton browseButton;
     juce::TextButton clearButton;
+    juce::TextButton rescanButton;
     juce::Rectangle<int> busyIndicatorBounds;
     std::array<std::unique_ptr<VESRecentMediaButton>, maximumRecentItems> recentButtons;
 };
@@ -583,12 +730,20 @@ EmbeddedEmulatorDisplayComponent::~EmbeddedEmulatorDisplayComponent()
 
 bool EmbeddedEmulatorDisplayComponent::updateFrame()
 {
+    const auto mode = processor.getGuiPerformanceMode();
+    applyGuiPerformanceMode (mode);
+    if (mode == GuiPerformanceMode::Disabled || (mode == GuiPerformanceMode::Static && staticFrameAcquired))
+        return false;
+
     updateCaptureWidthForCurrentDisplay();
     publishStableCaptureWidth();
 
     const auto activeEngineGeneration = processor.getVideoEngineGeneration();
     if (activeEngineGeneration != displayedEngineGeneration)
+    {
         clearDisplayedFrame (activeEngineGeneration);
+        staticFrameAcquired = false;
+    }
 
     EmbeddedVideoFrameForEditor frame;
     if (! processor.copyLatestVideoFrame (frame))
@@ -598,6 +753,9 @@ bool EmbeddedEmulatorDisplayComponent::updateFrame()
         return false;
 
     if (frame.engineGeneration == displayedEngineGeneration && frame.generation == displayedGeneration)
+        return false;
+
+    if (mode == GuiPerformanceMode::Static && frame.generation <= staticFrameMinimumGeneration)
         return false;
 
     if (frame.width <= 0 || frame.height <= 0
@@ -626,16 +784,63 @@ bool EmbeddedEmulatorDisplayComponent::updateFrame()
 
     displayedGeneration = frame.generation;
     displayedEngineGeneration = frame.engineGeneration;
-    updateSourceBounds();
+    if (sourceBounds.isEmpty()
+        || sourceBoundsFrameWidth != frame.width
+        || sourceBoundsFrameHeight != frame.height
+        || sourceBoundsEngineGeneration != frame.engineGeneration)
+        updateSourceBounds();
     lastError.clear();
     repaint();
+    if (mode == GuiPerformanceMode::Static)
+    {
+        staticFrameAcquired = true;
+        processor.setVideoDisplayActive (false);
+    }
     return true;
+}
+
+void EmbeddedEmulatorDisplayComponent::refreshGuiPerformanceMode()
+{
+    appliedGuiPerformanceMode = processor.getGuiPerformanceMode() == GuiPerformanceMode::Normal
+        ? GuiPerformanceMode::Reduced
+        : GuiPerformanceMode::Normal;
+    applyGuiPerformanceMode (processor.getGuiPerformanceMode());
+}
+
+void EmbeddedEmulatorDisplayComponent::applyGuiPerformanceMode (GuiPerformanceMode mode)
+{
+    if (mode == appliedGuiPerformanceMode)
+        return;
+
+    appliedGuiPerformanceMode = mode;
+    staticFrameAcquired = false;
+    staticFrameMinimumGeneration = mode == GuiPerformanceMode::Static ? displayedGeneration : 0;
+
+    if (mode == GuiPerformanceMode::Disabled)
+    {
+        processor.setVideoDisplayActive (false);
+        image = {};
+        sourceBounds = {};
+        sourceBoundsFrameWidth = 0;
+        sourceBoundsFrameHeight = 0;
+        sourceBoundsEngineGeneration = 0;
+        lastError.clear();
+        repaint();
+        return;
+    }
+
+    processor.setVideoDisplayActive (true);
+    updateCaptureWidthForCurrentDisplay();
+    publishStableCaptureWidth();
 }
 
 void EmbeddedEmulatorDisplayComponent::clearDisplayedFrame (uint64_t engineGeneration)
 {
     image = {};
     sourceBounds = {};
+    sourceBoundsFrameWidth = 0;
+    sourceBoundsFrameHeight = 0;
+    sourceBoundsEngineGeneration = 0;
     displayedGeneration = 0;
     displayedEngineGeneration = engineGeneration;
     lastError.clear();
@@ -657,7 +862,10 @@ void EmbeddedEmulatorDisplayComponent::updateCaptureWidthForCurrentDisplay()
 
     const auto scale = display != nullptr ? display->scale : getDesktopScaleFactor();
     const auto physicalWidth = juce::jmax (1, juce::roundToInt (innerWidth * scale));
-    const auto quantized = juce::jlimit (1024, 4096, ((physicalWidth + 63) / 64) * 64);
+    const auto mode = processor.getGuiPerformanceMode();
+    const auto minimum = mode == GuiPerformanceMode::Normal ? 1024 : 512;
+    const auto maximum = mode == GuiPerformanceMode::Normal ? 4096 : 1024;
+    const auto quantized = juce::jlimit (minimum, maximum, ((physicalWidth + 63) / 64) * 64);
     if (quantized != pendingCaptureWidth)
     {
         pendingCaptureWidth = quantized;
@@ -679,9 +887,35 @@ void EmbeddedEmulatorDisplayComponent::publishStableCaptureWidth()
 void EmbeddedEmulatorDisplayComponent::paint (juce::Graphics& g)
 {
     auto bounds = getLocalBounds();
+    const auto snapshot = processor.getDiagnosticSnapshot();
     g.fillAll (juce::Colour::fromRGB (111, 110, 186));
     g.setColour (juce::Colour::fromRGB (70, 70, 70));
     g.drawRect (bounds);
+
+    if (snapshot.guiPerformanceMode == GuiPerformanceMode::Disabled)
+    {
+        auto area = bounds.reduced (10);
+        g.setColour (juce::Colour::fromRGB (6, 6, 8));
+        g.fillRect (area);
+        g.setColour (juce::Colour::fromRGB (235, 235, 235));
+        g.setFont (juce::FontOptions (16.0f, juce::Font::bold));
+        g.drawFittedText ("GUI Disabled\n\nAudio and MIDI remain active.",
+                          area.reduced (24), juce::Justification::centred, 4);
+        return;
+    }
+
+    if (snapshot.engineState == EmbeddedEngineState::Failed
+        && snapshot.startupDiagnostic.category != StartupError::None)
+    {
+        auto area = bounds.reduced (10);
+        g.setColour (juce::Colour::fromRGB (6, 6, 8));
+        g.fillRect (area);
+        g.setColour (juce::Colour::fromRGB (235, 235, 235));
+        g.setFont (juce::FontOptions (15.0f));
+        g.drawFittedText (formatStartupDiagnosticForDisplay (snapshot),
+                          area.reduced (24), juce::Justification::centredLeft, 28);
+        return;
+    }
 
     if (! image.isValid())
     {
@@ -690,7 +924,6 @@ void EmbeddedEmulatorDisplayComponent::paint (juce::Graphics& g)
         g.fillRect (area);
         g.setColour (juce::Colours::white);
         g.setFont (juce::FontOptions (16.0f, juce::Font::bold));
-        const auto snapshot = processor.getDiagnosticSnapshot();
         const auto text = snapshot.lastVideoError.isNotEmpty() ? snapshot.lastVideoError
             : (! snapshot.videoRenderTargetAvailable ? "Starting " + snapshot.machineName + "..."
                                                       : "Waiting for " + snapshot.machineName + " frame...");
@@ -702,7 +935,9 @@ void EmbeddedEmulatorDisplayComponent::paint (juce::Graphics& g)
     if (image.isValid())
     {
         const auto target = getImageDestination();
-        g.setImageResamplingQuality (juce::Graphics::highResamplingQuality);
+        g.setImageResamplingQuality (snapshot.guiPerformanceMode == GuiPerformanceMode::Normal
+                                        ? juce::Graphics::highResamplingQuality
+                                        : juce::Graphics::mediumResamplingQuality);
         const auto source = getSourceBounds();
         g.drawImage (image,
                      juce::roundToInt (target.getX()), juce::roundToInt (target.getY()),
@@ -711,8 +946,6 @@ void EmbeddedEmulatorDisplayComponent::paint (juce::Graphics& g)
 
         return;
     }
-
-    const auto snapshot = processor.getDiagnosticSnapshot();
     g.setColour (juce::Colour::fromRGB (210, 210, 210));
     g.setFont (juce::FontOptions (16.0f, juce::Font::bold));
 
@@ -787,6 +1020,10 @@ void EmbeddedEmulatorDisplayComponent::updateSourceBounds()
         sourceBounds = { minX, minY, maxX - minX + 1, maxY - minY + 1 };
     else
         sourceBounds = image.getBounds();
+
+    sourceBoundsFrameWidth = image.getWidth();
+    sourceBoundsFrameHeight = image.getHeight();
+    sourceBoundsEngineGeneration = displayedEngineGeneration;
 }
 
 void EmbeddedEmulatorDisplayComponent::recordMouseEvent (const juce::MouseEvent& event,
@@ -988,7 +1225,43 @@ VintageEmulatorStudioEditor::VintageEmulatorStudioEditor (VintageEmulatorStudioP
     lookAndFeel.setColour (juce::PopupMenu::highlightedTextColourId, juce::Colours::white);
 
     addAndMakeVisible (mameDisplay);
-    processor.setVideoDisplayActive (true);
+    addAndMakeVisible (optionsButton);
+    optionsButton.setColour (juce::TextButton::buttonColourId, juce::Colour::fromRGB (29, 31, 36));
+    optionsButton.setColour (juce::TextButton::buttonOnColourId, juce::Colour::fromRGB (38, 44, 50));
+    optionsButton.setColour (juce::TextButton::textColourOffId, juce::Colour::fromRGB (226, 232, 236));
+    optionsButton.setColour (juce::TextButton::textColourOnId, juce::Colours::white);
+    optionsButton.onClick = [safeThis]
+    {
+        if (safeThis != nullptr)
+            safeThis->showOptionsMenu();
+    };
+
+#if JucePlugin_Build_Standalone
+    addAndMakeVisible (volumeLabel);
+    volumeLabel.setText ("Volume", juce::dontSendNotification);
+    volumeLabel.setFont (lookAndFeel.regularFont (13.0f));
+    volumeLabel.setColour (juce::Label::textColourId, juce::Colour::fromRGB (226, 232, 236));
+    volumeLabel.setJustificationType (juce::Justification::centredRight);
+    volumeLabel.setInterceptsMouseClicks (false, false);
+
+    addAndMakeVisible (volumeSlider);
+    volumeSlider.setSliderStyle (juce::Slider::LinearHorizontal);
+    volumeSlider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
+    volumeSlider.setRange (0.0, 1.0, 0.01);
+    volumeSlider.setValue (processor.getStandaloneMasterVolume(), juce::dontSendNotification);
+    volumeSlider.setColour (juce::Slider::trackColourId, juce::Colour::fromRGB (33, 104, 123));
+    volumeSlider.setColour (juce::Slider::backgroundColourId, juce::Colour::fromRGB (45, 48, 54));
+    volumeSlider.setColour (juce::Slider::thumbColourId, juce::Colour::fromRGB (238, 240, 243));
+    volumeSlider.onValueChange = [safeThis]
+    {
+        if (safeThis != nullptr)
+            safeThis->processor.setStandaloneMasterVolume (static_cast<float> (safeThis->volumeSlider.getValue()));
+    };
+    updateStandaloneVolumePresentation();
+#endif
+
+    mameDisplay.refreshGuiPerformanceMode();
+    updateOptionsPresentation();
 
     rebuildSynthList();
 
@@ -1082,6 +1355,14 @@ void VintageEmulatorStudioEditor::paint (juce::Graphics& g)
     {
         g.setColour (juce::Colour::fromRGB (232, 232, 232));
         g.fillRect (0, headerHeight, getWidth(), secondaryHeaderBottom - headerHeight);
+    }
+
+    if (! optionsBarBounds.isEmpty())
+    {
+        g.setColour (juce::Colour::fromRGB (22, 23, 27));
+        g.fillRect (optionsBarBounds);
+        g.setColour (juce::Colour::fromRGB (59, 63, 70));
+        g.drawHorizontalLine (optionsBarBounds.getY(), 12.0f, static_cast<float> (getWidth() - 12));
     }
 
     if (logoImage.isValid())
@@ -1196,7 +1477,23 @@ void VintageEmulatorStudioEditor::resized()
 
     updateFitToScreenButtonVisibility();
 
-    mameDisplay.setBounds (12, viewportY, getWidth() - 24, getHeight() - viewportY - 12);
+    const auto displayBottom = getHeight() - optionsBarHeight - 12;
+    mameDisplay.setBounds (12, viewportY, getWidth() - 24, juce::jmax (80, displayBottom - viewportY));
+    optionsBarBounds = { 12, mameDisplay.getBottom(), getWidth() - 24, optionsBarHeight };
+    optionsButton.setBounds (optionsBarBounds.getX() + 8,
+                             optionsBarBounds.getY() + (optionsBarHeight - optionsButtonHeight) / 2,
+                             optionsButtonWidth,
+                             optionsButtonHeight);
+#if JucePlugin_Build_Standalone
+    const auto sliderHeight = 22;
+    const auto sliderY = optionsBarBounds.getY() + (optionsBarHeight - sliderHeight) / 2;
+    const auto sliderX = optionsBarBounds.getRight() - 8 - volumeSliderWidth;
+    volumeSlider.setBounds (sliderX, sliderY, volumeSliderWidth, sliderHeight);
+    volumeLabel.setBounds (sliderX - volumeControlGap - volumeLabelWidth,
+                           optionsBarBounds.getY(),
+                           volumeLabelWidth,
+                           optionsBarHeight);
+#endif
 }
 
 void VintageEmulatorStudioEditor::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
@@ -1238,6 +1535,22 @@ void VintageEmulatorStudioEditor::browseRoms()
 
         safeThis->romsChooser.reset();
     });
+}
+
+void VintageEmulatorStudioEditor::rescanRoms()
+{
+    const auto selectedDriver = processor.getSelectedMachineDriverName();
+    const auto shouldRetrySelectedMachine = processor.getEngineState() != EmbeddedEngineState::Ready;
+
+    rebuildSynthList();
+    updateControlState();
+    updateStatus();
+
+    if (shouldRetrySelectedMachine && processor.hasMachineRomByDriverName (selectedDriver))
+        processor.selectMachineByDriverName (selectedDriver);
+
+    updateStatus();
+    refreshActiveToolbarPopup();
 }
 
 void VintageEmulatorStudioEditor::browseArtworks()
@@ -1466,7 +1779,15 @@ void VintageEmulatorStudioEditor::launchToolbarPopup (ToolbarPopupType type, juc
                     if (safeThis != nullptr)
                         safeThis->browseRoms();
                 },
-                VESToolbarPopup::Action {}, juce::String {});
+                VESToolbarPopup::Action {}, juce::String {},
+                VESToolbarPopup::RecentPathProvider {},
+                VESToolbarPopup::RecentSelectionAction {},
+                std::function<bool()> {}, false,
+                [safeThis]
+                {
+                    if (safeThis != nullptr)
+                        safeThis->rescanRoms();
+                });
             break;
 
         case ToolbarPopupType::artwork:
@@ -1761,6 +2082,48 @@ void VintageEmulatorStudioEditor::saveSettledEditorSize()
     editorSizePending = false;
 }
 
+void VintageEmulatorStudioEditor::showOptionsMenu()
+{
+    const auto currentMode = processor.getGuiPerformanceMode();
+
+    juce::PopupMenu displayMenu;
+    displayMenu.addItem (optionsMenuNormalId, "Normal", true, currentMode == GuiPerformanceMode::Normal);
+    displayMenu.addItem (optionsMenuReducedId, "Reduced", true, currentMode == GuiPerformanceMode::Reduced);
+    displayMenu.addItem (optionsMenuStaticId, "Static", true, currentMode == GuiPerformanceMode::Static);
+    displayMenu.addItem (optionsMenuDisabledId, "Disabled", true, currentMode == GuiPerformanceMode::Disabled);
+
+    juce::PopupMenu optionsMenu;
+    optionsMenu.addSubMenu ("Display", displayMenu);
+
+    juce::Component::SafePointer<VintageEmulatorStudioEditor> safeThis (this);
+    optionsMenu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&optionsButton),
+                               [safeThis] (int result)
+                               {
+                                   if (safeThis != nullptr && result != 0)
+                                       safeThis->setGuiPerformanceModeFromMenu (guiPerformanceModeForMenuId (result));
+                               });
+}
+
+void VintageEmulatorStudioEditor::setGuiPerformanceModeFromMenu (GuiPerformanceMode mode)
+{
+    processor.setGuiPerformanceMode (mode);
+    mameDisplay.refreshGuiPerformanceMode();
+    updateOptionsPresentation();
+}
+
+void VintageEmulatorStudioEditor::updateOptionsPresentation()
+{
+    const auto mode = processor.getGuiPerformanceMode();
+    optionsButton.setTooltip ("Display: " + guiPerformanceModeToDisplayString (mode));
+}
+
+#if JucePlugin_Build_Standalone
+void VintageEmulatorStudioEditor::updateStandaloneVolumePresentation()
+{
+    volumeSlider.setTooltip ("Standalone master volume");
+}
+#endif
+
 void VintageEmulatorStudioEditor::rebuildSynthList()
 {
     struct ModelItem
@@ -1887,7 +2250,9 @@ void VintageEmulatorStudioEditor::updateStatus()
     juce::Colour stateColour = juce::Colour::fromRGB (205, 205, 205);
     if (snapshot.engineState == EmbeddedEngineState::Failed)
     {
-        stateText = "Failed";
+        stateText = compactStatusForStartupError (snapshot.startupDiagnostic.category);
+        if (stateText.isEmpty())
+            stateText = "Failed";
         stateColour = failedStatusColour;
     }
     else if (snapshot.engineState == EmbeddedEngineState::Stopping || snapshot.engineState == EmbeddedEngineState::Starting)

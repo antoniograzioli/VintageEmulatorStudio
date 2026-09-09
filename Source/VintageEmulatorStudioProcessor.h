@@ -22,6 +22,55 @@ enum class EmbeddedEngineState : int
     Failed
 };
 
+enum class StartupError
+{
+    None,
+    RuntimeResources,
+    PrimaryRomMissing,
+    MissingRom,
+    RomChecksumMismatch,
+    InvalidRomSet,
+    MediaLoad,
+    Configuration,
+    Nvram,
+    LuaPlugin,
+    DeviceInitialization,
+    AudioInitialization,
+    EngineFailure,
+    StartupTimeout,
+    Unknown
+};
+
+enum class GuiPerformanceMode
+{
+    Normal,
+    Reduced,
+    Static,
+    Disabled
+};
+
+struct StartupIssue
+{
+    juce::String name;
+    juce::String owner;
+    juce::String expectedCrc;
+    juce::String expectedSha1;
+    juce::String actualCrc;
+    juce::String actualSha1;
+    uint64_t expectedLength = 0;
+    uint64_t actualLength = 0;
+};
+
+struct StartupDiagnostic
+{
+    StartupError category = StartupError::None;
+    juce::String summary;
+    juce::String details;
+    juce::String recovery;
+    juce::String technicalDetails;
+    std::vector<StartupIssue> issues;
+};
+
 struct EmbeddedDiagnosticSnapshot
 {
     EmbeddedEngineState engineState = EmbeddedEngineState::Stopped;
@@ -53,6 +102,7 @@ struct EmbeddedDiagnosticSnapshot
     bool selectedMachineRomFound = false;
     juce::String nvramStatus;
     juce::String lastError;
+    StartupDiagnostic startupDiagnostic;
     bool videoInitialized = false;
     bool videoRenderTargetAvailable = false;
     int videoFrameWidth = 0;
@@ -81,6 +131,7 @@ struct EmbeddedDiagnosticSnapshot
     uint64_t videoLastFrameTimestampMs = 0;
     bool videoCaptureEnabled = false;
     bool videoEditorDisplayActive = false;
+    GuiPerformanceMode guiPerformanceMode = GuiPerformanceMode::Normal;
     uint64_t videoTargetFlags = 0;
     uint64_t videoTargetGeneration = 0;
     uint64_t videoTargetOrientation = 0;
@@ -210,6 +261,12 @@ public:
     void setSavedEditorSize (int width, int height);
     bool copyLatestVideoFrame (EmbeddedVideoFrameForEditor& snapshot);
     uint64_t getVideoEngineGeneration() const { return videoEngineGeneration.load (std::memory_order_acquire); }
+    void setGuiPerformanceMode (GuiPerformanceMode mode);
+    GuiPerformanceMode getGuiPerformanceMode() const;
+#if JucePlugin_Build_Standalone
+    void setStandaloneMasterVolume (float volume);
+    float getStandaloneMasterVolume() const;
+#endif
     void setVideoDisplayActive (bool active);
     void requestVideoCaptureWidth (int width);
     bool enqueueMouseEvent (ves::EmbeddedMouseEventType type, int x, int y);
@@ -227,11 +284,21 @@ private:
     void persistRomsPath() const;
     juce::String loadPersistedArtworkPath() const;
     void persistArtworkPath() const;
+    GuiPerformanceMode loadPersistedGuiPerformanceMode() const;
+    void persistGuiPerformanceMode() const;
+#if JucePlugin_Build_Standalone
+    float loadPersistedStandaloneMasterVolume() const;
+    void persistStandaloneMasterVolume() const;
+#endif
+    void applyGuiPerformanceModeToEngine();
+    int getEffectiveVideoCaptureWidth (int requestedWidth) const;
     juce::String getMediaStateKey (const juce::String& driverName, const juce::String& instanceName) const;
     juce::String getMediaPathForSelectedMachine() const;
     juce::String getEffectiveMameArtworkPath() const;
     void addRecentMediaPath (RecentMediaType type, const juce::File& file);
     void updateBootState();
+    void clearStartupDiagnostic();
+    void setStartupDiagnostic (StartupDiagnostic diagnostic);
     void handleReadyTransition (ves::EmbeddedEmulatorEngine& localEngine);
     void trimAudioBacklog (ves::EmbeddedEmulatorEngine& localEngine);
     void flushAudioForTransportBoundary (ves::EmbeddedEmulatorEngine& localEngine);
@@ -256,9 +323,16 @@ private:
     mutable juce::CriticalSection machineSelectionLock;
     juce::String selectedMachineDriverName { "tx81z" };
     std::atomic<int> requestedVideoCaptureWidth { 1024 };
+    std::atomic<int> guiPerformanceMode { static_cast<int> (GuiPerformanceMode::Normal) };
+#if JucePlugin_Build_Standalone
+    std::atomic<float> standaloneMasterVolume { 1.0f };
+    juce::LinearSmoothedValue<float> standaloneMasterGain { 1.0f };
+#endif
     juce::String configuredRomsPath;
     juce::String configuredArtworkPath;
     std::map<juce::String, juce::String> configuredMediaPaths;
+    mutable juce::CriticalSection startupDiagnosticLock;
+    StartupDiagnostic startupDiagnostic;
     std::atomic<uint64_t> floppyHotSwapRequestId { 0 };
     std::atomic<bool> floppyHotSwapPending { false };
     std::atomic<uint64_t> floppyHotSwapRevision { 0 };

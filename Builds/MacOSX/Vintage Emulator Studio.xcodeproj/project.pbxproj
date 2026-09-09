@@ -56,6 +56,7 @@
 		7D477AD655BBA20E8098C95C /* include_juce_data_structures.mm */ = {isa = PBXBuildFile; fileRef = 96B65FC283F9A26A17C52682; };
 		7D8EFC0AF0D14347BF48BF9A /* include_juce_audio_plugin_client_VST3.mm */ = {isa = PBXBuildFile; fileRef = 5FBDFECDF6BB36689A36E145; };
 		7FDFC2F1D85415342F39EA13 /* pluginopts.cpp */ = {isa = PBXBuildFile; fileRef = 98DFF932572FD84B52C668B2; };
+		A17D1A0D1A0D1A0D1A0D1A01 /* audit.cpp */ = {isa = PBXBuildFile; fileRef = A17D1A0D1A0D1A0D1A0D1A02; };
 		83E0AE48C1CEB362DA89E165 /* EmbeddedEmulatorEngine.cpp */ = {isa = PBXBuildFile; fileRef = 2886D36811234A24C0BD339A; };
 		8862D077EB2978C436D2733E /* include_juce_graphics_Sheenbidi.c */ = {isa = PBXBuildFile; fileRef = E74E0DB8949EB7D6E3434F57; };
 		89F4084E972E6092EC665563 /* include_juce_gui_extra.mm */ = {isa = PBXBuildFile; fileRef = 1F46806872693DD99A057FEE; };
@@ -142,6 +143,7 @@
 		96B65FC283F9A26A17C52682 /* include_juce_data_structures.mm */ /* include_juce_data_structures.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_data_structures.mm; path = ../../JuceLibraryCode/include_juce_data_structures.mm; sourceTree = SOURCE_ROOT; };
 		9865C186136BB8AF53A9D613 /* include_juce_events.mm */ /* include_juce_events.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_events.mm; path = ../../JuceLibraryCode/include_juce_events.mm; sourceTree = SOURCE_ROOT; };
 		98DFF932572FD84B52C668B2 /* pluginopts.cpp */ /* pluginopts.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = pluginopts.cpp; path = "../../validation/mame-0.289-patched/src/frontend/mame/pluginopts.cpp"; sourceTree = SOURCE_ROOT; };
+		A17D1A0D1A0D1A0D1A0D1A02 /* audit.cpp */ /* audit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = audit.cpp; path = "../../validation/mame-0.289-patched/src/frontend/mame/audit.cpp"; sourceTree = SOURCE_ROOT; };
 		9CA4BBAE7C8D1E5BDB8BD7F6 /* QuartzCore.framework */ /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9E20E53C70D29122AE65DB0D /* VintageEmulatorStudioProcessor.cpp */ /* VintageEmulatorStudioProcessor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = VintageEmulatorStudioProcessor.cpp; path = ../../Source/VintageEmulatorStudioProcessor.cpp; sourceTree = SOURCE_ROOT; };
 		A02726EAB569B92890EA3866 /* Accelerate.framework */ /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -398,6 +400,7 @@
 				DC6C2BF5CA4A0C1D79C0B8B8,
 				2886D36811234A24C0BD339A,
 				7289A3AF70402CDB295855BA,
+				A17D1A0D1A0D1A0D1A0D1A02,
 				E6DEF50E59BC73A25684DE15,
 				EDC00AF854791C6129E6F0EF,
 				0CDB29EAA53B82012926B53A,
@@ -840,6 +843,7 @@
 				14F459F9EDE61C8CF6AFAC1E,
 				D16635D7D8FDCAECC24F47FC,
 				83E0AE48C1CEB362DA89E165,
+				A17D1A0D1A0D1A0D1A0D1A01,
 				BB42175EE34E94E041CF739F,
 				E036138B2BE7BD140940146B,
 				7FDFC2F1D85415342F39EA13,

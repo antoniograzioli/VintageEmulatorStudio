@@ -20,6 +20,7 @@ $standaloneProject = Join-Path $buildRoot 'Vintage Emulator Studio_StandalonePlu
 $vst3Project = Join-Path $buildRoot 'Vintage Emulator Studio_VST3.vcxproj'
 $helperProject = Join-Path $buildRoot 'Vintage Emulator Studio_VST3ManifestHelper.vcxproj'
 $mameRoot = Join-Path $projectRoot 'validation\mame-0.289-patched'
+$embeddedRuntimeSource = Join-Path $projectRoot 'Source\EmbeddedStandaloneRuntimeResources.cpp'
 $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 
 function Assert-File([string] $Path, [string] $Description) {
@@ -147,6 +148,44 @@ function Set-SharedCodeFlacOverride {
     Write-TextIfChanged $sharedProject ([regex]::Replace($text, $pattern, $replacement))
 }
 
+function Add-StandaloneRuntimeResourcesSource {
+    $relativeSource = '..\..\Source\EmbeddedStandaloneRuntimeResources.cpp'
+
+    $projectText = [System.IO.File]::ReadAllText($standaloneProject)
+    if (-not $projectText.Contains($relativeSource)) {
+        $needle = '    <ClCompile Include="..\..\platform\windows\JuceLibraryCode\include_juce_audio_plugin_client_Standalone.cpp"/>'
+        if (-not $projectText.Contains($needle)) {
+            throw "Could not locate Standalone JUCE client source item in $standaloneProject"
+        }
+        $replacement = '    <ClCompile Include="' + $relativeSource + '"/>' + "`r`n" + $needle
+        Write-TextIfChanged $standaloneProject ($projectText.Replace($needle, $replacement))
+    } else {
+        Write-Host "Already integrated: $standaloneProject"
+    }
+
+    $filtersPath = $standaloneProject + '.filters'
+    $filtersText = [System.IO.File]::ReadAllText($filtersPath)
+    if (-not $filtersText.Contains($relativeSource)) {
+        $needle = @'
+    <ClCompile Include="..\..\platform\windows\JuceLibraryCode\include_juce_audio_plugin_client_Standalone.cpp">
+      <Filter>JUCE Library Code</Filter>
+    </ClCompile>
+'@
+        if (-not $filtersText.Contains($needle)) {
+            throw "Could not locate Standalone JUCE client filter item in $filtersPath"
+        }
+        $replacement = @"
+    <ClCompile Include="$relativeSource">
+      <Filter>JUCE Library Code</Filter>
+    </ClCompile>
+$needle
+"@
+        Write-TextIfChanged $filtersPath ($filtersText.Replace($needle, $replacement))
+    } else {
+        Write-Host "Already integrated: $filtersPath"
+    }
+}
+
 function Apply-ProjucerIntegration {
     Normalize-JucerJucePaths
     Assert-File $juceRootProps 'JUCE root property sheet'
@@ -161,6 +200,7 @@ function Apply-ProjucerIntegration {
     }
 
     Set-SharedCodeFlacOverride
+    Add-StandaloneRuntimeResourcesSource
     foreach ($project in @($sharedProject, $standaloneProject, $vst3Project)) {
         Add-IntegrationImport $project
     }
@@ -197,6 +237,25 @@ function Apply-ProjucerIntegration {
     }
 
     Write-Host 'Projucer integration verified for Shared Code, Standalone, and VST3.'
+}
+
+function Find-Python {
+    foreach ($candidate in @('python3', 'python')) {
+        $command = Get-Command $candidate -ErrorAction SilentlyContinue
+        if ($command) { return $command.Source }
+    }
+    throw 'Python 3 is required to generate embedded standalone runtime resources.'
+}
+
+function Update-StandaloneRuntimeResources {
+    $python = Find-Python
+    $generator = Join-Path $projectRoot 'tools\generate-standalone-runtime-resources.py'
+    Assert-File $generator 'standalone runtime resource generator'
+    & $python $generator --root $projectRoot --output $embeddedRuntimeSource
+    if ($LASTEXITCODE -ne 0) {
+        throw "Standalone runtime resource generation failed ($LASTEXITCODE)."
+    }
+    Assert-File $embeddedRuntimeSource 'embedded standalone runtime resources source'
 }
 
 function Find-MSBuild {
@@ -425,7 +484,6 @@ function Stage-And-Validate([string] $MSBuild) {
     $distVst3 = Join-Path $distRoot 'VST3'
     New-Item -ItemType Directory -Path $distStandalone, $distVst3 | Out-Null
     Copy-Item -LiteralPath $standaloneBinary -Destination $distStandalone
-    Copy-Item -LiteralPath (Join-Path $standaloneOutput 'Resources') -Destination $distStandalone -Recurse
     Copy-Item -LiteralPath $vst3Output -Destination $distVst3 -Recurse
 
     $stagedStandaloneBinary = Join-Path $distStandalone 'Vintage Emulator Studio.exe'
@@ -433,7 +491,7 @@ function Stage-And-Validate([string] $MSBuild) {
     $stagedVst3Binary = Join-Path $stagedVst3Root 'Contents\x86_64-win\Vintage Emulator Studio.vst3'
     $stagedModuleInfo = Join-Path $stagedVst3Root 'Contents\Resources\moduleinfo.json'
     $nonReleaseArtwork = @(
-        Get-ChildItem -LiteralPath (Join-Path $distStandalone 'Resources\artwork'), (Join-Path $stagedVst3Root 'Contents\Resources\artwork') -Recurse -File |
+        Get-ChildItem -LiteralPath (Join-Path $stagedVst3Root 'Contents\Resources\artwork') -Recurse -File |
             Where-Object { -not (Test-ReleaseFile $_) }
     )
     foreach ($file in $nonReleaseArtwork) { Remove-Item -LiteralPath $file.FullName -Force }
@@ -443,10 +501,11 @@ function Stage-And-Validate([string] $MSBuild) {
         if ((Get-PeMachine $binary) -ne 0x8664) { throw "Not PE x64: $binary" }
     }
     Assert-JsonFile $stagedModuleInfo 'staged VST3 moduleinfo.json'
+    if (Test-Path -LiteralPath (Join-Path $distStandalone 'Resources')) {
+        throw 'Standalone Dist must be self-contained and must not include a sibling Resources directory.'
+    }
 
-    Assert-TreesEqual (Join-Path $standaloneOutput 'Resources') (Join-Path $distStandalone 'Resources') 'Standalone release resources' $true
     Assert-TreesEqual $vst3Output $stagedVst3Root 'VST3 release bundle' $true
-    Assert-ReleaseResources (Join-Path $distStandalone 'Resources') 'Standalone release'
     Assert-ReleaseResources (Join-Path $stagedVst3Root 'Contents\Resources') 'VST3 release'
 
     $drivers = Get-MachineDrivers
@@ -454,16 +513,20 @@ function Stage-And-Validate([string] $MSBuild) {
         $missing = @(Test-BinaryContains $binary $drivers)
         if ($missing.Count -ne 0) { throw "Machine names absent from $(Split-Path -Leaf $binary): $($missing -join ', ')" }
     }
+    $sourceText = [System.IO.File]::ReadAllText($embeddedRuntimeSource)
+    $hashMatch = [regex]::Match($sourceText, '[0-9a-f]{64}')
+    if (-not $hashMatch.Success) { throw 'Could not locate embedded runtime payload hash in generated source.' }
+    $missingEmbeddedRuntime = @(Test-BinaryContains $stagedStandaloneBinary @('plugins/boot.lua', 'plugins/layout/init.lua', $hashMatch.Value))
+    if ($missingEmbeddedRuntime.Count -ne 0) {
+        throw "Embedded standalone runtime resources absent from staged Standalone binary: $($missingEmbeddedRuntime -join ', ')"
+    }
     Write-Host 'All 45 machine profiles are registered in source and present in both staged binaries.'
 
     $dumpbin = Get-Dumpbin $MSBuild
     Assert-Dependencies $dumpbin $stagedStandaloneBinary
     Assert-Dependencies $dumpbin $stagedVst3Binary
 
-    foreach ($resourceRoot in @(
-        (Join-Path $distStandalone 'Resources'),
-        (Join-Path $stagedVst3Root 'Contents\Resources')
-    )) {
+    foreach ($resourceRoot in @((Join-Path $stagedVst3Root 'Contents\Resources'))) {
         foreach ($kind in @('plugins', 'artwork')) {
             $files = @(Get-ChildItem -LiteralPath (Join-Path $resourceRoot $kind) -Recurse -File)
             Write-Host "$resourceRoot\$kind : $($files.Count) files, $(($files | Measure-Object Length -Sum).Sum) bytes"
@@ -491,6 +554,7 @@ if ($Regenerate) {
 Apply-ProjucerIntegration
 if ($IntegrateOnly) { return }
 
+Update-StandaloneRuntimeResources
 Assert-MameArtifacts
 $msbuild = Find-MSBuild
 Invoke-Build $msbuild $sharedProject 'x64' $juceRootResolved
