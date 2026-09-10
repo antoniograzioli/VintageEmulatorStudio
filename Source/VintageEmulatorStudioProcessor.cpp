@@ -52,7 +52,7 @@ ves::standalone_resources::Payload loadWindowsStandaloneRuntimeResourcesPayload(
 
     const auto resource = FindResourceW (module,
                                          MAKEINTRESOURCEW (VES_STANDALONE_RUNTIME_RESOURCES_ZIP_ID),
-                                         RT_RCDATA);
+                                         MAKEINTRESOURCEW (10));
     if (resource == nullptr)
         return {};
 
@@ -927,7 +927,7 @@ void VintageEmulatorStudioProcessor::prepareToPlay (double sampleRate, int sampl
     // rate always matches the device-selected rate, while preserving driver and
     // ROM-path state in this processor.
     const auto newSampleRate = sampleRate > 0.0 ? sampleRate : 0.0;
-    const auto newBlockSize = std::max (samplesPerBlock, 0);
+    const auto newBlockSize = juce::jmax (samplesPerBlock, 0);
     const auto configurationChanged = currentSampleRate != newSampleRate || maxBlockSize != newBlockSize;
     currentSampleRate = newSampleRate;
     maxBlockSize = newBlockSize;
@@ -979,7 +979,7 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
 
     updateBootState();
     localEngine->diagnostics().juce_process_block_count.fetch_add (1, std::memory_order_relaxed);
-    localEngine->diagnostics().juce_block_size.store (static_cast<uint64_t> (std::max (buffer.getNumSamples(), 0)), std::memory_order_relaxed);
+    localEngine->diagnostics().juce_block_size.store (static_cast<uint64_t> (juce::jmax (buffer.getNumSamples(), 0)), std::memory_order_relaxed);
 
     const bool ready = state.load (std::memory_order_relaxed) == static_cast<int> (EmbeddedEngineState::Ready);
     if (ready)
@@ -1032,7 +1032,7 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     int offset = 0;
     while (offset < samples)
     {
-        const auto request = static_cast<std::size_t> (std::min<int> (samples - offset, static_cast<int> (audioScratch.size())));
+        const auto request = static_cast<std::size_t> (juce::jmin (samples - offset, static_cast<int> (audioScratch.size())));
         const auto read = localEngine->readAudioFrames (audioScratch.data(), request);
         audioFramesReadByPlugin.fetch_add (read, std::memory_order_relaxed);
 
