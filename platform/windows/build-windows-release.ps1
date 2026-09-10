@@ -20,7 +20,9 @@ $standaloneProject = Join-Path $buildRoot 'Vintage Emulator Studio_StandalonePlu
 $vst3Project = Join-Path $buildRoot 'Vintage Emulator Studio_VST3.vcxproj'
 $helperProject = Join-Path $buildRoot 'Vintage Emulator Studio_VST3ManifestHelper.vcxproj'
 $mameRoot = Join-Path $projectRoot 'validation\mame-0.289-patched'
-$embeddedRuntimeSource = Join-Path $projectRoot 'Source\EmbeddedStandaloneRuntimeResources.cpp'
+$embeddedRuntimeWindowsHeader = Join-Path $projectRoot 'Source\EmbeddedStandaloneRuntimeResourcesWindows.h'
+$standaloneRuntimeResourceRc = Join-Path $buildRoot 'StandaloneRuntimeResources.rc'
+$standaloneRuntimeResourceZip = Join-Path $buildRoot 'StandaloneRuntimeResources.zip'
 $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 
 function Assert-File([string] $Path, [string] $Description) {
@@ -148,42 +150,36 @@ function Set-SharedCodeFlacOverride {
     Write-TextIfChanged $sharedProject ([regex]::Replace($text, $pattern, $replacement))
 }
 
-function Add-StandaloneRuntimeResourcesSource {
+function Set-StandaloneRuntimeResourcesResource {
     $relativeSource = '..\..\Source\EmbeddedStandaloneRuntimeResources.cpp'
+    $resourcesRc = Join-Path $buildRoot 'resources.rc'
+    $resourceInclude = '#include "StandaloneRuntimeResources.rc"'
 
     $projectText = [System.IO.File]::ReadAllText($standaloneProject)
-    if (-not $projectText.Contains($relativeSource)) {
-        $needle = '    <ClCompile Include="..\..\platform\windows\JuceLibraryCode\include_juce_audio_plugin_client_Standalone.cpp"/>'
-        if (-not $projectText.Contains($needle)) {
-            throw "Could not locate Standalone JUCE client source item in $standaloneProject"
-        }
-        $replacement = '    <ClCompile Include="' + $relativeSource + '"/>' + "`r`n" + $needle
-        Write-TextIfChanged $standaloneProject ($projectText.Replace($needle, $replacement))
-    } else {
-        Write-Host "Already integrated: $standaloneProject"
-    }
+    $projectText = [regex]::Replace(
+        $projectText,
+        '(?m)^\s*<ClCompile Include="' + [regex]::Escape($relativeSource) + '"\s*/>\r?\n?',
+        '')
+    Write-TextIfChanged $standaloneProject $projectText
 
     $filtersPath = $standaloneProject + '.filters'
     $filtersText = [System.IO.File]::ReadAllText($filtersPath)
-    if (-not $filtersText.Contains($relativeSource)) {
-        $needle = @'
-    <ClCompile Include="..\..\platform\windows\JuceLibraryCode\include_juce_audio_plugin_client_Standalone.cpp">
-      <Filter>JUCE Library Code</Filter>
-    </ClCompile>
-'@
-        if (-not $filtersText.Contains($needle)) {
-            throw "Could not locate Standalone JUCE client filter item in $filtersPath"
+    $filtersText = [regex]::Replace(
+        $filtersText,
+        '(?s)\s*<ClCompile Include="' + [regex]::Escape($relativeSource) + '">\s*<Filter>[^<]+</Filter>\s*</ClCompile>\r?\n?',
+        '')
+    Write-TextIfChanged $filtersPath $filtersText
+
+    $resourcesText = [System.IO.File]::ReadAllText($resourcesRc)
+    if (-not $resourcesText.Contains($resourceInclude)) {
+        $needle = '#include <windows.h>'
+        if (-not $resourcesText.Contains($needle)) {
+            throw "Could not locate windows.h include in $resourcesRc"
         }
-        $replacement = @"
-    <ClCompile Include="$relativeSource">
-      <Filter>JUCE Library Code</Filter>
-    </ClCompile>
-$needle
-"@
-        Write-TextIfChanged $filtersPath ($filtersText.Replace($needle, $replacement))
-    } else {
-        Write-Host "Already integrated: $filtersPath"
+        $replacement = $needle + "`r`n`r`n" + '#if JucePlugin_Build_Standalone' + "`r`n #include `"StandaloneRuntimeResources.rc`"" + "`r`n#endif"
+        $resourcesText = $resourcesText.Replace($needle, $replacement)
     }
+    Write-TextIfChanged $resourcesRc $resourcesText
 }
 
 function Apply-ProjucerIntegration {
@@ -200,7 +196,7 @@ function Apply-ProjucerIntegration {
     }
 
     Set-SharedCodeFlacOverride
-    Add-StandaloneRuntimeResourcesSource
+    Set-StandaloneRuntimeResourcesResource
     foreach ($project in @($sharedProject, $standaloneProject, $vst3Project)) {
         Add-IntegrationImport $project
     }
@@ -251,11 +247,13 @@ function Update-StandaloneRuntimeResources {
     $python = Find-Python
     $generator = Join-Path $projectRoot 'tools\generate-standalone-runtime-resources.py'
     Assert-File $generator 'standalone runtime resource generator'
-    & $python $generator --root $projectRoot --output $embeddedRuntimeSource
+    & $python $generator --root $projectRoot --windows-resource-dir $buildRoot --windows-header $embeddedRuntimeWindowsHeader
     if ($LASTEXITCODE -ne 0) {
         throw "Standalone runtime resource generation failed ($LASTEXITCODE)."
     }
-    Assert-File $embeddedRuntimeSource 'embedded standalone runtime resources source'
+    Assert-File $embeddedRuntimeWindowsHeader 'embedded standalone runtime resources Windows metadata header'
+    Assert-File $standaloneRuntimeResourceRc 'embedded standalone runtime resources Windows resource script'
+    Assert-File $standaloneRuntimeResourceZip 'embedded standalone runtime resources ZIP'
 }
 
 function Find-MSBuild {
@@ -513,9 +511,9 @@ function Stage-And-Validate([string] $MSBuild) {
         $missing = @(Test-BinaryContains $binary $drivers)
         if ($missing.Count -ne 0) { throw "Machine names absent from $(Split-Path -Leaf $binary): $($missing -join ', ')" }
     }
-    $sourceText = [System.IO.File]::ReadAllText($embeddedRuntimeSource)
-    $hashMatch = [regex]::Match($sourceText, '[0-9a-f]{64}')
-    if (-not $hashMatch.Success) { throw 'Could not locate embedded runtime payload hash in generated source.' }
+    $metadataText = [System.IO.File]::ReadAllText($embeddedRuntimeWindowsHeader)
+    $hashMatch = [regex]::Match($metadataText, '[0-9a-f]{64}')
+    if (-not $hashMatch.Success) { throw 'Could not locate embedded runtime payload hash in generated Windows metadata header.' }
     $missingEmbeddedRuntime = @(Test-BinaryContains $stagedStandaloneBinary @('plugins/boot.lua', 'plugins/layout/init.lua', $hashMatch.Value))
     if ($missingEmbeddedRuntime.Count -ne 0) {
         throw "Embedded standalone runtime resources absent from staged Standalone binary: $($missingEmbeddedRuntime -join ', ')"

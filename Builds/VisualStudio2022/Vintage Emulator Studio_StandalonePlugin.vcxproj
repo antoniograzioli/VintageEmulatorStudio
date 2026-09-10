@@ -158,7 +158,6 @@
     <ClCompile Include="$(VesJuceRoot)\modules\juce_audio_plugin_client\juce_audio_plugin_client_Standalone.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\Source\EmbeddedStandaloneRuntimeResources.cpp"/>
     <ClCompile Include="..\..\platform\windows\JuceLibraryCode\include_juce_audio_plugin_client_Standalone.cpp"/>
   </ItemGroup>
   <ItemGroup>

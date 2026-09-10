@@ -21,6 +21,9 @@
 
 # Generated standalone runtime payload source
 /Source/EmbeddedStandaloneRuntimeResources.cpp
+/Source/EmbeddedStandaloneRuntimeResourcesWindows.h
+/Builds/VisualStudio2022/StandaloneRuntimeResources.rc
+/Builds/VisualStudio2022/StandaloneRuntimeResources.zip
 
 # Distribution products
 /Dist/

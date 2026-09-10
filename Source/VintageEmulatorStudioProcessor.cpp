@@ -11,6 +11,14 @@
 #include <cmath>
 #include <utility>
 
+#if JUCE_WINDOWS
+ #ifndef WIN32_LEAN_AND_MEAN
+  #define WIN32_LEAN_AND_MEAN
+ #endif
+ #include <windows.h>
+ #include "EmbeddedStandaloneRuntimeResourcesWindows.h"
+#endif
+
 namespace
 {
 constexpr auto romDirectoryProperty = "romDirectory";
@@ -34,6 +42,39 @@ constexpr auto standaloneMasterVolumePreferenceKey = "standalone.masterVolume";
 #endif
 
 ves::standalone_resources::Payload standaloneRuntimeResourcesPayload;
+
+#if JUCE_WINDOWS
+ves::standalone_resources::Payload loadWindowsStandaloneRuntimeResourcesPayload()
+{
+    const auto module = GetModuleHandleW (nullptr);
+    if (module == nullptr)
+        return {};
+
+    const auto resource = FindResourceW (module,
+                                         MAKEINTRESOURCEW (VES_STANDALONE_RUNTIME_RESOURCES_ZIP_ID),
+                                         RT_RCDATA);
+    if (resource == nullptr)
+        return {};
+
+    const auto resourceSize = SizeofResource (module, resource);
+    if (resourceSize == 0 || static_cast<unsigned long long> (resourceSize) != VES_STANDALONE_RUNTIME_RESOURCES_ZIP_SIZE)
+        return {};
+
+    const auto loadedResource = LoadResource (module, resource);
+    if (loadedResource == nullptr)
+        return {};
+
+    const auto data = LockResource (loadedResource);
+    if (data == nullptr)
+        return {};
+
+    return {
+        static_cast<const unsigned char*> (data),
+        static_cast<std::size_t> (resourceSize),
+        VES_STANDALONE_RUNTIME_RESOURCES_SHA256
+    };
+}
+#endif
 
 const char* guiPerformanceModeToString (GuiPerformanceMode mode)
 {
@@ -848,6 +889,12 @@ void registerPayload (Payload payload)
 
 Payload getPayload()
 {
+#if JUCE_WINDOWS
+    static const auto windowsResourcePayload = loadWindowsStandaloneRuntimeResourcesPayload();
+    if (windowsResourcePayload.zipData != nullptr)
+        return windowsResourcePayload;
+#endif
+
     return standaloneRuntimeResourcesPayload;
 }
 }

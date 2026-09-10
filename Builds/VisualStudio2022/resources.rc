@@ -8,6 +8,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#if JucePlugin_Build_Standalone
+ #include "StandaloneRuntimeResources.rc"
+#endif
+
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION  0,9,289,0
 PRODUCTVERSION  0,9,289,0
