@@ -32,6 +32,9 @@ constexpr int statusGroupRightMargin = 18;
 constexpr int optionsBarHeight = 30;
 constexpr int optionsButtonWidth = 82;
 constexpr int optionsButtonHeight = 22;
+constexpr int versionLabelWidth = 92;
+constexpr int versionLabelGap = 10;
+constexpr int vesReleaseRevision = 1;
 #if JucePlugin_Build_Standalone
 constexpr int volumeLabelWidth = 52;
 constexpr int volumeSliderWidth = 128;
@@ -71,6 +74,11 @@ GuiPerformanceMode guiPerformanceModeForMenuId (int menuId)
         case optionsMenuDisabledId: return GuiPerformanceMode::Disabled;
         default:                    return GuiPerformanceMode::Normal;
     }
+}
+
+juce::String vesDisplayVersion()
+{
+    return "v. " + juce::String (JucePlugin_VersionString) + "." + juce::String (vesReleaseRevision);
 }
 
 juce::String compactStatusForStartupError (StartupError category)
@@ -1236,6 +1244,13 @@ VintageEmulatorStudioEditor::VintageEmulatorStudioEditor (VintageEmulatorStudioP
             safeThis->showOptionsMenu();
     };
 
+    addAndMakeVisible (versionLabel);
+    versionLabel.setText (vesDisplayVersion(), juce::dontSendNotification);
+    versionLabel.setFont (lookAndFeel.regularFont (12.0f));
+    versionLabel.setColour (juce::Label::textColourId, juce::Colour::fromRGB (142, 150, 158));
+    versionLabel.setJustificationType (juce::Justification::centredLeft);
+    versionLabel.setInterceptsMouseClicks (false, false);
+
 #if JucePlugin_Build_Standalone
     addAndMakeVisible (volumeLabel);
     volumeLabel.setText ("Volume", juce::dontSendNotification);
@@ -1484,6 +1499,10 @@ void VintageEmulatorStudioEditor::resized()
                              optionsBarBounds.getY() + (optionsBarHeight - optionsButtonHeight) / 2,
                              optionsButtonWidth,
                              optionsButtonHeight);
+    versionLabel.setBounds (optionsButton.getRight() + versionLabelGap,
+                            optionsBarBounds.getY(),
+                            versionLabelWidth,
+                            optionsBarHeight);
 #if JucePlugin_Build_Standalone
     const auto sliderHeight = 22;
     const auto sliderY = optionsBarBounds.getY() + (optionsBarHeight - sliderHeight) / 2;

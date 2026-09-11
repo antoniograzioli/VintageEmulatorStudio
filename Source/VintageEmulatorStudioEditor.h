@@ -153,6 +153,7 @@ private:
     EmbeddedMissingRomLookAndFeel lookAndFeel;
     EmbeddedEmulatorDisplayComponent mameDisplay;
     juce::TextButton optionsButton { "Settings" };
+    juce::Label versionLabel;
 #if JucePlugin_Build_Standalone
     juce::Label volumeLabel;
     juce::Slider volumeSlider;
