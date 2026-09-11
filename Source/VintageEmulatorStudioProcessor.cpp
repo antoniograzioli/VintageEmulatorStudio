@@ -966,7 +966,8 @@ bool VintageEmulatorStudioProcessor::isSupportedMidiForPrototype (const juce::Mi
     return message.isNoteOnOrOff()
         || message.isController()
         || message.isProgramChange()
-        || message.isPitchWheel();
+        || message.isPitchWheel()
+        || message.isSysEx();
 }
 
 void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
