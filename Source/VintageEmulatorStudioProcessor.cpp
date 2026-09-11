@@ -961,15 +961,6 @@ bool VintageEmulatorStudioProcessor::isBusesLayoutSupported (const BusesLayout& 
         || layouts.getMainOutputChannelSet() == juce::AudioChannelSet::mono();
 }
 
-bool VintageEmulatorStudioProcessor::isSupportedMidiForPrototype (const juce::MidiMessage& message)
-{
-    return message.isNoteOnOrOff()
-        || message.isController()
-        || message.isProgramChange()
-        || message.isPitchWheel()
-        || message.isSysEx();
-}
-
 void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     buffer.clear();
@@ -999,7 +990,8 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     for (const auto metadata : midiMessages)
     {
         const auto message = metadata.getMessage();
-        if (! isSupportedMidiForPrototype (message))
+        const auto size = message.getRawDataSize();
+        if (size <= 0)
             continue;
 
         const auto midiNow = nowMs();
@@ -1014,13 +1006,9 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
             continue;
         }
 
-        const auto size = message.getRawDataSize();
-        if (size > 0)
-        {
-            lastMidiSentToEngineMs.store (midiNow, std::memory_order_relaxed);
-            waitingForMidiAudioOnset.store (true, std::memory_order_relaxed);
-            localEngine->sendMidiBytes (message.getRawData(), static_cast<std::size_t> (size));
-        }
+        lastMidiSentToEngineMs.store (midiNow, std::memory_order_relaxed);
+        waitingForMidiAudioOnset.store (true, std::memory_order_relaxed);
+        localEngine->sendMidiBytes (message.getRawData(), static_cast<std::size_t> (size));
     }
 
     if (! ready)

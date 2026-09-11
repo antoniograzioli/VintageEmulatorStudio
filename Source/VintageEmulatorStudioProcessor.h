@@ -303,7 +303,6 @@ private:
     void trimAudioBacklog (ves::EmbeddedEmulatorEngine& localEngine);
     void flushAudioForTransportBoundary (ves::EmbeddedEmulatorEngine& localEngine);
     void timerCallback() override;
-    static bool isSupportedMidiForPrototype (const juce::MidiMessage& message);
 
     std::shared_ptr<ves::EmbeddedEmulatorEngine> engine;
     std::atomic<uint64_t> videoEngineGeneration { 0 };
