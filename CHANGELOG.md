@@ -26,3 +26,8 @@
 
 ### KNOWN LIMITATIONS
 - Offline / faster-than-realtime bounce is not currently supported reliably. Use realtime bounce/export when rendering VES tracks.
+
+
+## VES 0.9.289
+
+First public Beta release
