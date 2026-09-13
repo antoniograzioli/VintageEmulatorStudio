@@ -16,6 +16,7 @@ Get the latest VES builds and documentation from Autodafe.net.
 
 [![Download VES](https://img.shields.io/badge/Download-VES-blue?style=for-the-badge)](https://www.autodafe.net/vintage-emulator-studio.html)
 [![User Guide](https://img.shields.io/badge/User%20Guide-PDF-red?style=for-the-badge)](https://www.autodafe.net/media/com_eshop/attachments/Vintage_Emulator_Studio_User_Guide.pdf)
+[![Changelog](https://img.shields.io/badge/Changelog-VES%20Updates-green?style=for-the-badge)](CHANGELOG.md)
 
 ## Status
 
