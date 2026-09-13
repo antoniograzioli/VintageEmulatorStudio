@@ -20,7 +20,7 @@ Get the latest VES builds and documentation from Autodafe.net.
 
 ## Status
 
-VES 0.9.289 is a source baseline for four validated build configurations:
+VES 0.9.289.1 is a source baseline for four validated build configurations:
 
 - macOS Apple Silicon (`arm64`)
 - macOS Intel (`x86_64`)
