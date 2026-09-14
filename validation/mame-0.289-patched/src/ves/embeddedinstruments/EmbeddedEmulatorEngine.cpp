@@ -1523,8 +1523,8 @@ struct EmbeddedEmulatorEngine::Impl
 	{
 		const auto safe_rate = static_cast<std::uint64_t>(sample_rate > 0.0 ? std::llround(sample_rate) : settings.sample_rate);
 		const auto safe_block = static_cast<std::uint64_t>(std::max(block_size, 0));
-		const auto target = std::max<std::uint64_t>(512, safe_block);
-		const auto max_tolerated = std::max<std::uint64_t>(2048, safe_block * 4);
+		const auto target = std::max<std::uint64_t>(1024, safe_block * 2);
+		const auto max_tolerated = std::max<std::uint64_t>(1536, target + safe_block);
 		diag.juce_sample_rate.store(safe_rate, std::memory_order_relaxed);
 		diag.juce_block_size.store(safe_block, std::memory_order_relaxed);
 		diag.audio_target_queue_frames.store(target, std::memory_order_relaxed);

@@ -923,21 +923,28 @@ VintageEmulatorStudioProcessor::~VintageEmulatorStudioProcessor()
 void VintageEmulatorStudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // AudioProcessorPlayer calls this only after the active JUCE device is open.
-    // Recreate the embedded run on every device restart so MAME's fixed internal
-    // rate always matches the device-selected rate, while preserving driver and
-    // ROM-path state in this processor.
+    // Recreate the embedded run only when the device sample rate changes so
+    // MAME's fixed internal rate matches the device-selected rate.  Buffer-size
+    // changes only affect host-side queue tuning and diagnostics.
     const auto newSampleRate = sampleRate > 0.0 ? sampleRate : 0.0;
     const auto newBlockSize = juce::jmax (samplesPerBlock, 0);
-    const auto configurationChanged = currentSampleRate != newSampleRate || maxBlockSize != newBlockSize;
+    const auto sampleRateChanged = currentSampleRate != newSampleRate;
+    const auto engineExists = std::atomic_load (&engine) != nullptr;
+    const auto mayReuseExistingEngine = engineExists && ! sampleRateChanged;
+
     currentSampleRate = newSampleRate;
     maxBlockSize = newBlockSize;
 
-    if (configurationChanged && std::atomic_load (&engine) != nullptr)
+    if (sampleRateChanged && engineExists)
         stopEngine();
 
     startEngineIfNeeded (currentSampleRate);
     if (auto localEngine = std::atomic_load (&engine))
+    {
         localEngine->noteHostAudioConfiguration (currentSampleRate, maxBlockSize);
+        if (mayReuseExistingEngine)
+            localEngine->discardQueuedAudio();
+    }
 
 #if JucePlugin_Build_Standalone
     standaloneMasterGain.reset (currentSampleRate > 0.0 ? currentSampleRate : 44100.0, 0.02);
@@ -947,12 +954,13 @@ void VintageEmulatorStudioProcessor::prepareToPlay (double sampleRate, int sampl
 
 void VintageEmulatorStudioProcessor::releaseResources()
 {
-    // JUCE has stopped/suspended its callback before this is invoked.  Drop the
-    // producer and its queues rather than allowing stale samples to survive a
-    // device, rate, or buffer-size change.
-    currentSampleRate = 0.0;
+    // JUCE has stopped/suspended its callback before this is invoked.  Keep the
+    // emulated machine alive and remember the last valid sample rate so a
+    // buffer-size-only device reconfiguration can resume without rebooting.
+    if (auto localEngine = std::atomic_load (&engine))
+        localEngine->discardQueuedAudio();
+
     maxBlockSize = 0;
-    stopEngine();
 }
 
 bool VintageEmulatorStudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -1680,7 +1688,11 @@ void VintageEmulatorStudioProcessor::trimAudioBacklog (ves::EmbeddedEmulatorEngi
     const auto target = static_cast<std::size_t> (diag.audio_target_queue_frames.load (std::memory_order_relaxed));
 
     if (queued > maxTolerated && queued > target)
-        localEngine.discardOldestAudioFrames (queued - target);
+    {
+        const auto trimmed = localEngine.discardOldestAudioFrames (queued - target);
+        if (trimmed != 0)
+            diag.audio_trimmed_frames.fetch_add (static_cast<uint64_t> (trimmed), std::memory_order_relaxed);
+    }
 }
 
 void VintageEmulatorStudioProcessor::flushAudioForTransportBoundary (ves::EmbeddedEmulatorEngine& localEngine)
@@ -1779,6 +1791,9 @@ EmbeddedDiagnosticSnapshot VintageEmulatorStudioProcessor::getDiagnosticSnapshot
         snapshot.queuedAudioLatencyMs = static_cast<double> (diag.audio_queued_latency_us.load (std::memory_order_relaxed)) / 1000.0;
         snapshot.maxQueuedAudioFrames = diag.audio_max_queued_frames.load (std::memory_order_relaxed);
         snapshot.maxQueuedAudioLatencyMs = static_cast<double> (diag.audio_max_queued_latency_us.load (std::memory_order_relaxed)) / 1000.0;
+        snapshot.targetQueuedAudioFrames = diag.audio_target_queue_frames.load (std::memory_order_relaxed);
+        snapshot.maxToleratedQueuedAudioFrames = diag.audio_max_tolerated_queue_frames.load (std::memory_order_relaxed);
+        snapshot.trimmedAudioFrames = diag.audio_trimmed_frames.load (std::memory_order_relaxed);
         snapshot.midiBytesQueued = diag.midi_bytes_queued.load (std::memory_order_relaxed);
         snapshot.midiBytesConsumed = diag.midi_bytes_consumed.load (std::memory_order_relaxed);
         snapshot.audioFramesProduced = diag.audio_frames_written.load (std::memory_order_relaxed);

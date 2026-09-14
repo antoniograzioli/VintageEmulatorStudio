@@ -166,8 +166,9 @@ struct EngineDiagnostics
 	std::atomic<std::int64_t> audio_producer_consumer_frame_difference { 0 };
 	std::atomic<std::uint64_t> audio_queued_latency_us { 0 };
 	std::atomic<std::uint64_t> audio_max_queued_latency_us { 0 };
-	std::atomic<std::uint64_t> audio_target_queue_frames { 512 };
-	std::atomic<std::uint64_t> audio_max_tolerated_queue_frames { 2048 };
+	std::atomic<std::uint64_t> audio_target_queue_frames { 1024 };
+	std::atomic<std::uint64_t> audio_max_tolerated_queue_frames { 1536 };
+	std::atomic<std::uint64_t> audio_trimmed_frames { 0 };
 	std::atomic<std::uint64_t> audio_underruns { 0 };
 	std::atomic<std::uint64_t> audio_overflows { 0 };
 	std::atomic<std::uint64_t> mame_audio_callback_block_size { 0 };

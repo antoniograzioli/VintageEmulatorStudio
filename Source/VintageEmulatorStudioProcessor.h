@@ -85,6 +85,9 @@ struct EmbeddedDiagnosticSnapshot
     double queuedAudioLatencyMs = 0.0;
     uint64_t maxQueuedAudioFrames = 0;
     double maxQueuedAudioLatencyMs = 0.0;
+    uint64_t targetQueuedAudioFrames = 0;
+    uint64_t maxToleratedQueuedAudioFrames = 0;
+    uint64_t trimmedAudioFrames = 0;
     uint64_t midiMessagesReceived = 0;
     uint64_t midiBytesQueued = 0;
     uint64_t midiBytesConsumed = 0;
