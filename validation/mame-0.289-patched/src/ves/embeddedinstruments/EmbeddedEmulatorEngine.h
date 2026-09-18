@@ -83,6 +83,35 @@ struct MediaChangeResult
 	int error_value = 0;
 };
 
+enum class StateOperation : std::uint8_t
+{
+	Save,
+	Load
+};
+
+struct StateOperationRequest
+{
+	StateOperation operation = StateOperation::Save;
+	std::uint64_t engine_generation = 0;
+	std::uint64_t request_id = 0;
+	std::uint64_t requested_at_ms = 0;
+	std::vector<std::uint8_t> snapshot_blob;
+};
+
+struct StateOperationResult
+{
+	StateOperation operation = StateOperation::Save;
+	std::uint64_t engine_generation = 0;
+	std::uint64_t request_id = 0;
+	bool success = false;
+	std::uint64_t snapshot_size = 0;
+	std::uint64_t scheduler_wait_ms = 0;
+	std::uint64_t stream_duration_ms = 0;
+	std::uint64_t total_duration_ms = 0;
+	std::vector<std::uint8_t> snapshot_blob;
+	std::string error_message;
+};
+
 using FloppyChangeRequest = MediaChangeRequest;
 using FloppyChangeResult = MediaChangeResult;
 
@@ -104,6 +133,7 @@ enum class EmbeddedStartupError : std::uint8_t
 	MissingRom,
 	RomChecksumMismatch,
 	InvalidRomSet,
+	MediaUnavailable,
 	MediaLoad,
 	Configuration,
 	Nvram,
@@ -193,6 +223,8 @@ struct EngineDiagnostics
 	std::atomic<std::uint64_t> machine_started { 0 };
 	std::atomic<std::uint64_t> machine_exited { 0 };
 	std::atomic<std::uint64_t> machine_started_ms { 0 };
+	std::atomic<bool> machine_running { false };
+	std::atomic<std::uint64_t> normal_scheduler_iterations { 0 };
 	std::atomic<std::uint64_t> stream_updates { 0 };
 	std::atomic<float> peak_abs { 0.0f };
 	std::atomic<bool> stop_requested { false };
@@ -201,6 +233,7 @@ struct EngineDiagnostics
 	std::atomic<bool> video_initialized { false };
 	std::atomic<bool> video_render_target_available { false };
 	std::atomic<bool> video_capture_enabled { false };
+	std::atomic<bool> video_capture_single_frame { false };
 	std::atomic<bool> video_editor_display_active { false };
 	std::atomic<std::uint64_t> video_state { static_cast<std::uint64_t>(EmbeddedVideoState::Disabled) };
 	std::atomic<std::uint64_t> video_capture_requested { 0 };
@@ -210,6 +243,18 @@ struct EngineDiagnostics
 	std::atomic<std::uint64_t> video_rasterization_duration_us { 0 };
 	std::atomic<std::uint64_t> video_rasterization_total_us { 0 };
 	std::atomic<std::uint64_t> video_rasterization_max_us { 0 };
+	std::atomic<std::uint64_t> video_screen_update_partial_total_us { 0 };
+	std::atomic<std::uint64_t> video_screen_update_partial_max_us { 0 };
+	std::atomic<std::uint64_t> video_screen_update_partial_count { 0 };
+	std::atomic<std::uint64_t> video_screen_update_quads_total_us { 0 };
+	std::atomic<std::uint64_t> video_screen_update_quads_max_us { 0 };
+	std::atomic<std::uint64_t> video_screen_update_quads_count { 0 };
+	std::atomic<std::uint64_t> video_primitive_build_total_us { 0 };
+	std::atomic<std::uint64_t> video_primitive_build_max_us { 0 };
+	std::atomic<std::uint64_t> video_primitive_build_count { 0 };
+	std::atomic<std::uint64_t> video_capture_total_us { 0 };
+	std::atomic<std::uint64_t> video_capture_max_us { 0 };
+	std::atomic<std::uint64_t> video_capture_timing_count { 0 };
 	std::atomic<std::uint64_t> video_raster_error_code { 0 };
 	std::atomic<std::uint64_t> video_raster_error_index { 0 };
 	std::atomic<std::uint64_t> video_deadline_reset_requests { 0 };
@@ -231,6 +276,13 @@ struct EngineDiagnostics
 	std::atomic<std::uint64_t> mouse_hit_input_tag { 0 };
 	std::atomic<std::uint64_t> mouse_hit_input_mask { 0 };
 	std::atomic<bool> mouse_input_field_active { false };
+	std::atomic<std::uint64_t> state_restore_mouse_queue_cleared { 0 };
+	std::atomic<bool> state_restore_pointer_reset { false };
+	std::atomic<bool> state_restore_view_rebound { false };
+	std::atomic<std::uint64_t> state_restore_interactive_items_before { 0 };
+	std::atomic<std::uint64_t> state_restore_interactive_items_after { 0 };
+	std::atomic<std::uint64_t> state_restore_first_mouse_event_ms { 0 };
+	std::atomic<std::uint64_t> state_restore_first_input_hit_ms { 0 };
 	std::atomic<std::uint64_t> video_frame_width { 0 };
 	std::atomic<std::uint64_t> video_frame_height { 0 };
 	std::atomic<std::uint64_t> video_requested_width { 1024 };
@@ -243,6 +295,7 @@ struct EngineDiagnostics
 	std::atomic<std::uint64_t> video_frames_skipped_inactive { 0 };
 	std::atomic<std::uint64_t> video_frames_skipped_paused { 0 };
 	std::atomic<std::uint64_t> video_frame_generation { 0 };
+	std::atomic<std::uint64_t> video_frame_reset_generation { 0 };
 	std::atomic<std::uint64_t> video_capture_interval_ms { 200 };
 	std::atomic<std::uint64_t> video_target_frame_rate { 5 };
 	std::atomic<std::uint64_t> video_measured_frame_rate_x1000 { 0 };
@@ -252,6 +305,24 @@ struct EngineDiagnostics
 	std::atomic<std::uint64_t> video_target_generation { 0 };
 	std::atomic<std::uint64_t> video_target_orientation { 0 };
 	std::atomic<std::uint64_t> video_target_pixel_aspect_x1000 { 0 };
+	std::atomic<std::uint64_t> state_save_requests { 0 };
+	std::atomic<std::uint64_t> state_load_requests { 0 };
+	std::atomic<std::uint64_t> state_save_successes { 0 };
+	std::atomic<std::uint64_t> state_save_failures { 0 };
+	std::atomic<std::uint64_t> state_load_successes { 0 };
+	std::atomic<std::uint64_t> state_load_failures { 0 };
+	std::atomic<std::uint64_t> state_snapshot_bytes { 0 };
+	std::atomic<std::uint64_t> state_request_received_ms { 0 };
+	std::atomic<std::uint64_t> state_timeslice_exit_ms { 0 };
+	std::atomic<std::uint64_t> state_restore_read_started_ms { 0 };
+	std::atomic<std::uint64_t> state_restore_read_completed_ms { 0 };
+	std::atomic<std::uint64_t> state_restore_first_timeslice_completed_ms { 0 };
+	std::atomic<std::uint64_t> state_restore_first_audio_ms { 0 };
+	std::atomic<std::uint64_t> state_restore_second_audio_ms { 0 };
+	std::atomic<std::uint64_t> state_restore_first_video_ms { 0 };
+	std::atomic<std::uint64_t> state_restore_first_video_generation { 0 };
+	std::atomic<std::uint64_t> state_restore_cache_build_start_ms { 0 };
+	std::atomic<std::uint64_t> state_restore_cache_build_end_ms { 0 };
 };
 
 struct EmbeddedEmulatorEngineSettings
@@ -299,6 +370,8 @@ public:
 	void noteHostAudioConfiguration(double sample_rate, int block_size);
 	bool copyLatestVideoFrame(VideoFrameSnapshot &snapshot);
 	void setVideoDisplayActive(bool active);
+	void setVideoCaptureEnabled(bool enabled);
+	void setVideoCaptureSingleFrame(bool single_frame);
 	void setVideoCaptureIntervalMs(std::uint64_t interval_ms);
 	void requestVideoCaptureWidth(int width);
 	bool enqueueMouseEvent(EmbeddedMouseEventType type, std::int32_t x, std::int32_t y);
@@ -309,12 +382,16 @@ public:
 	bool requestMediaChange(const MediaChangeRequest &request);
 	bool pollMediaChangeResult(MediaChangeResult &result);
 	bool isMediaChangePending() const;
+	bool requestStateOperation(const StateOperationRequest &request);
+	bool pollStateOperationResult(StateOperationResult &result);
+	bool isStateOperationPending() const;
 
 	std::uint64_t machineUptimeMs() const;
 	const EngineDiagnostics &diagnostics() const;
 	EngineDiagnostics &diagnostics();
 	int mameResult() const;
 	const std::string &driverName() const;
+	std::uint64_t engineGeneration() const;
 	EmbeddedStartupDiagnostic startupDiagnostic() const;
 
 private:

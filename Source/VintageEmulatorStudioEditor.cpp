@@ -91,6 +91,8 @@ juce::String compactStatusForStartupError (StartupError category)
         case StartupError::StartupTimeout:      return "Startup Timeout";
         case StartupError::PrimaryRomMissing:   return "Missing ROMs";
         case StartupError::InvalidRomSet:       return "Missing ROMs";
+        case StartupError::MediaUnavailable:    return "Media unavailable";
+        case StartupError::MediaLoad:           return "Media Failure";
         case StartupError::None:                return {};
         default:                                return "Failed";
     }
@@ -163,7 +165,9 @@ juce::String formatStartupDiagnosticForDisplay (const EmbeddedDiagnosticSnapshot
     if (diagnostic.recovery.isNotEmpty())
         text << "\n" << diagnostic.recovery << "\n";
 
-    if ((diagnostic.category == StartupError::EngineFailure || diagnostic.category == StartupError::Unknown)
+    if ((diagnostic.category == StartupError::EngineFailure
+         || diagnostic.category == StartupError::MediaLoad
+         || diagnostic.category == StartupError::Unknown)
         && diagnostic.technicalDetails.isNotEmpty())
         text << "\nTechnical details:\n" << boundedTechnicalDetails (diagnostic.technicalDetails);
 
@@ -171,6 +175,71 @@ juce::String formatStartupDiagnosticForDisplay (const EmbeddedDiagnosticSnapshot
 }
 
 }
+
+class VESBackgroundColourPopup final : public juce::PopupMenu::CustomComponent,
+                                       private juce::ChangeListener
+{
+public:
+    VESBackgroundColourPopup (VintageEmulatorStudioProcessor& processorToUse,
+                              std::function<void()> colourChanged)
+        : juce::PopupMenu::CustomComponent (false),
+          processor (processorToUse),
+          onColourChanged (std::move (colourChanged)),
+          selector (juce::ColourSelector::showColourAtTop
+                    | juce::ColourSelector::showSliders
+                    | juce::ColourSelector::showColourspace),
+          resetButton ("Reset / Default")
+    {
+        selector.setCurrentColour (processor.getBackgroundColour());
+        selector.addChangeListener (this);
+        selector.setColour (juce::ColourSelector::backgroundColourId, juce::Colour::fromRGB (28, 29, 34));
+        resetButton.onClick = [this]
+        {
+            selector.setCurrentColour (juce::Colour::fromRGB (111, 110, 186));
+            processor.setBackgroundColour (selector.getCurrentColour());
+            if (onColourChanged)
+                onColourChanged();
+        };
+        addAndMakeVisible (selector);
+        addAndMakeVisible (resetButton);
+        setSize (320, 390);
+    }
+
+    ~VESBackgroundColourPopup() override
+    {
+        selector.removeChangeListener (this);
+    }
+
+    void getIdealSize (int& idealWidth, int& idealHeight) override
+    {
+        idealWidth = 320;
+        idealHeight = 390;
+    }
+
+    void resized() override
+    {
+        auto area = getLocalBounds().reduced (8);
+        resetButton.setBounds (area.removeFromBottom (28));
+        area.removeFromBottom (8);
+        selector.setBounds (area);
+    }
+
+private:
+    void changeListenerCallback (juce::ChangeBroadcaster* source) override
+    {
+        if (source == &selector)
+        {
+            processor.setBackgroundColour (selector.getCurrentColour());
+            if (onColourChanged)
+                onColourChanged();
+        }
+    }
+
+    VintageEmulatorStudioProcessor& processor;
+    std::function<void()> onColourChanged;
+    juce::ColourSelector selector;
+    juce::TextButton resetButton;
+};
 
 class VESMediaIconButton final : public juce::Button
 {
@@ -740,18 +809,21 @@ bool EmbeddedEmulatorDisplayComponent::updateFrame()
 {
     const auto mode = processor.getGuiPerformanceMode();
     applyGuiPerformanceMode (mode);
+    const auto activeEngineGeneration = processor.getVideoEngineGeneration();
+    const auto frameResetGeneration = processor.getVideoFrameResetGeneration();
+    if (activeEngineGeneration != displayedEngineGeneration
+        || frameResetGeneration != displayedFrameResetGeneration)
+    {
+        clearDisplayedFrame (activeEngineGeneration);
+        displayedFrameResetGeneration = frameResetGeneration;
+        staticFrameAcquired = false;
+    }
+
     if (mode == GuiPerformanceMode::Disabled || (mode == GuiPerformanceMode::Static && staticFrameAcquired))
         return false;
 
     updateCaptureWidthForCurrentDisplay();
     publishStableCaptureWidth();
-
-    const auto activeEngineGeneration = processor.getVideoEngineGeneration();
-    if (activeEngineGeneration != displayedEngineGeneration)
-    {
-        clearDisplayedFrame (activeEngineGeneration);
-        staticFrameAcquired = false;
-    }
 
     EmbeddedVideoFrameForEditor frame;
     if (! processor.copyLatestVideoFrame (frame))
@@ -868,12 +940,20 @@ void EmbeddedEmulatorDisplayComponent::updateCaptureWidthForCurrentDisplay()
     if (display == nullptr)
         display = displays.getPrimaryDisplay();
 
-    const auto scale = display != nullptr ? display->scale : getDesktopScaleFactor();
-    const auto physicalWidth = juce::jmax (1, juce::roundToInt (innerWidth * scale));
     const auto mode = processor.getGuiPerformanceMode();
-    const auto minimum = mode == GuiPerformanceMode::Normal ? 1024 : 512;
-    const auto maximum = mode == GuiPerformanceMode::Normal ? 4096 : 1024;
-    const auto quantized = juce::jlimit (minimum, maximum, ((physicalWidth + 63) / 64) * 64);
+    int quantized = 0;
+    if (mode == GuiPerformanceMode::Normal)
+        quantized = 1792;
+    else if (mode == GuiPerformanceMode::Static)
+        quantized = 1536;
+    else if (mode == GuiPerformanceMode::Reduced)
+        quantized = 1280;
+    else
+    {
+        const auto scale = display != nullptr ? display->scale : getDesktopScaleFactor();
+        const auto physicalWidth = juce::jmax (1, juce::roundToInt (innerWidth * scale));
+        quantized = juce::jlimit (512, 1024, ((physicalWidth + 63) / 64) * 64);
+    }
     if (quantized != pendingCaptureWidth)
     {
         pendingCaptureWidth = quantized;
@@ -896,7 +976,7 @@ void EmbeddedEmulatorDisplayComponent::paint (juce::Graphics& g)
 {
     auto bounds = getLocalBounds();
     const auto snapshot = processor.getDiagnosticSnapshot();
-    g.fillAll (juce::Colour::fromRGB (111, 110, 186));
+    g.fillAll (processor.getBackgroundColour());
     g.setColour (juce::Colour::fromRGB (70, 70, 70));
     g.drawRect (bounds);
 
@@ -1244,6 +1324,20 @@ VintageEmulatorStudioEditor::VintageEmulatorStudioEditor (VintageEmulatorStudioP
             safeThis->showOptionsMenu();
     };
 
+    for (auto* button : { &saveStateButton, &loadStateButton, &saveStateFileButton, &loadStateFileButton })
+    {
+        addAndMakeVisible (*button);
+        button->setColour (juce::TextButton::buttonColourId, juce::Colour::fromRGB (29, 31, 36));
+        button->setColour (juce::TextButton::textColourOffId, juce::Colour::fromRGB (226, 232, 236));
+    }
+    addAndMakeVisible (stateStatusLabel);
+    stateStatusLabel.setFont (lookAndFeel.regularFont (12.0f));
+    stateStatusLabel.setColour (juce::Label::textColourId, juce::Colour::fromRGB (142, 150, 158));
+    saveStateButton.onClick = [safeThis] { if (safeThis != nullptr) safeThis->processor.requestExperimentalStateSave(); };
+    loadStateButton.onClick = [safeThis] { if (safeThis != nullptr) safeThis->processor.requestExperimentalStateLoad(); };
+    saveStateFileButton.onClick = [safeThis] { if (safeThis != nullptr) safeThis->processor.requestExperimentalStateSaveToFile(); };
+    loadStateFileButton.onClick = [safeThis] { if (safeThis != nullptr) safeThis->processor.requestExperimentalStateLoadFromFile(); };
+
     addAndMakeVisible (versionLabel);
     versionLabel.setText (vesDisplayVersion(), juce::dontSendNotification);
     versionLabel.setFont (lookAndFeel.regularFont (12.0f));
@@ -1503,6 +1597,11 @@ void VintageEmulatorStudioEditor::resized()
                             optionsBarBounds.getY(),
                             versionLabelWidth,
                             optionsBarHeight);
+    saveStateButton.setBounds (versionLabel.getRight() + 8, optionsBarBounds.getY() + 3, 92, optionsBarHeight - 6);
+    loadStateButton.setBounds (saveStateButton.getRight() + 6, optionsBarBounds.getY() + 3, 92, optionsBarHeight - 6);
+    saveStateFileButton.setBounds (loadStateButton.getRight() + 6, optionsBarBounds.getY() + 3, 126, optionsBarHeight - 6);
+    loadStateFileButton.setBounds (saveStateFileButton.getRight() + 6, optionsBarBounds.getY() + 3, 138, optionsBarHeight - 6);
+    stateStatusLabel.setBounds (loadStateFileButton.getRight() + 8, optionsBarBounds.getY(), 460, optionsBarHeight);
 #if JucePlugin_Build_Standalone
     const auto sliderHeight = 22;
     const auto sliderY = optionsBarBounds.getY() + (optionsBarHeight - sliderHeight) / 2;
@@ -2111,10 +2210,24 @@ void VintageEmulatorStudioEditor::showOptionsMenu()
     displayMenu.addItem (optionsMenuStaticId, "Static", true, currentMode == GuiPerformanceMode::Static);
     displayMenu.addItem (optionsMenuDisabledId, "Disabled", true, currentMode == GuiPerformanceMode::Disabled);
 
+    juce::Component::SafePointer<VintageEmulatorStudioEditor> safeThis (this);
+    juce::PopupMenu backgroundMenu;
+    backgroundMenu.addCustomItem (0,
+        std::make_unique<VESBackgroundColourPopup> (processor,
+            [safeThis]
+            {
+                if (safeThis != nullptr)
+                {
+                    safeThis->mameDisplay.repaint();
+                    safeThis->repaint();
+                }
+            }),
+        {},
+        "Background colour selector");
+
     juce::PopupMenu optionsMenu;
     optionsMenu.addSubMenu ("Display", displayMenu);
-
-    juce::Component::SafePointer<VintageEmulatorStudioEditor> safeThis (this);
+    optionsMenu.addSubMenu ("Background", backgroundMenu);
     optionsMenu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&optionsButton),
                                [safeThis] (int result)
                                {
@@ -2259,6 +2372,21 @@ void VintageEmulatorStudioEditor::updateControlState()
                 "Hard Disk", "Hard Disk — not supported by this machine");
 
     dismissUnsupportedToolbarPopup();
+
+    const auto showState = processor.selectedMachineSupportsExperimentalState();
+    const auto stateEnabled = showState && processor.isReady() && ! processor.isExperimentalStatePending();
+    saveStateButton.setVisible (showState);
+    loadStateButton.setVisible (showState);
+    saveStateFileButton.setVisible (showState);
+    loadStateFileButton.setVisible (showState);
+    stateStatusLabel.setVisible (showState);
+    saveStateButton.setEnabled (stateEnabled);
+    loadStateButton.setEnabled (stateEnabled);
+    saveStateFileButton.setEnabled (stateEnabled);
+    loadStateFileButton.setEnabled (stateEnabled);
+    const auto stateStatus = processor.getExperimentalStateStatus();
+    stateStatusLabel.setText (stateStatus, juce::dontSendNotification);
+    stateStatusLabel.setTooltip (stateStatus);
 }
 
 void VintageEmulatorStudioEditor::updateStatus()

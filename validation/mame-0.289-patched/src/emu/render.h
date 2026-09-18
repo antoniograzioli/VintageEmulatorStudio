@@ -558,6 +558,7 @@ public:
 
 	// get a primitive list
 	render_primitive_list &get_primitives();
+	render_primitive_list &get_primitives(u32 first_item, u32 item_count, bool add_clears);
 
 	// hit testing
 	bool map_point_container(s32 target_x, s32 target_y, render_container &container, float &container_x, float &container_y);

@@ -30,6 +30,7 @@ enum class StartupError
     MissingRom,
     RomChecksumMismatch,
     InvalidRomSet,
+    MediaUnavailable,
     MediaLoad,
     Configuration,
     Nvram,
@@ -126,6 +127,18 @@ struct EmbeddedDiagnosticSnapshot
     uint64_t videoRasterizationDurationUs = 0;
     uint64_t videoRasterizationTotalUs = 0;
     uint64_t videoRasterizationMaxUs = 0;
+    uint64_t videoScreenUpdatePartialTotalUs = 0;
+    uint64_t videoScreenUpdatePartialMaxUs = 0;
+    uint64_t videoScreenUpdatePartialCount = 0;
+    uint64_t videoScreenUpdateQuadsTotalUs = 0;
+    uint64_t videoScreenUpdateQuadsMaxUs = 0;
+    uint64_t videoScreenUpdateQuadsCount = 0;
+    uint64_t videoPrimitiveBuildTotalUs = 0;
+    uint64_t videoPrimitiveBuildMaxUs = 0;
+    uint64_t videoPrimitiveBuildCount = 0;
+    uint64_t videoCaptureTotalUs = 0;
+    uint64_t videoCaptureMaxUs = 0;
+    uint64_t videoCaptureTimingCount = 0;
     uint64_t videoRasterError = 0;
     uint64_t videoRasterErrorIndex = 0;
     uint64_t videoTargetFrameRate = 0;
@@ -168,6 +181,31 @@ struct EmbeddedVideoFrameForEditor
     uint64_t engineGeneration = 0;
     uint64_t timestampMs = 0;
     std::vector<uint32_t> pixels;
+};
+
+struct MidiAudioLatencyPendingEvent
+{
+    uint64_t sessionRevision = 0;
+    uint64_t inputSamplePosition = 0;
+    uint64_t inputBlockIndex = 0;
+    uint64_t midiTimestampNs = 0;
+    uint8_t noteNumber = 0;
+    uint8_t velocity = 0;
+};
+
+struct MidiAudioLatencyResult
+{
+    uint64_t sessionRevision = 0;
+    uint64_t inputSamplePosition = 0;
+    uint64_t outputSamplePosition = 0;
+    uint64_t inputBlockIndex = 0;
+    uint64_t outputBlockIndex = 0;
+    uint64_t midiTimestampNs = 0;
+    uint64_t audioTimestampNs = 0;
+    uint64_t sampleRate = 0;
+    uint64_t blockSize = 0;
+    uint8_t noteNumber = 0;
+    uint8_t velocity = 0;
 };
 
 class VintageEmulatorStudioProcessor final : public juce::AudioProcessor,
@@ -233,6 +271,15 @@ public:
     juce::String getFloppyHotSwapMessage() const;
     bool processFloppyHotSwapResults();
     uint64_t getFloppyHotSwapRevision() const { return floppyHotSwapRevision.load (std::memory_order_acquire); }
+    bool selectedMachineSupportsExperimentalState() const;
+    bool requestExperimentalStateSave();
+    bool requestExperimentalStateLoad();
+    bool requestExperimentalStateSaveToFile();
+    bool requestExperimentalStateLoadFromFile();
+    bool isExperimentalStatePending() const { return experimentalStatePending.load (std::memory_order_acquire); }
+    juce::String getExperimentalStateStatus() const { return experimentalStateStatus; }
+    bool processExperimentalStateResults();
+    void finishExperimentalStateRestoreIfReady();
     juce::String getSelectedCdRomPath() const;
     void setSelectedCdRomFile (const juce::File& file);
     void clearSelectedCdRom();
@@ -264,8 +311,11 @@ public:
     void setSavedEditorSize (int width, int height);
     bool copyLatestVideoFrame (EmbeddedVideoFrameForEditor& snapshot);
     uint64_t getVideoEngineGeneration() const { return videoEngineGeneration.load (std::memory_order_acquire); }
+    uint64_t getVideoFrameResetGeneration() const;
     void setGuiPerformanceMode (GuiPerformanceMode mode);
     GuiPerformanceMode getGuiPerformanceMode() const;
+    juce::Colour getBackgroundColour() const;
+    void setBackgroundColour (juce::Colour colour);
 #if JucePlugin_Build_Standalone
     void setStandaloneMasterVolume (float volume);
     float getStandaloneMasterVolume() const;
@@ -276,9 +326,10 @@ public:
     void requestMouseRelease();
 
 private:
-    void startEngineIfNeeded (double sampleRate);
-    void stopEngine();
-    void restartSelectedMachine();
+    void startEngineIfNeeded (double sampleRate, const juce::String& caller, const juce::String& reason);
+    void stopEngine (const juce::String& caller, const juce::String& reason);
+    void restartSelectedMachine (const juce::String& caller, const juce::String& reason);
+    void logLifecycleEvent (const juce::String& event, const juce::String& caller, const juce::String& reason) const;
     bool prepareNvramState (const juce::File& runtimeNvramDirectory);
     juce::File getRomsDirectory() const;
     juce::File getNvramSeedFile() const;
@@ -305,8 +356,20 @@ private:
     void handleReadyTransition (ves::EmbeddedEmulatorEngine& localEngine);
     void trimAudioBacklog (ves::EmbeddedEmulatorEngine& localEngine);
     void flushAudioForTransportBoundary (ves::EmbeddedEmulatorEngine& localEngine);
+    void enqueueMidiAudioLatencyEvent (const MidiAudioLatencyPendingEvent& event);
+    void expireMidiAudioLatencyEvent (uint64_t currentSamplePosition, uint64_t nowNs);
+    void completeMidiAudioLatencyEvent (uint64_t outputSamplePosition, uint64_t outputBlockIndex, uint64_t audioTimestampNs);
+    void flushMidiAudioLatencyResults();
+    void recordVideoRuntimeDiagnostics();
+    void tryStandaloneFb01AutosaveRestore();
+    void saveStandaloneFb01AutosaveOnShutdown();
+    bool isDawPluginWrapper() const;
+    void tryDawFb01SnapshotRefresh();
+    void tryDawFb01PendingRestore();
+    void flushPluginStateDiagnostics();
     void timerCallback() override;
 
+    const uint64_t lifecycleInstanceId;
     std::shared_ptr<ves::EmbeddedEmulatorEngine> engine;
     std::atomic<uint64_t> videoEngineGeneration { 0 };
     mutable std::atomic<int> state { static_cast<int> (EmbeddedEngineState::Stopped) };
@@ -324,8 +387,9 @@ private:
     std::atomic<uint64_t> stateRestorationRevision { 0 };
     mutable juce::CriticalSection machineSelectionLock;
     juce::String selectedMachineDriverName { "tx81z" };
-    std::atomic<int> requestedVideoCaptureWidth { 1024 };
+    std::atomic<int> requestedVideoCaptureWidth { 1792 };
     std::atomic<int> guiPerformanceMode { static_cast<int> (GuiPerformanceMode::Normal) };
+    std::atomic<std::uint32_t> backgroundColourArgb { 0xff6f6eba };
 #if JucePlugin_Build_Standalone
     std::atomic<float> standaloneMasterVolume { 1.0f };
     juce::LinearSmoothedValue<float> standaloneMasterGain { 1.0f };
@@ -333,12 +397,43 @@ private:
     juce::String configuredRomsPath;
     juce::String configuredArtworkPath;
     std::map<juce::String, juce::String> configuredMediaPaths;
+    std::map<juce::String, juce::String> configuredMediaPathOrigins;
     mutable juce::CriticalSection startupDiagnosticLock;
     StartupDiagnostic startupDiagnostic;
     std::atomic<uint64_t> floppyHotSwapRequestId { 0 };
     std::atomic<bool> floppyHotSwapPending { false };
     std::atomic<uint64_t> floppyHotSwapRevision { 0 };
     juce::String floppyHotSwapMessage;
+    std::atomic<uint64_t> experimentalStateRequestId { 0 };
+    std::atomic<bool> experimentalStatePending { false };
+    std::atomic<bool> experimentalStateRestoreInProgress { false };
+    juce::String experimentalStateStatus;
+    uint64_t experimentalStateGenerationBeforeRestore = 0;
+    uint64_t experimentalStateGenerationAfterRestore = 0;
+    uint64_t experimentalStateGuardStartedMs = 0;
+    uint64_t experimentalStateReadCompletedMs = 0;
+    uint64_t experimentalStateSchedulerWaitMs = 0;
+    uint64_t experimentalStateReadStreamMs = 0;
+    enum class ExperimentalStateTarget { Memory, File, Autosave, DawSnapshot, DawRestore };
+    ExperimentalStateTarget experimentalStateTarget = ExperimentalStateTarget::Memory;
+    uint64_t standaloneAutosaveRestoreAttemptedGeneration = 0;
+    mutable juce::CriticalSection dawStateLock;
+    std::shared_ptr<const std::vector<std::uint8_t>> dawCachedSnapshot;
+    std::vector<std::uint8_t> dawPendingRestoreSnapshot;
+    bool dawPendingRestoreArmed = false;
+    uint64_t dawCachedSnapshotAtMs = 0;
+    uint64_t dawCachedSnapshotEngineGeneration = 0;
+    uint64_t dawSnapshotLastRequestMs = 0;
+    uint64_t dawSnapshotRequestCount = 0;
+    std::atomic<bool> pluginStateGetDiagnosticPending { false };
+    std::atomic<bool> pluginStateGetIncludedBlob { false };
+    std::atomic<uint64_t> pluginStateGetBlobSize { 0 };
+    std::atomic<uint64_t> pluginStateGetSnapshotAgeMs { 0 };
+    std::atomic<uint64_t> pluginStateGetTotalSize { 0 };
+    std::atomic<bool> pluginStateSetDiagnosticPending { false };
+    std::atomic<bool> pluginStateSetBlobFound { false };
+    std::atomic<bool> pluginStateSetBlobAccepted { false };
+    std::atomic<bool> pluginStateSetRestoreArmed { false };
     juce::String lastError;
     // This is deliberately invalid until JUCE has opened its selected device and
     // called prepareToPlay.  In particular, standalone state restoration must
@@ -346,6 +441,30 @@ private:
     double currentSampleRate = 0.0;
     int maxBlockSize = 0;
     std::array<ves::StereoFrame, 8192> audioScratch {};
+
+    static constexpr std::size_t midiAudioLatencyPendingCapacity = 64;
+    static constexpr std::size_t midiAudioLatencyResultCapacity = 64;
+    static constexpr uint64_t midiAudioLatencyMeasurementCount = 20;
+    static constexpr float midiAudioLatencyThreshold = 0.001f;
+    std::array<MidiAudioLatencyPendingEvent, midiAudioLatencyPendingCapacity> midiAudioLatencyPending {};
+    std::array<MidiAudioLatencyResult, midiAudioLatencyResultCapacity> midiAudioLatencyResults {};
+    std::size_t midiAudioLatencyPendingHead = 0;
+    std::size_t midiAudioLatencyPendingTail = 0;
+    std::atomic<std::size_t> midiAudioLatencyResultWrite { 0 };
+    std::atomic<std::size_t> midiAudioLatencyResultRead { 0 };
+    std::atomic<uint64_t> midiAudioLatencyCompletedCount { 0 };
+    std::atomic<uint64_t> midiAudioLatencyDroppedResults { 0 };
+    std::atomic<bool> midiAudioLatencyResetRequested { false };
+    std::atomic<uint64_t> midiAudioLatencySessionRevision { 0 };
+    uint64_t midiAudioLatencyWrittenRevision = 0;
+    std::array<MidiAudioLatencyResult, midiAudioLatencyMeasurementCount> midiAudioLatencySessionResults {};
+    std::size_t midiAudioLatencySessionResultCount = 0;
+    bool midiAudioLatencyAudioWasAboveThreshold = false;
+    uint64_t hostAudioSamplePosition = 0;
+    uint64_t hostAudioBlockIndex = 0;
+    uint64_t videoConfigLoggedEngineGeneration = 0;
+    uint64_t videoConfigLoggedTargetGeneration = 0;
+    uint64_t videoConfigLoggedCaptureCount = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VintageEmulatorStudioProcessor)
 };

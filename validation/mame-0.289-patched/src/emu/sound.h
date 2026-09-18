@@ -395,7 +395,7 @@ public:
 		std::vector<channel_mapping> m_channel_mappings;
 	};
 
-	static constexpr int STREAMS_UPDATE_FREQUENCY = 50;
+	static constexpr int STREAMS_UPDATE_FREQUENCY = 200;
 
 	// construction/destruction
 	sound_manager(running_machine &machine);

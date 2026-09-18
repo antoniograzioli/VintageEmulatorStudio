@@ -82,10 +82,11 @@ private:
     int sourceBoundsFrameWidth = 0;
     int sourceBoundsFrameHeight = 0;
     uint64_t sourceBoundsEngineGeneration = 0;
-    int pendingCaptureWidth = 1024;
+    int pendingCaptureWidth = 1792;
     int publishedCaptureWidth = 0;
     juce::uint32 captureWidthDeadlineMs = 0;
     uint64_t displayedGeneration = 0;
+    uint64_t displayedFrameResetGeneration = 0;
     uint64_t displayedEngineGeneration = 0;
     GuiPerformanceMode appliedGuiPerformanceMode = GuiPerformanceMode::Normal;
     bool staticFrameAcquired = false;
@@ -153,6 +154,11 @@ private:
     EmbeddedMissingRomLookAndFeel lookAndFeel;
     EmbeddedEmulatorDisplayComponent mameDisplay;
     juce::TextButton optionsButton { "Settings" };
+    juce::TextButton saveStateButton { "Save State" };
+    juce::TextButton loadStateButton { "Load State" };
+    juce::TextButton saveStateFileButton { "Save State to File" };
+    juce::TextButton loadStateFileButton { "Load State from File" };
+    juce::Label stateStatusLabel;
     juce::Label versionLabel;
 #if JucePlugin_Build_Standalone
     juce::Label volumeLabel;

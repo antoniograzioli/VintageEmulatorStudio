@@ -1657,6 +1657,11 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 
 render_primitive_list &render_target::get_primitives()
 {
+	return get_primitives(0, std::numeric_limits<u32>::max(), true);
+}
+
+render_primitive_list &render_target::get_primitives(u32 first_item, u32 item_count, bool add_clears)
+{
 	// switch to the next primitive list
 	render_primitive_list &list = m_primlist[m_listindex];
 	m_listindex = (m_listindex + 1) % std::size(m_primlist);
@@ -1683,8 +1688,13 @@ render_primitive_list &render_target::get_primitives()
 	{
 		// we're running - iterate over items in the view
 		current_view().prepare_items();
+		u32 item_index = 0;
 		for (layout_view_item &curitem : current_view().visible_items())
 		{
+			const bool selected = item_index >= first_item && (item_index - first_item) < item_count;
+			++item_index;
+			if (!selected)
+				continue;
 			// first apply orientation to the bounds
 			render_bounds bounds = curitem.bounds();
 			apply_orientation(bounds, root_xform.orientation);
@@ -1747,8 +1757,10 @@ render_primitive_list &render_target::get_primitives()
 		add_container_primitives(list, root_xform, ui_xform, *m_ui_container, BLENDMODE_ALPHA);
 	}
 
-	// optimize the list before handing it off
-	add_clear_and_optimize_primitive_list(list);
+	// Optimize the complete target path. Filtered VES cache paths render into
+	// transparent or already-composited buffers and must not inject clears.
+	if (add_clears)
+		add_clear_and_optimize_primitive_list(list);
 	list.release_lock();
 	return list;
 }

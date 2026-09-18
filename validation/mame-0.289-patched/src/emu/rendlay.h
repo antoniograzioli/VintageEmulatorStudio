@@ -284,6 +284,26 @@ public:
 	screen_device *screen() const { return m_screen; }
 	bool bounds_animated() const { return m_bounds.size() > 1U; }
 	bool color_animated() const { return m_color.size() > 1U; }
+	bool has_dynamic_dependency() const
+	{
+		return has_input()
+			|| !m_output_name.empty()
+			|| !m_animinput_tag.empty()
+			|| !m_animoutput_name.empty()
+			|| !m_scrollxinput_tag.empty()
+			|| !m_scrollxoutput_name.empty()
+			|| !m_scrollyinput_tag.empty()
+			|| !m_scrollyoutput_name.empty()
+			|| bounds_animated()
+			|| color_animated();
+	}
+	bool has_scroll_dependency() const
+	{
+		return !m_scrollxinput_tag.empty()
+			|| !m_scrollxoutput_name.empty()
+			|| !m_scrollyinput_tag.empty()
+			|| !m_scrollyoutput_name.empty();
+	}
 	render_bounds bounds() const { return m_get_bounds(); }
 	render_color color() const { return m_get_color(); }
 	bool scroll_wrap_x() const { return m_scrollwrapx; }
