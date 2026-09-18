@@ -2672,6 +2672,7 @@ u64 sound_manager::rate_and_time_to_index(attotime time, u32 sample_rate) const
 void sound_manager::update(s32)
 {
 	auto profile = g_profiler.start(PROFILER_SOUND);
+	machine().osd().sound_manager_update();
 
 	mapping_update();
 	streams_update();

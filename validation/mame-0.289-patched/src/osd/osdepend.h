@@ -92,6 +92,7 @@ public:
 	virtual void sound_stream_set_volumes(uint32_t id, const std::vector<float> &db) = 0;
 	virtual void sound_begin_update() = 0;
 	virtual void sound_end_update() = 0;
+	virtual void sound_manager_update() { }
 
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) = 0;

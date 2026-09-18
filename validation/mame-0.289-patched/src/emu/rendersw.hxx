@@ -1744,25 +1744,30 @@ private:
 	//-------------------------------------------------
 
 public:
+	static void draw_primitive(render_primitive const &prim, void *dstdata, u32 width, u32 height, u32 pitch)
+	{
+		switch (prim.type)
+		{
+			case render_primitive::LINE:
+				draw_line(prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
+				break;
+
+			case render_primitive::QUAD:
+				if (!prim.texture.base)
+					draw_rect(prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
+				else
+					setup_and_draw_textured_quad(prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
+				break;
+
+			default:
+				throw emu_fatalerror("Unexpected render_primitive type");
+		}
+	}
+
 	static void draw_primitives(render_primitive_list const &primlist, void *dstdata, u32 width, u32 height, u32 pitch)
 	{
 		// loop over the list and render each element
 		for (render_primitive const *prim = primlist.first(); prim != nullptr; prim = prim->next())
-			switch (prim->type)
-			{
-				case render_primitive::LINE:
-					draw_line(*prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
-					break;
-
-				case render_primitive::QUAD:
-					if (!prim->texture.base)
-						draw_rect(*prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
-					else
-						setup_and_draw_textured_quad(*prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
-					break;
-
-				default:
-					throw emu_fatalerror("Unexpected render_primitive type");
-			}
+			draw_primitive(*prim, dstdata, width, height, pitch);
 	}
 };

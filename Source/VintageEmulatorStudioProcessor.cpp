@@ -1503,9 +1503,41 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     if (! ready)
         return;
 
+    auto& rateDiagnostics = localEngine->diagnostics();
+    const auto requestedFrames = static_cast<uint64_t> (juce::jmax (samples, 0));
+    const auto hostBlockFrames = requestedFrames;
+    rateDiagnostics.audio_rate_host_requested_frames.fetch_add (requestedFrames, std::memory_order_relaxed);
+    rateDiagnostics.audio_rate_host_callback_count.fetch_add (1, std::memory_order_relaxed);
+    rateDiagnostics.audio_rate_host_latest_block.store (requestedFrames, std::memory_order_relaxed);
+    auto hostMinimum = rateDiagnostics.audio_rate_host_window_min_block.load (std::memory_order_relaxed);
+    while (requestedFrames < hostMinimum
+           && ! rateDiagnostics.audio_rate_host_window_min_block.compare_exchange_weak (
+               hostMinimum, requestedFrames, std::memory_order_relaxed, std::memory_order_relaxed)) {}
+    auto hostMaximum = rateDiagnostics.audio_rate_host_window_max_block.load (std::memory_order_relaxed);
+    while (requestedFrames > hostMaximum
+           && ! rateDiagnostics.audio_rate_host_window_max_block.compare_exchange_weak (
+               hostMaximum, requestedFrames, std::memory_order_relaxed, std::memory_order_relaxed)) {}
+
     const auto channels = buffer.getNumChannels();
     auto* const leftChannel = channels > 0 ? buffer.getWritePointer (0) : nullptr;
     auto* const rightChannel = channels > 1 ? buffer.getWritePointer (1) : nullptr;
+    auto queuedFrames = static_cast<uint64_t> (localEngine->queuedAudioFrames());
+    rateDiagnostics.audio_rate_queue_depth_total.fetch_add (queuedFrames, std::memory_order_relaxed);
+    rateDiagnostics.audio_rate_queue_depth_count.fetch_add (1, std::memory_order_relaxed);
+    if (queuedFrames < hostBlockFrames)
+        rateDiagnostics.audio_rate_queue_below_host_block.fetch_add (1, std::memory_order_relaxed);
+    auto minimumQueueDepth = rateDiagnostics.audio_rate_queue_window_min.load (std::memory_order_relaxed);
+    while (queuedFrames < minimumQueueDepth
+           && ! rateDiagnostics.audio_rate_queue_window_min.compare_exchange_weak (
+               minimumQueueDepth, queuedFrames, std::memory_order_relaxed))
+    {
+    }
+    auto maximumQueueDepth = rateDiagnostics.audio_rate_queue_window_max.load (std::memory_order_relaxed);
+    while (queuedFrames > maximumQueueDepth
+           && ! rateDiagnostics.audio_rate_queue_window_max.compare_exchange_weak (
+               maximumQueueDepth, queuedFrames, std::memory_order_relaxed))
+    {
+    }
     int offset = 0;
     while (offset < samples)
     {
@@ -2447,6 +2479,7 @@ void VintageEmulatorStudioProcessor::handleReadyTransition (ves::EmbeddedEmulato
     diag.boot_ready_stale_frames.store (static_cast<uint64_t> (stale), std::memory_order_relaxed);
     diag.boot_ready_flush_count.fetch_add (1, std::memory_order_relaxed);
     diag.audio_underruns.store (0, std::memory_order_relaxed);
+    localEngine.resetLatencyDiagnostics();
     diag.audio_overflows.store (0, std::memory_order_relaxed);
     waitingForMidiAudioOnset.store (false, std::memory_order_relaxed);
     clearStartupDiagnostic();
@@ -2572,7 +2605,31 @@ EmbeddedDiagnosticSnapshot VintageEmulatorStudioProcessor::getDiagnosticSnapshot
         snapshot.audioFramesConsumed = diag.audio_frames_read.load (std::memory_order_relaxed);
         snapshot.staleAudioFramesDiscarded = diag.audio_stale_frames_dropped.load (std::memory_order_relaxed);
         snapshot.audioUnderruns = diag.audio_underruns.load (std::memory_order_relaxed);
+        snapshot.audioUnderrunCallbacks = diag.audio_underrun_callbacks.load (std::memory_order_relaxed);
+        snapshot.audioMissingOutputFrames = diag.audio_missing_output_frames.load (std::memory_order_relaxed);
         snapshot.audioOverflows = diag.audio_overflows.load (std::memory_order_relaxed);
+        const auto lowWatermark = diag.audio_queue_read_low_watermark_frames.load (std::memory_order_relaxed);
+        snapshot.audioQueueReadLowWatermarkFrames = lowWatermark == UINT64_MAX ? 0 : lowWatermark;
+        snapshot.audioSinkLatestInterarrivalUs = diag.audio_sink_latest_interarrival_us.load (std::memory_order_relaxed);
+        snapshot.audioSinkMaxInterarrivalUs = diag.audio_sink_max_interarrival_us.load (std::memory_order_relaxed);
+        snapshot.audioSinkLatestBlockFrames = diag.audio_sink_latest_block_frames.load (std::memory_order_relaxed);
+        const auto minimumSinkBlock = diag.audio_sink_min_block_frames.load (std::memory_order_relaxed);
+        snapshot.audioSinkMinBlockFrames = minimumSinkBlock == UINT64_MAX ? 0 : minimumSinkBlock;
+        snapshot.audioSinkMaxBlockFrames = diag.audio_sink_max_block_frames.load (std::memory_order_relaxed);
+        snapshot.audioSinkRecentMaxBlockFrames = diag.audio_sink_recent_max_block_frames.load (std::memory_order_relaxed);
+        snapshot.audioSinkBlocksApprox240 = diag.audio_sink_blocks_approx_240.load (std::memory_order_relaxed);
+        snapshot.audioSinkBlocksApprox480 = diag.audio_sink_blocks_approx_480.load (std::memory_order_relaxed);
+        snapshot.audioSinkBlocksApprox720 = diag.audio_sink_blocks_approx_720.load (std::memory_order_relaxed);
+        snapshot.audioSinkBlocks960Plus = diag.audio_sink_blocks_960_plus.load (std::memory_order_relaxed);
+        snapshot.audioSinkBlocksOther = diag.audio_sink_blocks_other.load (std::memory_order_relaxed);
+        snapshot.audioJitterPrimed = diag.audio_jitter_state.load (std::memory_order_relaxed) != 0;
+        snapshot.audioJitterPrimeLevelFrames = diag.audio_jitter_prime_level_frames.load (std::memory_order_relaxed);
+        snapshot.audioJitterReprimeCount = diag.audio_jitter_reprime_count.load (std::memory_order_relaxed);
+        snapshot.audioJitterConsecutiveUnderrunCallbacks = diag.audio_jitter_consecutive_underrun_callbacks.load (std::memory_order_relaxed);
+        snapshot.audioJitterLongestUnderrunRun = diag.audio_jitter_longest_underrun_run.load (std::memory_order_relaxed);
+        snapshot.audioJitterReprimeSilencedCallbacks = diag.audio_jitter_reprime_silenced_callbacks.load (std::memory_order_relaxed);
+        snapshot.videoCaptureQueueDepthBefore = diag.video_capture_queue_depth_before.load (std::memory_order_relaxed);
+        snapshot.videoCaptureQueueDepthAfter = diag.video_capture_queue_depth_after.load (std::memory_order_relaxed);
         snapshot.audioPeak = diag.peak_abs.load (std::memory_order_relaxed);
         snapshot.midiToAudioOnsetMs = diag.midi_to_audio_onset_ms.load (std::memory_order_relaxed);
         snapshot.bootReadyQueuedFrames = diag.boot_ready_queued_frames.load (std::memory_order_relaxed);
@@ -2609,6 +2666,19 @@ EmbeddedDiagnosticSnapshot VintageEmulatorStudioProcessor::getDiagnosticSnapshot
         snapshot.videoCaptureTotalUs = diag.video_capture_total_us.load (std::memory_order_relaxed);
         snapshot.videoCaptureMaxUs = diag.video_capture_max_us.load (std::memory_order_relaxed);
         snapshot.videoCaptureTimingCount = diag.video_capture_timing_count.load (std::memory_order_relaxed);
+        snapshot.videoPrepareTotalUs = diag.video_prepare_total_us.load (std::memory_order_relaxed);
+        snapshot.videoPrepareMaxUs = diag.video_prepare_max_us.load (std::memory_order_relaxed);
+        snapshot.videoSnapshotTotalUs = diag.video_snapshot_total_us.load (std::memory_order_relaxed);
+        snapshot.videoSnapshotMaxUs = diag.video_snapshot_max_us.load (std::memory_order_relaxed);
+        snapshot.videoSnapshotBytes = diag.video_snapshot_bytes.load (std::memory_order_relaxed);
+        snapshot.videoJobsSubmitted = diag.video_jobs_submitted.load (std::memory_order_relaxed);
+        snapshot.videoJobsReplaced = diag.video_jobs_replaced.load (std::memory_order_relaxed);
+        snapshot.videoJobsCompleted = diag.video_jobs_completed.load (std::memory_order_relaxed);
+        snapshot.videoWorkerRasterUs = diag.video_worker_raster_us.load (std::memory_order_relaxed);
+        snapshot.videoWorkerStaticCompositeUs = diag.video_worker_static_composite_us.load (std::memory_order_relaxed);
+        snapshot.videoWorkerTotalUs = diag.video_worker_total_us.load (std::memory_order_relaxed);
+        snapshot.videoWorkerMaxUs = diag.video_worker_max_us.load (std::memory_order_relaxed);
+        snapshot.videoWorkerPendingDepth = diag.video_worker_pending_depth.load (std::memory_order_relaxed);
         snapshot.videoRasterError = diag.video_raster_error_code.load (std::memory_order_relaxed);
         snapshot.videoRasterErrorIndex = diag.video_raster_error_index.load (std::memory_order_relaxed);
         snapshot.videoTargetFrameRate = diag.video_target_frame_rate.load (std::memory_order_relaxed);
@@ -3672,6 +3742,205 @@ void VintageEmulatorStudioProcessor::timerCallback()
     flushPluginStateDiagnostics();
     flushMidiAudioLatencyResults();
     recordVideoRuntimeDiagnostics();
+    recordAudioRateDiagnostics();
+}
+
+void VintageEmulatorStudioProcessor::recordAudioRateDiagnostics()
+{
+    if (! audioRateInitializedSentinelLogged)
+    {
+        appendLifecycleLog ("[VES audio rate debug] initialized");
+        audioRateInitializedSentinelLogged = true;
+    }
+
+    auto localEngine = std::atomic_load (&engine);
+    if (localEngine == nullptr || getEngineState() != EmbeddedEngineState::Ready)
+    {
+        audioRateWindowStartedNs = 0;
+        audioRateLoggedEngineGeneration = 0;
+        return;
+    }
+
+    if (! audioRateReadySentinelLogged)
+    {
+        appendLifecycleLog ("[VES audio rate debug] ready");
+        audioRateReadySentinelLogged = true;
+    }
+
+    auto& diag = localEngine->diagnostics();
+    const auto nowNs = steadyNowNs();
+    const auto engineGeneration = videoEngineGeneration.load (std::memory_order_acquire);
+    const auto producerFrames = diag.audio_rate_producer_frames.load (std::memory_order_relaxed);
+    const auto consumerFrames = diag.audio_rate_host_requested_frames.load (std::memory_order_relaxed);
+    const auto hostCallbacks = diag.audio_rate_host_callback_count.load (std::memory_order_relaxed);
+    const auto sinkCallbacks = diag.mame_audio_callback_count.load (std::memory_order_relaxed);
+    const auto sinkGapTotalUs = diag.audio_rate_sink_gap_total_us.load (std::memory_order_relaxed);
+    const auto sinkGapCount = diag.audio_rate_sink_gap_count.load (std::memory_order_relaxed);
+    const auto sinkGapGt7500 = diag.audio_rate_sink_gap_gt_7500.load (std::memory_order_relaxed);
+    const auto sinkGapGt10000 = diag.audio_rate_sink_gap_gt_10000.load (std::memory_order_relaxed);
+    const auto sinkGapGt15000 = diag.audio_rate_sink_gap_gt_15000.load (std::memory_order_relaxed);
+    const auto schedulerUpdates = diag.audio_rate_scheduler_update_count.load (std::memory_order_relaxed);
+    const auto schedulerGapTotalUs = diag.audio_rate_scheduler_gap_total_us.load (std::memory_order_relaxed);
+    const auto schedulerGapCount = diag.audio_rate_scheduler_gap_count.load (std::memory_order_relaxed);
+    const auto schedulerGapGt7500 = diag.audio_rate_scheduler_gap_gt_7500.load (std::memory_order_relaxed);
+    const auto schedulerGapGt10000 = diag.audio_rate_scheduler_gap_gt_10000.load (std::memory_order_relaxed);
+    const auto schedulerGapGt15000 = diag.audio_rate_scheduler_gap_gt_15000.load (std::memory_order_relaxed);
+    const std::array<uint64_t, 5> histogram {
+        diag.audio_rate_sink_hist_le_256.load (std::memory_order_relaxed),
+        diag.audio_rate_sink_hist_257_512.load (std::memory_order_relaxed),
+        diag.audio_rate_sink_hist_513_768.load (std::memory_order_relaxed),
+        diag.audio_rate_sink_hist_769_1024.load (std::memory_order_relaxed),
+        diag.audio_rate_sink_hist_gt_1024.load (std::memory_order_relaxed)
+    };
+
+    if (audioRateWindowStartedNs == 0 || audioRateLoggedEngineGeneration != engineGeneration)
+    {
+        audioRateWindowStartedNs = nowNs;
+        audioRateLoggedEngineGeneration = engineGeneration;
+        audioRateLastProducerFrames = producerFrames;
+        audioRateLastConsumerFrames = consumerFrames;
+        audioRateLastHostCallbacks = hostCallbacks;
+        audioRateLastSinkCallbacks = sinkCallbacks;
+        audioRateLastSinkGapTotalUs = sinkGapTotalUs;
+        audioRateLastSinkGapCount = sinkGapCount;
+        audioRateLastSinkGapGt7500 = sinkGapGt7500;
+        audioRateLastSinkGapGt10000 = sinkGapGt10000;
+        audioRateLastSinkGapGt15000 = sinkGapGt15000;
+        audioRateLastSchedulerUpdates = schedulerUpdates;
+        audioRateLastSchedulerGapTotalUs = schedulerGapTotalUs;
+        audioRateLastSchedulerGapCount = schedulerGapCount;
+        audioRateLastSchedulerGapGt7500 = schedulerGapGt7500;
+        audioRateLastSchedulerGapGt10000 = schedulerGapGt10000;
+        audioRateLastSchedulerGapGt15000 = schedulerGapGt15000;
+        audioRateLastSinkHistogram = histogram;
+        audioRateLastReprimes = diag.audio_jitter_reprime_count.load (std::memory_order_relaxed);
+        audioRateLastUnderrunCallbacks = diag.audio_underrun_callbacks.load (std::memory_order_relaxed);
+        audioRateLastSilencedCallbacks = diag.audio_jitter_reprime_silenced_callbacks.load (std::memory_order_relaxed);
+        diag.audio_rate_sink_window_min_block.exchange (UINT64_MAX, std::memory_order_relaxed);
+        diag.audio_rate_sink_window_max_block.exchange (0, std::memory_order_relaxed);
+        diag.audio_rate_sink_window_max_gap_us.exchange (0, std::memory_order_relaxed);
+        diag.audio_rate_queue_depth_total.exchange (0, std::memory_order_relaxed);
+        diag.audio_rate_queue_depth_count.exchange (0, std::memory_order_relaxed);
+        diag.audio_rate_queue_window_min.exchange (UINT64_MAX, std::memory_order_relaxed);
+        diag.audio_rate_queue_window_max.exchange (0, std::memory_order_relaxed);
+        diag.audio_rate_queue_below_host_block.exchange (0, std::memory_order_relaxed);
+        diag.audio_rate_host_window_min_block.exchange (UINT64_MAX, std::memory_order_relaxed);
+        diag.audio_rate_host_window_max_block.exchange (0, std::memory_order_relaxed);
+        if (! audioRateBaselineSentinelLogged)
+        {
+            appendLifecycleLog ("[VES audio rate debug] baseline_started");
+            audioRateBaselineSentinelLogged = true;
+        }
+        return;
+    }
+
+    const auto elapsedNs = nowNs - audioRateWindowStartedNs;
+    if (elapsedNs < 5'000'000'000ULL)
+        return;
+
+    const auto elapsedSeconds = static_cast<double> (elapsedNs) / 1.0e9;
+    const auto produced = producerFrames - audioRateLastProducerFrames;
+    const auto consumed = consumerFrames - audioRateLastConsumerFrames;
+    const auto callbackCount = sinkCallbacks - audioRateLastSinkCallbacks;
+    const auto hostCallbackCount = hostCallbacks - audioRateLastHostCallbacks;
+    const auto producerFps = static_cast<double> (produced) / elapsedSeconds;
+    const auto consumerFps = static_cast<double> (consumed) / elapsedSeconds;
+    const auto differenceFps = producerFps - consumerFps;
+    const auto ppm = consumerFps > 0.0 ? (producerFps / consumerFps - 1.0) * 1.0e6 : 0.0;
+    const auto gapTotal = sinkGapTotalUs - audioRateLastSinkGapTotalUs;
+    const auto gapCount = sinkGapCount - audioRateLastSinkGapCount;
+    const auto schedulerGapTotal = schedulerGapTotalUs - audioRateLastSchedulerGapTotalUs;
+    const auto schedulerGapSamples = schedulerGapCount - audioRateLastSchedulerGapCount;
+    const auto schedulerUpdateDelta = schedulerUpdates - audioRateLastSchedulerUpdates;
+    const auto averageBlock = callbackCount != 0 ? static_cast<double> (produced) / static_cast<double> (callbackCount) : 0.0;
+    const auto averageHostBlock = hostCallbackCount != 0 ? static_cast<double> (consumed) / static_cast<double> (hostCallbackCount) : 0.0;
+    const auto averageGapUs = gapCount != 0 ? static_cast<double> (gapTotal) / static_cast<double> (gapCount) : 0.0;
+    const auto schedulerAverageGapUs = schedulerGapSamples != 0 ? static_cast<double> (schedulerGapTotal) / static_cast<double> (schedulerGapSamples) : 0.0;
+    const auto minimumBlock = diag.audio_rate_sink_window_min_block.exchange (UINT64_MAX, std::memory_order_relaxed);
+    const auto maximumBlock = diag.audio_rate_sink_window_max_block.exchange (0, std::memory_order_relaxed);
+    const auto maximumGapUs = diag.audio_rate_sink_window_max_gap_us.exchange (0, std::memory_order_relaxed);
+    const auto queueTotal = diag.audio_rate_queue_depth_total.exchange (0, std::memory_order_relaxed);
+    const auto queueCount = diag.audio_rate_queue_depth_count.exchange (0, std::memory_order_relaxed);
+    const auto minimumQueue = diag.audio_rate_queue_window_min.exchange (UINT64_MAX, std::memory_order_relaxed);
+    const auto maximumQueue = diag.audio_rate_queue_window_max.exchange (0, std::memory_order_relaxed);
+    const auto queueBelowBlock = diag.audio_rate_queue_below_host_block.exchange (0, std::memory_order_relaxed);
+    const auto averageQueue = queueCount != 0 ? static_cast<double> (queueTotal) / static_cast<double> (queueCount) : 0.0;
+    const auto minimumHostBlock = diag.audio_rate_host_window_min_block.exchange (UINT64_MAX, std::memory_order_relaxed);
+    const auto maximumHostBlock = diag.audio_rate_host_window_max_block.exchange (0, std::memory_order_relaxed);
+    const auto reprimes = diag.audio_jitter_reprime_count.load (std::memory_order_relaxed);
+    const auto underruns = diag.audio_underrun_callbacks.load (std::memory_order_relaxed);
+    const auto silenced = diag.audio_jitter_reprime_silenced_callbacks.load (std::memory_order_relaxed);
+    const auto counterDelta = [] (uint64_t current, uint64_t previous)
+    {
+        return current >= previous ? current - previous : current;
+    };
+
+    appendLifecycleLog ("[VES audio rate] window_s=" + juce::String (elapsedSeconds, 3)
+        + " host_rate=" + juce::String (static_cast<juce::int64> (diag.juce_sample_rate.load (std::memory_order_relaxed)))
+        + " mame_rate=" + juce::String (static_cast<juce::int64> (diag.mame_sample_rate.load (std::memory_order_relaxed)))
+        + " effective_mame_rate=" + juce::String (static_cast<juce::int64> (diag.effective_mame_sample_rate.load (std::memory_order_relaxed)))
+        + " configured_block=" + juce::String (static_cast<juce::int64> (diag.juce_configured_block_size.load (std::memory_order_relaxed)))
+        + " process_block_latest=" + juce::String (static_cast<juce::int64> (diag.audio_rate_host_latest_block.load (std::memory_order_relaxed)))
+        + " process_block_min=" + juce::String (static_cast<juce::int64> (minimumHostBlock == UINT64_MAX ? 0 : minimumHostBlock))
+        + " process_block_avg=" + juce::String (averageHostBlock, 2)
+        + " process_block_max=" + juce::String (static_cast<juce::int64> (maximumHostBlock))
+        + " process_block_callbacks=" + juce::String (static_cast<juce::int64> (hostCallbackCount))
+        + " producer_frames=" + juce::String (static_cast<juce::int64> (produced))
+        + " consumer_frames=" + juce::String (static_cast<juce::int64> (consumed))
+        + " producer_fps=" + juce::String (producerFps, 3)
+        + " consumer_fps=" + juce::String (consumerFps, 3)
+        + " difference_fps=" + juce::String (differenceFps, 3)
+        + " drift_ppm=" + juce::String (ppm, 2)
+        + " sink_callbacks=" + juce::String (static_cast<juce::int64> (callbackCount))
+        + " sink_block_latest=" + juce::String (static_cast<juce::int64> (diag.audio_sink_latest_block_frames.load (std::memory_order_relaxed)))
+        + " sink_block_min=" + juce::String (static_cast<juce::int64> (minimumBlock == UINT64_MAX ? 0 : minimumBlock))
+        + " sink_block_avg=" + juce::String (averageBlock, 2)
+        + " sink_block_max=" + juce::String (static_cast<juce::int64> (maximumBlock))
+        + " sink_hist_le256=" + juce::String (static_cast<juce::int64> (histogram[0] - audioRateLastSinkHistogram[0]))
+        + " sink_hist_257_512=" + juce::String (static_cast<juce::int64> (histogram[1] - audioRateLastSinkHistogram[1]))
+        + " sink_hist_513_768=" + juce::String (static_cast<juce::int64> (histogram[2] - audioRateLastSinkHistogram[2]))
+        + " sink_hist_769_1024=" + juce::String (static_cast<juce::int64> (histogram[3] - audioRateLastSinkHistogram[3]))
+        + " sink_hist_gt1024=" + juce::String (static_cast<juce::int64> (histogram[4] - audioRateLastSinkHistogram[4]))
+        + " sink_gap_latest_us=" + juce::String (static_cast<juce::int64> (diag.audio_sink_latest_interarrival_us.load (std::memory_order_relaxed)))
+        + " sink_gap_avg_us=" + juce::String (averageGapUs, 2)
+        + " sink_gap_max_us=" + juce::String (static_cast<juce::int64> (maximumGapUs))
+        + " sink_gap_gt7_5ms=" + juce::String (static_cast<juce::int64> (sinkGapGt7500 - audioRateLastSinkGapGt7500))
+        + " sink_gap_gt10ms=" + juce::String (static_cast<juce::int64> (sinkGapGt10000 - audioRateLastSinkGapGt10000))
+        + " sink_gap_gt15ms=" + juce::String (static_cast<juce::int64> (sinkGapGt15000 - audioRateLastSinkGapGt15000))
+        + " scheduler_updates=" + juce::String (static_cast<juce::int64> (schedulerUpdateDelta))
+        + " scheduler_gap_avg_us=" + juce::String (schedulerAverageGapUs, 2)
+        + " scheduler_gap_max_us=" + juce::String (static_cast<juce::int64> (diag.audio_rate_scheduler_window_max_gap_us.exchange (0, std::memory_order_relaxed)))
+        + " scheduler_gap_gt7_5ms=" + juce::String (static_cast<juce::int64> (schedulerGapGt7500 - audioRateLastSchedulerGapGt7500))
+        + " scheduler_gap_gt10ms=" + juce::String (static_cast<juce::int64> (schedulerGapGt10000 - audioRateLastSchedulerGapGt10000))
+        + " scheduler_gap_gt15ms=" + juce::String (static_cast<juce::int64> (schedulerGapGt15000 - audioRateLastSchedulerGapGt15000))
+        + " queue_min=" + juce::String (static_cast<juce::int64> (minimumQueue == UINT64_MAX ? 0 : minimumQueue))
+        + " queue_avg=" + juce::String (averageQueue, 2)
+        + " queue_max=" + juce::String (static_cast<juce::int64> (maximumQueue))
+        + " queue_below_host_block=" + juce::String (static_cast<juce::int64> (queueBelowBlock))
+        + " reprimes=" + juce::String (static_cast<juce::int64> (counterDelta (reprimes, audioRateLastReprimes)))
+        + " underrun_callbacks=" + juce::String (static_cast<juce::int64> (counterDelta (underruns, audioRateLastUnderrunCallbacks)))
+        + " reprime_silenced_callbacks=" + juce::String (static_cast<juce::int64> (counterDelta (silenced, audioRateLastSilencedCallbacks))));
+
+    audioRateWindowStartedNs = nowNs;
+    audioRateLastProducerFrames = producerFrames;
+    audioRateLastConsumerFrames = consumerFrames;
+    audioRateLastHostCallbacks = hostCallbacks;
+    audioRateLastSinkCallbacks = sinkCallbacks;
+    audioRateLastSinkGapTotalUs = sinkGapTotalUs;
+    audioRateLastSinkGapCount = sinkGapCount;
+    audioRateLastSinkGapGt7500 = sinkGapGt7500;
+    audioRateLastSinkGapGt10000 = sinkGapGt10000;
+    audioRateLastSinkGapGt15000 = sinkGapGt15000;
+    audioRateLastSchedulerUpdates = schedulerUpdates;
+    audioRateLastSchedulerGapTotalUs = schedulerGapTotalUs;
+    audioRateLastSchedulerGapCount = schedulerGapCount;
+    audioRateLastSchedulerGapGt7500 = schedulerGapGt7500;
+    audioRateLastSchedulerGapGt10000 = schedulerGapGt10000;
+    audioRateLastSchedulerGapGt15000 = schedulerGapGt15000;
+    audioRateLastSinkHistogram = histogram;
+    audioRateLastReprimes = reprimes;
+    audioRateLastUnderrunCallbacks = underruns;
+    audioRateLastSilencedCallbacks = silenced;
 }
 
 void VintageEmulatorStudioProcessor::recordVideoRuntimeDiagnostics()
