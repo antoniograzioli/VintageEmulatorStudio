@@ -1,0 +1,3056 @@
+diff --git a/scripts/genie.lua b/scripts/genie.lua
+index 586bea45fd054777999d9b8fbe08ee1504988ed1..ca097708d7421098b5aa3f2eac3cdebc9d272a21 100644
+--- a/scripts/genie.lua
++++ b/scripts/genie.lua
+@@ -490,6 +490,9 @@ configuration { "Debug", "vs20*" }
+ 	}
+ 
+ configuration { "Release", "vs20*" }
++	removeflags {
++		"StaticRuntime",
++	}
+ 	flags {
+ 		"Optimize",
+ 		"NoEditAndContinue",
+@@ -1247,11 +1250,13 @@ if _OPTIONS["vs"]==nil then
+ 			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
+ 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
+ 			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
++			"/wd4068", -- warning C4068: unknown pragma (MSVC does not implement #pragma STDC)
+ 			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
+ 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+ 			"/wd4127", -- warning C4127: conditional expression is constant
+ 			"/wd4146", -- warning C4146: unary minus operator applied to unsigned type, result still unsigned
+ 			"/wd4201", -- warning C4201: nonstandard extension used : nameless struct/union
++			"/wd4200", -- warning C4200: nonstandard extension used : zero-sized array in struct/union
+ 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+ 			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
+ 			"/wd4250", -- warning C4250: 'xxx' : inherits 'xxx' via dominance
+diff --git a/scripts/src/3rdparty.lua b/scripts/src/3rdparty.lua
+index 6c82dd172ff8af11b7aef9e48c502d37c80d28f3..552bcb9d044feb9077307a63c6597b310e7ad4c6 100755
+--- a/scripts/src/3rdparty.lua
++++ b/scripts/src/3rdparty.lua
+@@ -81,6 +81,7 @@ if _OPTIONS["vs"]==nil then
+ 			"/wd4127", -- warning C4127: conditional expression is constant
+ 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+ 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
++			"/wd4703", -- warning C4703: potentially uninitialized local pointer variable used
+ 		}
+ end
+ 
+@@ -1129,6 +1130,7 @@ if _OPTIONS["vs"]==nil then
+ 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+ 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+ 			"/wd4706", -- warning C4706: assignment within conditional expression
++			"/wd4189", -- warning C4189: local variable is initialized but not referenced
+ 		}
+ elseif _OPTIONS["vs"]=="clangcl" then
+ 		buildoptions {
+@@ -1421,6 +1423,7 @@ if _OPTIONS["vs"]==nil then
+ 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
+ 			"/wd4310", -- warning C4310: cast truncates constant value
+ 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
++			"/wd4828", -- warning C4828: vendored Dear ImGui markdown text contains non-UTF-8 bytes
+ 		}
+ elseif _OPTIONS["vs"]=="clangcl" then
+ 		buildoptions {
+diff --git a/scripts/target/mame/vesembedded.lua b/scripts/target/mame/vesembedded.lua
+index 3aae8a3c8939f471c813f90e42298cd36944b4eb..c17719915566618f1b7e7f873737f3c748b481e3 100644
+--- a/scripts/target/mame/vesembedded.lua
++++ b/scripts/target/mame/vesembedded.lua
+@@ -5,6 +5,7 @@
+ STANDALONE = true
+ 
+ CPUS["M6800"] = true
++CPUS["I86"] = true
+ CPUS["H8"] = true
+ CPUS["H8500"] = true
+ CPUS["DSPV"] = true
+@@ -40,6 +41,7 @@ MACHINES["HD63450"] = true
+ MACHINES["I8243"] = true
+ MACHINES["I8251"] = true
+ MACHINES["I8255"] = true
++MACHINES["MB89371"] = true
+ MACHINES["INPUT_MERGER"] = true
+ MACHINES["68681"] = true
+ MACHINES["MSM6200"] = true
+@@ -52,6 +54,7 @@ MACHINES["PIT8253"] = true
+ MACHINES["PIC8259"] = true
+ MACHINES["SCI4"] = true
+ MACHINES["UPD765"] = true
++MACHINES["TE7774"] = true
+ MACHINES["WD_FDC"] = true
+ MACHINES["WD33C9X"] = true
+ MACHINES["Z80DAISY"] = true
+@@ -75,6 +78,7 @@ SOUNDS["ESQPUMP"] = true
+ SOUNDS["GEW7"] = true
+ SOUNDS["MEG"] = true
+ SOUNDS["L7A1045"] = true
++SOUNDS["L4003"] = true
+ SOUNDS["MULTIPCM"] = true
+ SOUNDS["MM5837"] = true
+ SOUNDS["SWP00"] = true
+@@ -140,6 +144,8 @@ function standalone()
+ 		MAME_DIR .. "src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp",
+ 		MAME_DIR .. "src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h",
+ 		MAME_DIR .. "src/ves/embeddedinstruments/main.cpp",
++		MAME_DIR .. "src/frontend/mame/audit.cpp",
++		MAME_DIR .. "src/frontend/mame/audit.h",
+ 		MAME_DIR .. "src/frontend/mame/luaengine.cpp",
+ 		MAME_DIR .. "src/frontend/mame/luaengine.h",
+ 		MAME_DIR .. "src/frontend/mame/luaengine_render.cpp",
+@@ -147,6 +153,8 @@ function standalone()
+ 		MAME_DIR .. "src/frontend/mame/pluginopts.h",
+ 		MAME_DIR .. "src/mame/casio/ct8000.cpp",
+ 		MAME_DIR .. "src/mame/akai/s3000.cpp",
++		MAME_DIR .. "src/mame/akai/mpc60.cpp",
++		MAME_DIR .. "src/mame/akai/mpc3000.cpp",
+ 		MAME_DIR .. "src/mame/casio/ct8000_midi.cpp",
+ 		MAME_DIR .. "src/mame/casio/ct8000_midi.h",
+ 		MAME_DIR .. "src/mame/casio/ctk551.cpp",
+diff --git a/src/devices/cpu/drcbearm64.cpp b/src/devices/cpu/drcbearm64.cpp
+index dcfb3e2a953819c5dcba793a40026233fef0c326..d36973a1b5117b3f2edaafe445c0b7ddca39b10d 100644
+--- a/src/devices/cpu/drcbearm64.cpp
++++ b/src/devices/cpu/drcbearm64.cpp
+@@ -2763,7 +2763,7 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
+ 	assert(spacesizep.is_size_space());
+ 
+ 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+-	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
++	bool const have_specific = (uintptr_t(0) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
+ 
+ 	Label const nosave = a.new_label();
+ 	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+@@ -2874,7 +2874,7 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
+ 	assert(spacesizep.is_size_space());
+ 
+ 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+-	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
++	bool const have_specific = (uintptr_t(0) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
+ 
+ 	Label const nosave = a.new_label();
+ 	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+@@ -2986,7 +2986,7 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
+ 	assert(spacesizep.is_size_space());
+ 
+ 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+-	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
++	bool const have_specific = (uintptr_t(0) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+ 
+ 	Label const nosave = a.new_label();
+ 	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+@@ -3068,7 +3068,7 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
+ 
+ 	// set up a call to the write handler
+ 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+-	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
++	bool const have_specific = (uintptr_t(0) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+ 
+ 	Label const nosave = a.new_label();
+ 	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+diff --git a/src/devices/cpu/drcbeut.h b/src/devices/cpu/drcbeut.h
+index 01b1945f0e54f621e61006d773519fc2a73683b8..4244b4d1f0c3e634762e718540996d593c0071e7 100644
+--- a/src/devices/cpu/drcbeut.h
++++ b/src/devices/cpu/drcbeut.h
+@@ -194,7 +194,7 @@ private:
+ 
+ struct resolved_member_function
+ {
+-	uintptr_t obj = uintptr_t(nullptr);
++	uintptr_t obj = uintptr_t(0);
+ 	uint8_t *func = nullptr;
+ 
+ 	explicit operator bool() const noexcept
+diff --git a/src/devices/cpu/drcbex64.cpp b/src/devices/cpu/drcbex64.cpp
+index fe501cb35d90a894621b46b3c08137a44ebb928b..11d135f2cddc590a4f0eed0f50b28610bdaf7205 100644
+--- a/src/devices/cpu/drcbex64.cpp
++++ b/src/devices/cpu/drcbex64.cpp
+@@ -3086,7 +3086,7 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
+ 
+ 	// set up a call to the read handler
+ 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+-	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
++	bool const have_specific = (uintptr_t(0) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
+ 	mov_reg_param(a, gpd(REG_PARAM2), addrp);
+ 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
+ 	{
+@@ -3262,7 +3262,7 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
+ 
+ 	// set up a call to the read handler
+ 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+-	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
++	bool const have_specific = (uintptr_t(0) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
+ 	mov_reg_param(a, gpd(REG_PARAM2), addrp);
+ 	if (spacesizep.size() != SIZE_QWORD)
+ 		mov_reg_param(a, gpd(REG_PARAM3), maskp);
+@@ -3427,7 +3427,7 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
+ 
+ 	// set up a call to the write handler
+ 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+-	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
++	bool const have_specific = (uintptr_t(0) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+ 	mov_reg_param(a, gpd(REG_PARAM2), addrp);
+ 	if (spacesizep.size() != SIZE_QWORD)
+ 		mov_reg_param(a, gpd(REG_PARAM3), srcp);
+@@ -3564,7 +3564,7 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
+ 
+ 	// set up a call to the write handler
+ 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+-	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
++	bool const have_specific = (uintptr_t(0) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+ 	mov_reg_param(a, gpd(REG_PARAM2), addrp);
+ 	if (spacesizep.size() != SIZE_QWORD)
+ 		mov_reg_param(a, gpd(REG_PARAM3), srcp);
+diff --git a/src/devices/imagedev/midiin.cpp b/src/devices/imagedev/midiin.cpp
+index 88f38ad3e8b3face605ef52b256f1cb665652f82..1b1fbeb93e75d979a22b8f960c5605eb4970053e 100644
+--- a/src/devices/imagedev/midiin.cpp
++++ b/src/devices/imagedev/midiin.cpp
+@@ -13,13 +13,6 @@
+ 
+ #include "osdepend.h"
+ 
+-#if defined(__GNUC__)
+-__attribute__((weak))
+-#endif
+-void ves_embedded_midi_device_delivered(std::uint8_t, double)
+-{
+-}
+-
+ 
+ /***************************************************************************
+     IMPLEMENTATION
+@@ -102,6 +95,18 @@ void midiin_device::device_reset()
+ 	set_tra_rate(31250);
+ }
+ 
++void midiin_device::reset_transport_after_state_load()
++{
++	// Do not call device_reset(): this is a post-load transport cleanup, not a
++	// device/lifecycle reset.  The attached MIDI input remains open and its
++	// polling timer is untouched.
++	m_xmit_read = m_xmit_write = 0;
++	m_tx_busy = false;
++	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
++	set_rcv_rate(0);
++	set_tra_rate(attotime::from_hz(31250));
++}
++
+ /*-------------------------------------------------
+     midi_update
+ -------------------------------------------------*/
+@@ -252,8 +257,6 @@ void midiin_device::xmit_char(uint8_t data)
+ {
+ //  printf("MIDI in: xmit %02x\n", data);
+ 
+-	ves_embedded_midi_device_delivered(data, machine().time().as_double());
+-
+ 	// if tx is busy it'll pick this up automatically when it completes
+ 	if (!m_tx_busy)
+ 	{
+diff --git a/src/devices/imagedev/midiin.h b/src/devices/imagedev/midiin.h
+index 8ecb4910032c9dd9c8e759fbe587379cb55e27f1..c84cfd8cfb59d2a1dc20520097e16bc3c073942c 100644
+--- a/src/devices/imagedev/midiin.h
++++ b/src/devices/imagedev/midiin.h
+@@ -38,6 +38,10 @@ public:
+ 
+ 	auto input_callback() { return m_input_cb.bind(); }
+ 
++	// External MIDI input is transient across save-state restores.  Clear only
++	// the serial transport; leave the image source and emulated machine intact.
++	void reset_transport_after_state_load();
++
+ 	// device_image_interface implementation
+ 	virtual std::pair<std::error_condition, std::string> call_load() override;
+ 	virtual void call_unload() override;
+diff --git a/src/emu/machine.cpp b/src/emu/machine.cpp
+index 2298119b28969603fe10e849c0e42522f646d5e0..eae63b2ea645a5b9b4ea3a4f03787f947b7f67d2 100644
+--- a/src/emu/machine.cpp
++++ b/src/emu/machine.cpp
+@@ -412,7 +412,10 @@ int running_machine::run(bool quiet)
+ 
+ 			// execute CPUs if not paused
+ 			if (!m_paused)
++			{
+ 				m_scheduler.timeslice();
++				osd().timeslice_complete();
++			}
+ 			// otherwise, just pump video updates and sound mapping updates through
+ 			else
+ 			{
+diff --git a/src/emu/render.cpp b/src/emu/render.cpp
+index 90cdd8dd43f7a53b8528c6c39e553c46039772ee..86c324349e656b6a59d011aa180cf131ede44dd6 100644
+--- a/src/emu/render.cpp
++++ b/src/emu/render.cpp
+@@ -1656,6 +1656,11 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
+ //-------------------------------------------------
+ 
+ render_primitive_list &render_target::get_primitives()
++{
++	return get_primitives(0, std::numeric_limits<u32>::max(), true);
++}
++
++render_primitive_list &render_target::get_primitives(u32 first_item, u32 item_count, bool add_clears)
+ {
+ 	// switch to the next primitive list
+ 	render_primitive_list &list = m_primlist[m_listindex];
+@@ -1683,8 +1688,13 @@ render_primitive_list &render_target::get_primitives()
+ 	{
+ 		// we're running - iterate over items in the view
+ 		current_view().prepare_items();
++		u32 item_index = 0;
+ 		for (layout_view_item &curitem : current_view().visible_items())
+ 		{
++			const bool selected = item_index >= first_item && (item_index - first_item) < item_count;
++			++item_index;
++			if (!selected)
++				continue;
+ 			// first apply orientation to the bounds
+ 			render_bounds bounds = curitem.bounds();
+ 			apply_orientation(bounds, root_xform.orientation);
+@@ -1747,8 +1757,10 @@ render_primitive_list &render_target::get_primitives()
+ 		add_container_primitives(list, root_xform, ui_xform, *m_ui_container, BLENDMODE_ALPHA);
+ 	}
+ 
+-	// optimize the list before handing it off
+-	add_clear_and_optimize_primitive_list(list);
++	// Optimize the complete target path. Filtered VES cache paths render into
++	// transparent or already-composited buffers and must not inject clears.
++	if (add_clears)
++		add_clear_and_optimize_primitive_list(list);
+ 	list.release_lock();
+ 	return list;
+ }
+diff --git a/src/emu/render.h b/src/emu/render.h
+index 652a8abc9c50406d9fc36584fd2dd25a96f5f5a9..08675c9c81ed3ef8e0aeb2e0a76f2ca4be5265ec 100644
+--- a/src/emu/render.h
++++ b/src/emu/render.h
+@@ -558,6 +558,7 @@ public:
+ 
+ 	// get a primitive list
+ 	render_primitive_list &get_primitives();
++	render_primitive_list &get_primitives(u32 first_item, u32 item_count, bool add_clears);
+ 
+ 	// hit testing
+ 	bool map_point_container(s32 target_x, s32 target_y, render_container &container, float &container_x, float &container_y);
+diff --git a/src/emu/rendersw.hxx b/src/emu/rendersw.hxx
+index d4fde37566e1be0fd4a9eed1404e122535db0d22..2f51fad4db6a0bbb211c860f060516dad848759b 100644
+--- a/src/emu/rendersw.hxx
++++ b/src/emu/rendersw.hxx
+@@ -1744,25 +1744,30 @@ private:
+ 	//-------------------------------------------------
+ 
+ public:
++	static void draw_primitive(render_primitive const &prim, void *dstdata, u32 width, u32 height, u32 pitch)
++	{
++		switch (prim.type)
++		{
++			case render_primitive::LINE:
++				draw_line(prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
++				break;
++
++			case render_primitive::QUAD:
++				if (!prim.texture.base)
++					draw_rect(prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
++				else
++					setup_and_draw_textured_quad(prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
++				break;
++
++			default:
++				throw emu_fatalerror("Unexpected render_primitive type");
++		}
++	}
++
+ 	static void draw_primitives(render_primitive_list const &primlist, void *dstdata, u32 width, u32 height, u32 pitch)
+ 	{
+ 		// loop over the list and render each element
+ 		for (render_primitive const *prim = primlist.first(); prim != nullptr; prim = prim->next())
+-			switch (prim->type)
+-			{
+-				case render_primitive::LINE:
+-					draw_line(*prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
+-					break;
+-
+-				case render_primitive::QUAD:
+-					if (!prim->texture.base)
+-						draw_rect(*prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
+-					else
+-						setup_and_draw_textured_quad(*prim, reinterpret_cast<PixelType *>(dstdata), width, height, pitch);
+-					break;
+-
+-				default:
+-					throw emu_fatalerror("Unexpected render_primitive type");
+-			}
++			draw_primitive(*prim, dstdata, width, height, pitch);
+ 	}
+ };
+diff --git a/src/emu/rendlay.h b/src/emu/rendlay.h
+index 39d0507ca5251437678c6b504f7fc4b279c6d4f3..5ab3e79bcc5637b8ebedfda875b84211b4499e2a 100644
+--- a/src/emu/rendlay.h
++++ b/src/emu/rendlay.h
+@@ -284,6 +284,26 @@ public:
+ 	screen_device *screen() const { return m_screen; }
+ 	bool bounds_animated() const { return m_bounds.size() > 1U; }
+ 	bool color_animated() const { return m_color.size() > 1U; }
++	bool has_dynamic_dependency() const
++	{
++		return has_input()
++			|| !m_output_name.empty()
++			|| !m_animinput_tag.empty()
++			|| !m_animoutput_name.empty()
++			|| !m_scrollxinput_tag.empty()
++			|| !m_scrollxoutput_name.empty()
++			|| !m_scrollyinput_tag.empty()
++			|| !m_scrollyoutput_name.empty()
++			|| bounds_animated()
++			|| color_animated();
++	}
++	bool has_scroll_dependency() const
++	{
++		return !m_scrollxinput_tag.empty()
++			|| !m_scrollxoutput_name.empty()
++			|| !m_scrollyinput_tag.empty()
++			|| !m_scrollyoutput_name.empty();
++	}
+ 	render_bounds bounds() const { return m_get_bounds(); }
+ 	render_color color() const { return m_get_color(); }
+ 	bool scroll_wrap_x() const { return m_scrollwrapx; }
+diff --git a/src/emu/sound.cpp b/src/emu/sound.cpp
+index 30f1909542ef6bdc6bb26f9c5e3344494c035264..41e7a8c514788e0098d3ceda1e0369ad713bd97f 100644
+--- a/src/emu/sound.cpp
++++ b/src/emu/sound.cpp
+@@ -27,6 +27,11 @@
+ 
+ #include <algorithm>
+ 
++#if defined(__APPLE__)
++#include <pthread.h>
++#include <sys/qos.h>
++#endif
++
+ //**************************************************************************
+ //  DEBUGGING
+ //**************************************************************************
+@@ -1022,6 +1027,9 @@ void sound_manager::output_push(int id, sound_stream &stream)
+ 
+ void sound_manager::run_effects()
+ {
++#if defined(__APPLE__) && !defined(SOUND_DISABLE_THREADING)
++	pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
++#endif
+ #ifndef SOUND_DISABLE_THREADING
+ 	std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
+ 	for(;;) {
+@@ -2672,6 +2680,7 @@ u64 sound_manager::rate_and_time_to_index(attotime time, u32 sample_rate) const
+ void sound_manager::update(s32)
+ {
+ 	auto profile = g_profiler.start(PROFILER_SOUND);
++	machine().osd().sound_manager_update();
+ 
+ 	mapping_update();
+ 	streams_update();
+diff --git a/src/emu/sound.h b/src/emu/sound.h
+index 1065bdf05099de76a1d91125e284e9777f2a19a0..69113e1a74ecfe64a76fbb27d8d5bb4c5d60ac55 100644
+--- a/src/emu/sound.h
++++ b/src/emu/sound.h
+@@ -395,7 +395,7 @@ public:
+ 		std::vector<channel_mapping> m_channel_mappings;
+ 	};
+ 
+-	static constexpr int STREAMS_UPDATE_FREQUENCY = 50;
++	static constexpr int STREAMS_UPDATE_FREQUENCY = 200;
+ 
+ 	// construction/destruction
+ 	sound_manager(running_machine &machine);
+diff --git a/src/mame/casio/cz101.cpp b/src/mame/casio/cz101.cpp
+index 079b558eb1433e466b7d5274b8dd13f2540ceead..8d59416b79e101ee43de720fd7e6f3636766c301 100644
+--- a/src/mame/casio/cz101.cpp
++++ b/src/mame/casio/cz101.cpp
+@@ -62,7 +62,7 @@ public:
+ 		m_leds(*this, "led_%u", 0U),
+ 		m_led_env(*this, "led_env%u.%u", 0U, 0U),
+ 		m_led_tone(*this, "led_tone%u.%u", 0U, 0U),
+-		m_power(0),
++		m_power(1),
+ 		m_port_b(0),
+ 		m_port_c(0),
+ 		m_midi_rx(1)
+@@ -282,7 +282,7 @@ static INPUT_PORTS_START( cz101 )
+ 	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
+ 	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd933", FUNC(upd933_device::rq_r))
+ 	PORT_BIT(0x60, IP_ACTIVE_HIGH, IPT_UNUSED)
+-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_NAME("Power") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cz101_state::power_w), 0)
++	PORT_BIT(0x80, 0x80, IPT_POWER_OFF) PORT_NAME("Power") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cz101_state::power_w), 0)
+ 
+ 	PORT_START("AN1")
+ 	PORT_BIT(0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
+diff --git a/src/osd/osdepend.h b/src/osd/osdepend.h
+index a81632911f5b0fed2f5fd671cff2e8194a998545..586ae804f8ab8ba782935aa1b5b8a90779f789a5 100644
+--- a/src/osd/osdepend.h
++++ b/src/osd/osdepend.h
+@@ -69,6 +69,7 @@ public:
+ 	// general overridables
+ 	virtual void init(running_machine &machine) = 0;
+ 	virtual void update(bool skip_redraw) = 0;
++	virtual void timeslice_complete() { }
+ 	virtual void input_update(bool relative_reset) = 0;
+ 	virtual void check_osd_inputs() = 0;
+ 	virtual void set_verbose(bool print_verbose) = 0;
+@@ -91,6 +92,7 @@ public:
+ 	virtual void sound_stream_set_volumes(uint32_t id, const std::vector<float> &db) = 0;
+ 	virtual void sound_begin_update() = 0;
+ 	virtual void sound_end_update() = 0;
++	virtual void sound_manager_update() { }
+ 
+ 	// input overridables
+ 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) = 0;
+diff --git a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+index 686a794e7010f9bca43fb537778b0852c5493729..9b09975a2b989fe25441cf1e47133cd7f345108e 100644
+--- a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
++++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.cpp
+@@ -17,25 +17,41 @@
+ #include "uiinput.h"
+ #include "fileio.h"
+ 
++#include "frontend/mame/audit.h"
+ #include "frontend/mame/luaengine.h"
+ #include "frontend/mame/pluginopts.h"
+ 
+ #include "bus/midi/midi.h"
++#include "imagedev/midiin.h"
+ 
+ #include <algorithm>
+ #include <array>
+ #include <atomic>
+ #include <cmath>
++#include <cctype>
+ #include <cstdlib>
+ #include <cstring>
++#include <condition_variable>
++#include <functional>
++#include <fstream>
++#include <filesystem>
+ #include <memory>
+ #include <limits>
++#include <mutex>
++#include <sstream>
+ #include <thread>
+ #include <vector>
+ 
++#if defined(__APPLE__)
++#include <pthread.h>
++#include <sys/qos.h>
++#endif
++
+ GAME_EXTERN(ap10);
+ GAME_EXTERN(cd3000i);
+ GAME_EXTERN(cd3000xl);
++GAME_EXTERN(mpc60);
++GAME_EXTERN(mpc3000);
+ GAME_EXTERN(ct8000);
+ GAME_EXTERN(ctfk1);
+ GAME_EXTERN(cz1);
+@@ -94,6 +110,8 @@ const game_driver *const driver_list::s_drivers_sorted[] =
+ 	&GAME_NAME(fatman),
+ 	&GAME_NAME(fb01),
+ 	&GAME_NAME(linndrum),
++	&GAME_NAME(mpc3000),
++	&GAME_NAME(mpc60),
+ 	&GAME_NAME(mu2000),
+ 	&GAME_NAME(mu50),
+ 	&GAME_NAME(obdmx),
+@@ -131,6 +149,123 @@ namespace ves {
+ 
+ namespace {
+ 
++void append_engine_lifecycle_log(const std::string &line)
++{
++	const char *home = std::getenv("HOME");
++	if (home == nullptr || *home == '\0')
++		return;
++
++	std::ofstream file(std::filesystem::path(home) / "Library/Logs/VES-lifecycle.log", std::ios::app);
++	if (file)
++		file << line << '\n';
++}
++
++std::string lifecycle_log_field(std::string text)
++{
++	for (std::size_t pos = 0; (pos = text.find('\n', pos)) != std::string::npos; pos += 2)
++		text.replace(pos, 1, "\\n");
++	for (std::size_t pos = 0; (pos = text.find('\r', pos)) != std::string::npos; pos += 2)
++		text.replace(pos, 1, "\\r");
++	return text;
++}
++
++bool looks_like_media_failure(const std::string &output)
++{
++	std::string lower = output;
++	std::transform(lower.begin(), lower.end(), lower.begin(), [] (unsigned char character)
++	{
++		return static_cast<char> (std::tolower(character));
++	});
++	return lower.find("unable to open image") != std::string::npos
++		|| lower.find("error opening image") != std::string::npos
++		|| lower.find("loading image failed") != std::string::npos
++		|| lower.find("cannot open image") != std::string::npos
++		|| lower.find("image device") != std::string::npos;
++}
++
++std::string crcString(const util::hash_collection &hashes)
++{
++	uint32_t crc = 0;
++	return hashes.crc(crc) ? util::string_format("%08x", crc) : std::string();
++}
++
++std::string sha1String(const util::hash_collection &hashes)
++{
++	util::sha1_t sha1;
++	return hashes.sha1(sha1) ? sha1.as_string() : std::string();
++}
++
++EmbeddedStartupIssue makeStartupIssue(const media_auditor::audit_record &record)
++{
++	EmbeddedStartupIssue issue;
++	issue.name = record.name();
++	if (auto const shared_device = record.shared_device())
++		issue.owner = shared_device->shortname();
++	issue.expected_crc = crcString(record.expected_hashes());
++	issue.expected_sha1 = sha1String(record.expected_hashes());
++	issue.actual_crc = crcString(record.actual_hashes());
++	issue.actual_sha1 = sha1String(record.actual_hashes());
++	issue.expected_length = record.expected_length();
++	issue.actual_length = record.actual_length();
++	return issue;
++}
++
++void appendStartupIssue(EmbeddedStartupDiagnostic &diagnostic, const media_auditor::audit_record &record)
++{
++	diagnostic.issues.emplace_back(makeStartupIssue(record));
++}
++
++EmbeddedStartupDiagnostic auditDriverRomSet(emu_options &options, const game_driver &driver)
++{
++	driver_enumerator enumerator(options, driver);
++	if (!enumerator.next())
++	{
++		EmbeddedStartupDiagnostic diagnostic;
++		diagnostic.category = EmbeddedStartupError::InvalidRomSet;
++		diagnostic.summary = "The selected ROM set is incomplete or invalid.";
++		diagnostic.recovery = "Please check that you are using a complete MAME 0.289 ROM set for this machine.";
++		diagnostic.technical_details = "MAME driver enumerator could not select the requested driver.";
++		return diagnostic;
++	}
++
++	media_auditor auditor(enumerator);
++	const auto summary = auditor.audit_media(AUDIT_VALIDATE_FULL);
++
++	EmbeddedStartupDiagnostic missing;
++	missing.category = EmbeddedStartupError::MissingRom;
++	missing.summary = "Required ROM files are missing.";
++	missing.details = "Missing:";
++	missing.recovery = "Please check that you are using a complete MAME 0.289 ROM set for this machine.";
++
++	for (const auto &record : auditor.records())
++	{
++		switch (record.substatus())
++		{
++		case media_auditor::audit_substatus::NOT_FOUND:
++			appendStartupIssue(missing, record);
++			break;
++
++		default:
++			break;
++		}
++	}
++
++	if (!missing.issues.empty())
++		return missing;
++
++	if ((summary == media_auditor::NOTFOUND || summary == media_auditor::INCORRECT) && auditor.records().empty())
++	{
++		EmbeddedStartupDiagnostic invalid;
++		invalid.category = EmbeddedStartupError::InvalidRomSet;
++		invalid.summary = "The selected ROM set is incomplete or invalid.";
++		invalid.recovery = "Please check that you are using a complete MAME 0.289 ROM set for this machine.";
++		invalid.technical_details = util::string_format("MAME ROM audit summary: %d", static_cast<int>(summary));
++		return invalid;
++	}
++
++	return {};
++}
++
+ template <typename T, std::size_t Capacity>
+ class spsc_ring
+ {
+@@ -147,6 +282,27 @@ public:
+ 		return true;
+ 	}
+ 
++	template <typename Writer>
++	std::size_t push_bulk(std::size_t requested, Writer writer)
++	{
++		const auto head = m_head.load(std::memory_order_relaxed);
++		const auto tail = m_tail.load(std::memory_order_acquire);
++		const auto writable = writable_from(head, tail);
++		const auto count = std::min(requested, writable);
++		if (count == 0)
++			return 0;
++
++		const auto first = std::min(count, Capacity - head);
++		writer(&m_items[head], first, std::size_t(0));
++
++		const auto second = count - first;
++		if (second != 0)
++			writer(&m_items[0], second, first);
++
++		m_head.store((head + count) % Capacity, std::memory_order_release);
++		return count;
++	}
++
+ 	bool pop(T &item)
+ 	{
+ 		const auto tail = m_tail.load(std::memory_order_relaxed);
+@@ -160,9 +316,21 @@ public:
+ 
+ 	std::size_t pop(T *items, std::size_t max_count)
+ 	{
+-		std::size_t count = 0;
+-		while (count < max_count && pop(items[count]))
+-			++count;
++		const auto tail = m_tail.load(std::memory_order_relaxed);
++		const auto head = m_head.load(std::memory_order_acquire);
++		const auto readable = readable_from(head, tail);
++		const auto count = std::min(max_count, readable);
++		if (count == 0)
++			return 0;
++
++		const auto first = std::min(count, Capacity - tail);
++		std::copy_n(&m_items[tail], first, items);
++
++		const auto second = count - first;
++		if (second != 0)
++			std::copy_n(&m_items[0], second, items + first);
++
++		m_tail.store((tail + count) % Capacity, std::memory_order_release);
+ 		return count;
+ 	}
+ 
+@@ -200,6 +368,16 @@ private:
+ 		return (value + 1) % Capacity;
+ 	}
+ 
++	static constexpr std::size_t readable_from(std::size_t head, std::size_t tail)
++	{
++		return (head >= tail) ? (head - tail) : (Capacity + head - tail);
++	}
++
++	static constexpr std::size_t writable_from(std::size_t head, std::size_t tail)
++	{
++		return tail > head ? (tail - head - 1) : (Capacity - head + tail - 1);
++	}
++
+ 	std::array<T, Capacity> m_items {};
+ 	std::atomic<std::size_t> m_head { 0 };
+ 	std::atomic<std::size_t> m_tail { 0 };
+@@ -214,8 +392,10 @@ struct queued_midi_byte
+ using midi_byte_queue = spsc_ring<queued_midi_byte, 8192>;
+ using audio_frame_queue = spsc_ring<StereoFrame, 262144>;
+ using mouse_event_queue = spsc_ring<EmbeddedMouseEvent, 256>;
+-
+-EngineDiagnostics *g_active_diag = nullptr;
++using floppy_request_queue = spsc_ring<FloppyChangeRequest, 2>;
++using floppy_result_queue = spsc_ring<FloppyChangeResult, 2>;
++using state_request_queue = spsc_ring<StateOperationRequest, 2>;
++using state_result_queue = spsc_ring<StateOperationResult, 2>;
+ 
+ typedef software_renderer<std::uint32_t, 0,0,0, 16,8,0, false, false> embedded_video_renderer;
+ 
+@@ -287,7 +467,7 @@ public:
+ 		return nullptr;
+ 	}
+ 
+-	void publishWrittenBuffer(EngineDiagnostics &diag)
++	void publishWrittenBuffer(EngineDiagnostics &diag, std::uint64_t job_token)
+ 	{
+ 		const auto index = m_write_buffer_index;
+ 		const auto generation = ++m_generation_counter;
+@@ -297,6 +477,7 @@ public:
+ 		m_metadata[m_capture_slot][index].height = m_height[m_capture_slot];
+ 		m_metadata[m_capture_slot][index].generation = generation;
+ 		m_metadata[m_capture_slot][index].timestamp_ms = timestamp;
++		m_metadata[m_capture_slot][index].job_token = job_token;
+ 
+ 		m_published_index[m_capture_slot].store(static_cast<int>(index), std::memory_order_release);
+ 		m_generation[m_capture_slot] = generation;
+@@ -315,6 +496,11 @@ public:
+ 		diag.video_frame_generation.store(generation, std::memory_order_relaxed);
+ 		diag.video_last_frame_timestamp_ms.store(timestamp, std::memory_order_relaxed);
+ 		diag.video_frames_produced.fetch_add(1, std::memory_order_relaxed);
++		if (diag.state_restore_first_timeslice_completed_ms.load(std::memory_order_acquire) != 0)
++		{
++			std::uint64_t expected = 0;
++			diag.state_restore_first_video_ms.compare_exchange_strong(expected, timestamp, std::memory_order_release, std::memory_order_relaxed);
++		}
+ 	}
+ 
+ 	bool copy(VideoFrameSnapshot &snapshot, EngineDiagnostics &diag)
+@@ -337,7 +523,8 @@ public:
+ 			}
+ 
+ 			const auto metadata = m_metadata[slot][static_cast<std::size_t>(index)];
+-			if (metadata.generation == 0 || metadata.width <= 0 || metadata.height <= 0)
++			if (metadata.generation == 0 || metadata.width <= 0 || metadata.height <= 0
++				|| metadata.job_token < m_minimum_job_token.load(std::memory_order_acquire))
+ 			{
+ 				m_reader_index[slot].store(-1, std::memory_order_release);
+ 				return false;
+@@ -355,6 +542,21 @@ public:
+ 		return false;
+ 	}
+ 
++	void invalidatePublishedFrames(EngineDiagnostics &diag)
++	{
++		for (auto &published : m_published_index)
++			published.store(-1, std::memory_order_release);
++		diag.video_frame_width.store(0, std::memory_order_relaxed);
++		diag.video_frame_height.store(0, std::memory_order_relaxed);
++		diag.video_source_aspect_x1000.store(0, std::memory_order_relaxed);
++		diag.video_frame_reset_generation.fetch_add(1, std::memory_order_release);
++	}
++
++	void setMinimumJobToken(std::uint64_t token)
++	{
++		m_minimum_job_token.store(token, std::memory_order_release);
++	}
++
+ private:
+ 	struct metadata
+ 	{
+@@ -362,6 +564,7 @@ private:
+ 		int height = 0;
+ 		std::uint64_t generation = 0;
+ 		std::uint64_t timestamp_ms = 0;
++		std::uint64_t job_token = 0;
+ 	};
+ 
+ 	std::array<int, 2> m_width {};
+@@ -374,6 +577,7 @@ private:
+ 	std::array<std::atomic<int>, 2> m_reader_index { -1, -1 };
+ 	std::array<std::uint64_t, 2> m_generation {};
+ 	std::atomic<int> m_active_slot { 0 };
++	std::atomic<std::uint64_t> m_minimum_job_token { 0 };
+ 	std::size_t m_capture_slot = 0;
+ 	bool m_pending_generation = false;
+ 	std::uint64_t m_generation_counter = 0;
+@@ -414,6 +618,9 @@ void update_audio_queue_diagnostics(EngineDiagnostics &diag, std::size_t queued)
+ 		std::memory_order_relaxed);
+ }
+ 
++constexpr std::uint32_t k_audio_sink_diagnostics_interval = 32;
++constexpr std::uint32_t k_audio_read_diagnostics_interval = 32;
++
+ class memory_midi_input_port : public osd::midi_input_port
+ {
+ public:
+@@ -469,15 +676,52 @@ class embedded_osd : public osd_common_t
+ {
+ public:
+ 	embedded_osd(osd_options &options, midi_byte_queue &midi, audio_frame_queue &audio, mouse_event_queue &mouse,
++		floppy_request_queue &floppy_requests, floppy_result_queue &floppy_results,
++		state_request_queue &state_requests, state_result_queue &state_results,
++		std::atomic<bool> &midi_panic_requested,
++		std::array<std::atomic<std::uint64_t>, 32> &midi_panic_held_notes,
++		std::array<std::atomic<std::uint64_t>, 32> &active_host_midi_notes,
+ 		embedded_video_bridge &video, EngineDiagnostics &diag)
+ 		: osd_common_t(options)
+ 		, m_options(options)
+ 		, m_midi_queue(midi)
+ 		, m_audio_queue(audio)
+ 		, m_mouse_queue(mouse)
++		, m_floppy_requests(floppy_requests)
++		, m_floppy_results(floppy_results)
++		, m_state_requests(state_requests)
++		, m_state_results(state_results)
++		, m_midi_panic_requested(midi_panic_requested)
++		, m_midi_panic_held_notes(midi_panic_held_notes)
++		, m_active_host_midi_notes(active_host_midi_notes)
+ 		, m_video_bridge(video)
+ 		, m_diag(diag)
+ 	{
++		m_video_worker = std::thread([this] { video_worker_loop(); });
++	}
++
++	~embedded_osd() override
++	{
++		stop_video_worker();
++	}
++
++	void output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args) override
++	{
++		if (channel == OSD_OUTPUT_CHANNEL_ERROR || channel == OSD_OUTPUT_CHANNEL_WARNING)
++		{
++			std::ostringstream text;
++			util::stream_format(text, args);
++			std::lock_guard<std::mutex> guard(m_startup_output_mutex);
++			if (m_startup_output.size() < 65536)
++				m_startup_output.append(text.str(), 0, 65536 - m_startup_output.size());
++		}
++		osd_common_t::output_callback(channel, args);
++	}
++
++	std::string startup_output() const
++	{
++		std::lock_guard<std::mutex> guard(m_startup_output_mutex);
++		return m_startup_output;
+ 	}
+ 
+ 	void init(running_machine &machine) override
+@@ -488,20 +732,31 @@ public:
+ 		m_diag.video_initialized.store(true, std::memory_order_relaxed);
+ 		m_diag.video_render_target_available.store(false, std::memory_order_relaxed);
+ 		m_diag.video_capture_enabled.store(true, std::memory_order_relaxed);
+-		m_diag.video_target_frame_rate.store(5, std::memory_order_relaxed);
++		m_diag.video_target_frame_rate.store(1000 / std::max<std::uint64_t>(1, m_diag.video_capture_interval_ms.load(std::memory_order_relaxed)), std::memory_order_relaxed);
+ 		m_diag.mouse_forwarding_enabled.store(true, std::memory_order_relaxed);
+ 		m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::WaitingForMachine), std::memory_order_relaxed);
+ 	}
+ 
++	void sound_manager_update() override
++	{
++	}
++
+ 	void update(bool skip_redraw) override
+ 	{
++		process_floppy_requests();
+ 		consume_mouse_events();
+ 		process_embedded_ui_pointer_events();
+ 		osd_common_t::update(skip_redraw);
+ 		m_diag.osd_updates.fetch_add(1, std::memory_order_relaxed);
+ 		if (machine().phase() >= machine_phase::RESET)
+ 		{
+-			if (ensure_video_target())
++			if (!m_diag.video_editor_display_active.load(std::memory_order_relaxed)
++				|| !m_diag.video_capture_enabled.load(std::memory_order_relaxed))
++			{
++				release_video_target();
++				m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::Disabled), std::memory_order_relaxed);
++			}
++			else if (ensure_video_target())
+ 				capture_video_frame(skip_redraw);
+ 			else
+ 				m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::Unavailable), std::memory_order_relaxed);
+@@ -513,6 +768,339 @@ public:
+ 		}
+ 	}
+ 
++	void timeslice_complete() override
++	{
++		const auto now = steadyMs();
++		if (machine().phase() == machine_phase::RUNNING)
++		{
++			m_diag.machine_running.store(true, std::memory_order_release);
++			m_diag.normal_scheduler_iterations.fetch_add(1, std::memory_order_release);
++		}
++		if (m_restore_waiting_for_clean_timeslice)
++		{
++			m_restore_waiting_for_clean_timeslice = false;
++			m_diag.state_restore_first_timeslice_completed_ms.store(now, std::memory_order_release);
++			m_diag.video_deadline_reset_requests.fetch_add(1, std::memory_order_release);
++			m_diag.video_capture_requested.fetch_add(1, std::memory_order_release);
++		}
++		process_state_requests();
++		process_midi_panic_request();
++	}
++
++	struct immutable_primitive
++	{
++		render_primitive primitive;
++		std::vector<std::uint8_t> texture_pixels;
++		std::vector<rgb_t> palette;
++
++		void bind_owned_data()
++		{
++			primitive.texture.base = texture_pixels.empty() ? nullptr : texture_pixels.data();
++			primitive.texture.palette = palette.empty() ? nullptr : palette.data();
++			primitive.container = nullptr;
++		}
++	};
++
++	struct immutable_video_job
++	{
++		struct run
++		{
++			bool is_static = false;
++			std::uint64_t signature = 0;
++			std::vector<immutable_primitive> primitives;
++		};
++
++		int width = 0;
++		int height = 0;
++		std::uint64_t token = 0;
++		std::uint64_t snapshot_bytes = 0;
++		bool use_static_cache = false;
++		std::vector<run> runs;
++	};
++
++	struct worker_static_run
++	{
++		std::uint64_t signature = 0;
++		int x = 0;
++		int y = 0;
++		int width = 0;
++		int height = 0;
++		std::vector<std::uint32_t> pixels;
++	};
++
++	static std::uint64_t snapshot_signature(const immutable_video_job::run &run)
++	{
++		std::uint64_t hash = 1469598103934665603ULL;
++		auto mix = [&hash] (std::uint64_t value) { hash = (hash ^ value) * 1099511628211ULL; };
++		for (const auto &snapshot : run.primitives)
++		{
++			mix(snapshot.primitive.flags);
++			mix(snapshot.primitive.texture.unique_id);
++			mix(snapshot.primitive.texture.seqid);
++			mix(snapshot.texture_pixels.size());
++			mix(snapshot.palette.size());
++			std::uint32_t bits = 0;
++			std::memcpy(&bits, &snapshot.primitive.bounds.x0, sizeof(bits)); mix(bits);
++			std::memcpy(&bits, &snapshot.primitive.bounds.y0, sizeof(bits)); mix(bits);
++			std::memcpy(&bits, &snapshot.primitive.bounds.x1, sizeof(bits)); mix(bits);
++			std::memcpy(&bits, &snapshot.primitive.bounds.y1, sizeof(bits)); mix(bits);
++		}
++		return hash;
++	}
++
++	static std::size_t texture_pixel_size(u32 format)
++	{
++		return (format == TEXFORMAT_PALETTE16 || format == TEXFORMAT_YUY16) ? sizeof(std::uint16_t) : sizeof(std::uint32_t);
++	}
++
++	static bool cacheable_static_blend(int blend_mode)
++	{
++		return blend_mode == BLENDMODE_ALPHA || blend_mode == BLENDMODE_NONE;
++	}
++
++	bool snapshot_primitive(const render_primitive &source, immutable_primitive &destination, std::uint64_t &bytes)
++	{
++		destination.primitive.type = source.type;
++		destination.primitive.bounds = source.bounds;
++		destination.primitive.full_bounds = source.full_bounds;
++		destination.primitive.color = source.color;
++		destination.primitive.flags = source.flags;
++		destination.primitive.width = source.width;
++		destination.primitive.texture = source.texture;
++		destination.primitive.texcoords = source.texcoords;
++		destination.primitive.container = nullptr;
++		if (source.texture.base != nullptr)
++		{
++			const auto pixel_size = texture_pixel_size(PRIMFLAG_GET_TEXFORMAT(source.flags));
++			const auto row_bytes = static_cast<std::size_t>(source.texture.rowpixels) * pixel_size;
++			const auto texture_bytes = row_bytes * static_cast<std::size_t>(source.texture.height);
++			if (source.texture.rowpixels == 0 || source.texture.height == 0
++				|| texture_bytes > 256ULL * 1024ULL * 1024ULL)
++				return false;
++			destination.texture_pixels.resize(texture_bytes);
++			std::memcpy(destination.texture_pixels.data(), source.texture.base, texture_bytes);
++			bytes += texture_bytes;
++		}
++		if (source.texture.palette != nullptr && source.texture.palette_length != 0)
++		{
++			destination.palette.assign(source.texture.palette, source.texture.palette + source.texture.palette_length);
++			bytes += destination.palette.size() * sizeof(rgb_t);
++		}
++		destination.bind_owned_data();
++		bytes += sizeof(render_primitive);
++		return true;
++	}
++
++	void invalidate_video_jobs()
++	{
++		const auto token = m_video_job_token.fetch_add(1, std::memory_order_acq_rel) + 1;
++		m_video_bridge.setMinimumJobToken(token);
++		std::unique_lock<std::mutex> lock(m_video_worker_mutex, std::try_to_lock);
++		if (lock.owns_lock())
++		{
++			m_pending_video_job.reset();
++			m_diag.video_worker_pending_depth.store(0, std::memory_order_relaxed);
++		}
++	}
++
++	bool submit_video_job(std::unique_ptr<immutable_video_job> job)
++	{
++		std::unique_lock<std::mutex> lock(m_video_worker_mutex, std::try_to_lock);
++		if (!lock.owns_lock())
++		{
++			m_diag.video_jobs_replaced.fetch_add(1, std::memory_order_relaxed);
++			return false;
++		}
++		if (m_pending_video_job)
++			m_diag.video_jobs_replaced.fetch_add(1, std::memory_order_relaxed);
++		m_pending_video_job = std::move(job);
++		m_diag.video_worker_pending_depth.store(1, std::memory_order_relaxed);
++		m_diag.video_jobs_submitted.fetch_add(1, std::memory_order_relaxed);
++		lock.unlock();
++		m_video_worker_condition.notify_one();
++		return true;
++	}
++
++	worker_static_run build_worker_static_run(immutable_video_job::run &run, int width, int height)
++	{
++		worker_static_run cached;
++		cached.signature = run.signature;
++		int left = width;
++		int top = height;
++		int right = 0;
++		int bottom = 0;
++		for (const auto &snapshot : run.primitives)
++		{
++			left = std::min(left, std::clamp(static_cast<int>(std::floor(snapshot.primitive.bounds.x0)) - 1, 0, width));
++			top = std::min(top, std::clamp(static_cast<int>(std::floor(snapshot.primitive.bounds.y0)) - 1, 0, height));
++			right = std::max(right, std::clamp(static_cast<int>(std::ceil(snapshot.primitive.bounds.x1)) + 1, 0, width));
++			bottom = std::max(bottom, std::clamp(static_cast<int>(std::ceil(snapshot.primitive.bounds.y1)) + 1, 0, height));
++		}
++		if (right <= left || bottom <= top)
++			return cached;
++
++		const auto pixel_count = static_cast<std::size_t>(width) * height;
++		std::vector<std::uint32_t> black(pixel_count, 0U);
++		std::vector<std::uint32_t> white(pixel_count, 0x00ffffffU);
++		for (auto &snapshot : run.primitives)
++		{
++			snapshot.bind_owned_data();
++			embedded_video_renderer::draw_primitive(snapshot.primitive, black.data(), width, height, width);
++			embedded_video_renderer::draw_primitive(snapshot.primitive, white.data(), width, height, width);
++		}
++		cached.x = left;
++		cached.y = top;
++		cached.width = right - left;
++		cached.height = bottom - top;
++		cached.pixels.resize(static_cast<std::size_t>(cached.width) * cached.height);
++		for (int y = 0; y < cached.height; ++y)
++			for (int x = 0; x < cached.width; ++x)
++			{
++				const auto source_index = static_cast<std::size_t>(cached.y + y) * width + cached.x + x;
++				const auto black_pixel = black[source_index];
++				const auto white_pixel = white[source_index];
++				const auto alpha_channel = [] (unsigned b, unsigned w)
++				{
++					const int difference = static_cast<int>(w) - static_cast<int>(b);
++					return difference >= 0 ? 0xffU - std::min(0xff, difference) : 0xffU;
++				};
++				const auto alpha = std::max({
++					alpha_channel((black_pixel >> 16) & 0xffU, (white_pixel >> 16) & 0xffU),
++					alpha_channel((black_pixel >> 8) & 0xffU, (white_pixel >> 8) & 0xffU),
++					alpha_channel(black_pixel & 0xffU, white_pixel & 0xffU) });
++				const auto red = alpha != 0 ? std::min(0xffU, (((black_pixel >> 16) & 0xffU) * 0xffU) / alpha) : 0U;
++				const auto green = alpha != 0 ? std::min(0xffU, (((black_pixel >> 8) & 0xffU) * 0xffU) / alpha) : 0U;
++				const auto blue = alpha != 0 ? std::min(0xffU, ((black_pixel & 0xffU) * 0xffU) / alpha) : 0U;
++				cached.pixels[static_cast<std::size_t>(y) * cached.width + x] =
++					(alpha << 24) | (red << 16) | (green << 8) | blue;
++			}
++		return cached;
++	}
++
++	static void composite_worker_static_run(std::uint32_t *destination, int destination_width, const worker_static_run &run)
++	{
++		for (int y = 0; y < run.height; ++y)
++			for (int x = 0; x < run.width; ++x)
++			{
++				const auto source = run.pixels[static_cast<std::size_t>(y) * run.width + x];
++				const auto alpha = (source >> 24) & 0xffU;
++				if (alpha == 0)
++					continue;
++				const auto index = static_cast<std::size_t>(run.y + y) * destination_width + run.x + x;
++				const auto dest = destination[index];
++				const auto inverse = 0xffU - alpha;
++				const auto red = (((source >> 16) & 0xffU) * alpha + ((dest >> 16) & 0xffU) * inverse) / 0xffU;
++				const auto green = (((source >> 8) & 0xffU) * alpha + ((dest >> 8) & 0xffU) * inverse) / 0xffU;
++				const auto blue = ((source & 0xffU) * alpha + (dest & 0xffU) * inverse) / 0xffU;
++				destination[index] = (red << 16) | (green << 8) | blue;
++			}
++	}
++
++	void video_worker_loop()
++	{
++#if defined(__APPLE__)
++		pthread_set_qos_class_self_np(QOS_CLASS_UTILITY, 0);
++#endif
++		for (;;)
++		{
++			std::unique_ptr<immutable_video_job> job;
++			{
++				std::unique_lock<std::mutex> lock(m_video_worker_mutex);
++				m_video_worker_condition.wait(lock, [this] { return m_video_worker_stop || m_pending_video_job != nullptr; });
++				if (m_video_worker_stop)
++					return;
++				job = std::move(m_pending_video_job);
++				m_diag.video_worker_pending_depth.store(0, std::memory_order_relaxed);
++			}
++
++			if (!job || job->token != m_video_job_token.load(std::memory_order_acquire))
++			{
++				m_diag.video_capture_in_progress.store(false, std::memory_order_release);
++				continue;
++			}
++			try
++			{
++				std::vector<std::uint32_t> pixels(static_cast<std::size_t>(job->width) * job->height, 0xff000000U);
++				if (m_worker_cache_token != job->token || m_worker_cache_width != job->width
++					|| m_worker_cache_height != job->height || m_worker_static_runs.size() != job->runs.size())
++				{
++					m_worker_static_runs.clear();
++					m_worker_static_runs.resize(job->runs.size());
++					m_worker_cache_token = job->token;
++					m_worker_cache_width = job->width;
++					m_worker_cache_height = job->height;
++				}
++				for (std::size_t index = 0; index < job->runs.size(); ++index)
++				{
++					auto &run = job->runs[index];
++					if (job->use_static_cache && run.is_static)
++					{
++						auto &cached = m_worker_static_runs[index];
++						if (cached.signature != run.signature || cached.pixels.empty())
++							cached = build_worker_static_run(run, job->width, job->height);
++						composite_worker_static_run(pixels.data(), job->width, cached);
++					}
++					else
++					{
++						for (auto &snapshot : run.primitives)
++						{
++							snapshot.bind_owned_data();
++							embedded_video_renderer::draw_primitive(snapshot.primitive, pixels.data(),
++								static_cast<u32>(job->width), static_cast<u32>(job->height), static_cast<u32>(job->width));
++						}
++					}
++				}
++
++				if (job->token != m_video_job_token.load(std::memory_order_acquire))
++				{
++					m_diag.video_capture_in_progress.store(false, std::memory_order_release);
++					continue;
++				}
++				const auto begin_status = m_video_bridge.beginFrame(job->width, job->height);
++				if (begin_status != embedded_video_bridge::begin_status::ready)
++				{
++					m_diag.video_capture_in_progress.store(false, std::memory_order_release);
++					continue;
++				}
++				auto *const destination = m_video_bridge.writeBuffer();
++				if (destination == nullptr)
++				{
++					m_diag.video_capture_in_progress.store(false, std::memory_order_release);
++					continue;
++				}
++				std::copy(pixels.begin(), pixels.end(), destination);
++				if (job->token != m_video_job_token.load(std::memory_order_acquire))
++				{
++					m_diag.video_capture_in_progress.store(false, std::memory_order_release);
++					continue;
++				}
++				m_video_bridge.publishWrittenBuffer(m_diag, job->token);
++				m_diag.video_jobs_completed.fetch_add(1, std::memory_order_relaxed);
++				m_diag.video_capture_completed.fetch_add(1, std::memory_order_relaxed);
++				m_diag.video_capture_in_progress.store(false, std::memory_order_release);
++				m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::Running), std::memory_order_relaxed);
++			}
++			catch (...)
++			{
++				m_diag.video_capture_in_progress.store(false, std::memory_order_release);
++				m_diag.video_raster_error_code.store(1, std::memory_order_relaxed);
++				m_diag.video_last_error_code.store(1, std::memory_order_relaxed);
++			}
++		}
++	}
++
++	void stop_video_worker()
++	{
++		{
++			std::lock_guard<std::mutex> lock(m_video_worker_mutex);
++			m_video_worker_stop = true;
++			m_pending_video_job.reset();
++		}
++		m_video_worker_condition.notify_one();
++		if (m_video_worker.joinable())
++			m_video_worker.join();
++	}
++
+ 	void input_update(bool relative_reset) override
+ 	{
+ 		poll_input_modules(relative_reset);
+@@ -568,64 +1156,340 @@ public:
+ 
+ 	void sound_stream_sink_update(std::uint32_t, const std::int16_t *buffer, int samples_this_frame) override
+ 	{
+-		m_diag.stream_updates.fetch_add(1, std::memory_order_relaxed);
+-		m_diag.mame_audio_callback_count.fetch_add(1, std::memory_order_relaxed);
+-		m_diag.mame_audio_callback_block_size.store(static_cast<std::uint64_t>(std::max(samples_this_frame, 0)), std::memory_order_relaxed);
++		if (m_diag.state_restore_first_timeslice_completed_ms.load(std::memory_order_acquire) != 0)
++		{
++			const auto callback_ms = steadyMs();
++			const auto first = m_diag.state_restore_first_audio_ms.load(std::memory_order_acquire);
++			if (first == 0)
++			{
++				std::uint64_t expected = 0;
++				m_diag.state_restore_first_audio_ms.compare_exchange_strong(expected, callback_ms, std::memory_order_release, std::memory_order_relaxed);
++			}
++			else if (callback_ms > first && callback_ms - first <= 100)
++			{
++				std::uint64_t expected = 0;
++				m_diag.state_restore_second_audio_ms.compare_exchange_strong(expected, callback_ms, std::memory_order_release, std::memory_order_relaxed);
++			}
++			else if (callback_ms > first)
++			{
++				// Start a new candidate pair after a long gap.  The guard is released
++				// only after two callbacks demonstrate plausible realtime cadence.
++				m_diag.state_restore_first_audio_ms.store(callback_ms, std::memory_order_release);
++				m_diag.state_restore_second_audio_ms.store(0, std::memory_order_release);
++			}
++		}
++		if (samples_this_frame <= 0)
++			return;
+ 
+ 		static constexpr float scale = 1.0f / 32768.0f;
+-		for (int i = 0; i < samples_this_frame; ++i)
++		float block_peak = 0.0f;
++		const auto requested = static_cast<std::size_t>(samples_this_frame);
++		const auto written = m_audio_queue.push_bulk(requested, [&](StereoFrame *dest, std::size_t count, std::size_t source_offset)
+ 		{
+-			const StereoFrame frame {
+-				static_cast<float>(buffer[i * 2]) * scale,
+-				static_cast<float>(buffer[i * 2 + 1]) * scale };
++			const auto *src = buffer + (source_offset * 2);
++			for (std::size_t i = 0; i < count; ++i)
++			{
++				const StereoFrame frame {
++					static_cast<float>(src[i * 2]) * scale,
++					static_cast<float>(src[i * 2 + 1]) * scale };
++
++				block_peak = std::max(block_peak, std::max(std::fabs(frame.left), std::fabs(frame.right)));
++				dest[i] = frame;
++			}
++		});
++
++		if (written != 0)
++			m_diag.audio_frames_written.fetch_add(written, std::memory_order_relaxed);
++
++		const auto dropped = requested - written;
++		if (dropped != 0)
++		{
++			const auto *src = buffer + (written * 2);
++			for (std::size_t i = 0; i < dropped; ++i)
++			{
++				const auto left = static_cast<float>(src[i * 2]) * scale;
++				const auto right = static_cast<float>(src[i * 2 + 1]) * scale;
++				block_peak = std::max(block_peak, std::max(std::fabs(left), std::fabs(right)));
++			}
++		}
++
++		if (block_peak > 0.0f)
++		{
++			auto current_peak = m_diag.peak_abs.load(std::memory_order_relaxed);
++			while (block_peak > current_peak && !m_diag.peak_abs.compare_exchange_weak(current_peak, block_peak, std::memory_order_relaxed))
++			{
++			}
++		}
++
++		if (dropped != 0)
++		{
++			m_diag.audio_frames_dropped.fetch_add(dropped, std::memory_order_relaxed);
++			m_diag.audio_overflows.fetch_add(dropped, std::memory_order_relaxed);
++		}
++
++		if (++m_audio_sink_diagnostics_counter >= k_audio_sink_diagnostics_interval || dropped != 0)
++		{
++			m_audio_sink_diagnostics_counter = 0;
++			update_audio_queue_diagnostics(m_diag, m_audio_queue.size());
++		}
++	}
++
++	void sound_stream_source_update(std::uint32_t, std::int16_t *, int) override {}
++	void sound_begin_update() override {}
++	void sound_end_update() override {}
++
++	std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) override
++	{
++		if (name != "ves")
++		{
++			const std::string name_string(name);
++			osd_printf_warning("Embedded TX81Z test expected MIDI input 'ves', got '%s'\n", name_string.c_str());
++		}
++
++		m_diag.midi_input_open_count.fetch_add(1, std::memory_order_relaxed);
++		return std::make_unique<memory_midi_input_port>(m_midi_queue, m_diag);
++	}
++
++	std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view) override
++	{
++		m_diag.midi_output_open_count.fetch_add(1, std::memory_order_relaxed);
++		return std::make_unique<memory_midi_output_port>();
++	}
++
++	std::vector<osd::midi_port_info> list_midi_ports() override
++	{
++		return {
++			osd::midi_port_info { "ves", true, true, true, true }
++		};
++	}
++
++private:
++	static std::string state_error_message(save_error error)
++	{
++		switch (error)
++		{
++		case STATERR_NONE: return {};
++		case STATERR_INVALID_HEADER: return "MAME rejected the snapshot header";
++		case STATERR_READ_ERROR: return "MAME could not read the snapshot stream";
++		case STATERR_WRITE_ERROR: return "MAME could not write the snapshot stream";
++		default: return "MAME save manager returned error " + std::to_string(static_cast<int>(error));
++		}
++	}
++
++	void process_state_requests()
++	{
++		constexpr std::uint64_t state_scheduler_wait_timeout_ms = 2000;
++		if (!m_pending_state_request)
++		{
++			if (!m_state_requests.pop(m_current_state_request))
++				return;
++			m_pending_state_request = true;
++			m_state_scheduler_wait_started_ms = steadyMs();
++			if (m_current_state_request.operation == StateOperation::Load)
++			{
++				m_audio_queue.clear();
++				m_midi_queue.clear();
++			}
++		}
++		if (machine().phase() != machine_phase::RUNNING || !machine().scheduler().can_save())
++		{
++			const auto waited_ms = steadyMs() - m_state_scheduler_wait_started_ms;
++			if (waited_ms < state_scheduler_wait_timeout_ms)
++				return;
++
++			StateOperationResult timeout_result;
++			timeout_result.operation = m_current_state_request.operation;
++			timeout_result.engine_generation = m_current_state_request.engine_generation;
++			timeout_result.request_id = m_current_state_request.request_id;
++			timeout_result.error_message = "Timed out waiting for a safe scheduler save-state boundary";
++			const bool save = timeout_result.operation == StateOperation::Save;
++			(save ? m_diag.state_save_failures : m_diag.state_load_failures).fetch_add(1, std::memory_order_relaxed);
++			m_state_results.push(timeout_result);
++			m_pending_state_request = false;
++			return;
++		}
++
++		StateOperationResult result;
++		result.operation = m_current_state_request.operation;
++		result.engine_generation = m_current_state_request.engine_generation;
++		result.request_id = m_current_state_request.request_id;
++		if (result.operation == StateOperation::Save)
++		{
++			std::ostringstream stream(std::ios::binary);
++			const auto error = machine().save().write_stream(stream);
++			if (error == STATERR_NONE)
++			{
++				m_state_snapshot = stream.str();
++				for (std::size_t i = 0; i < m_state_snapshot_held_notes.size(); ++i)
++					m_state_snapshot_held_notes[i] = m_active_host_midi_notes[i].load(std::memory_order_acquire);
++				result.snapshot_blob.assign(m_state_snapshot.begin(), m_state_snapshot.end());
++				result.held_midi_notes = m_state_snapshot_held_notes;
++				result.success = true;
++				result.snapshot_size = m_state_snapshot.size();
++				m_diag.state_snapshot_bytes.store(result.snapshot_size, std::memory_order_relaxed);
++			}
++			else
++				result.error_message = state_error_message(error);
++		}
++		else if (m_current_state_request.snapshot_blob.empty() && m_state_snapshot.empty())
++			result.error_message = "No in-memory state snapshot has been captured";
++		else
++		{
++			if (!m_current_state_request.snapshot_blob.empty())
++			{
++				m_state_snapshot.assign(m_current_state_request.snapshot_blob.begin(), m_current_state_request.snapshot_blob.end());
++				m_state_snapshot_held_notes = m_current_state_request.held_midi_notes;
++			}
++			result.held_midi_notes = m_state_snapshot_held_notes;
++			std::istringstream stream(m_state_snapshot, std::ios::binary);
++			m_diag.state_restore_read_completed_ms.store(0, std::memory_order_release);
++			m_diag.state_restore_first_timeslice_completed_ms.store(0, std::memory_order_release);
++			m_diag.state_restore_first_audio_ms.store(0, std::memory_order_release);
++			m_diag.state_restore_second_audio_ms.store(0, std::memory_order_release);
++			m_diag.state_restore_first_video_ms.store(0, std::memory_order_release);
++			const auto error = machine().save().read_stream(stream);
++			if (error == STATERR_NONE)
++			{
++				m_diag.state_restore_read_completed_ms.store(steadyMs(), std::memory_order_release);
++				for (device_t &device : device_enumerator(machine().root_device()))
++					if (auto *midi_input = dynamic_cast<midiin_device *>(&device))
++						midi_input->reset_transport_after_state_load();
++				reset_post_restore_video_and_input();
++				m_restore_waiting_for_clean_timeslice = true;
++				result.success = true;
++				result.snapshot_size = m_state_snapshot.size();
++				m_audio_queue.clear();
++				m_midi_queue.clear();
++			}
++			else
++			{
++				result.error_message = state_error_message(error);
++				result.load_failed_requires_restart = true;
++			}
++		}
++		const bool save = result.operation == StateOperation::Save;
++		(save ? (result.success ? m_diag.state_save_successes : m_diag.state_save_failures)
++		      : (result.success ? m_diag.state_load_successes : m_diag.state_load_failures)).fetch_add(1, std::memory_order_relaxed);
++		m_state_results.push(result);
++		m_pending_state_request = false;
++	}
++
++	void process_midi_panic_request()
++	{
++		if (!m_midi_panic_requested.load(std::memory_order_relaxed))
++			return;
++		if (!m_midi_panic_requested.exchange(false, std::memory_order_acq_rel))
++			return;
+ 
+-			const float peak = std::max(std::fabs(frame.left), std::fabs(frame.right));
+-			auto current_peak = m_diag.peak_abs.load(std::memory_order_relaxed);
+-			while (peak > current_peak && !m_diag.peak_abs.compare_exchange_weak(current_peak, peak, std::memory_order_relaxed))
++		m_midi_queue.clear();
++		const auto now = steadyMs();
++		const auto queue_byte = [this, now](std::uint8_t value)
++		{
++			if (m_midi_queue.push(queued_midi_byte { value, now }))
++				m_diag.midi_bytes_queued.fetch_add(1, std::memory_order_relaxed);
++			else
++				m_diag.midi_queue_overflow.fetch_add(1, std::memory_order_relaxed);
++		};
++		for (std::uint8_t channel = 0; channel < 16; ++channel)
++		{
++			for (std::uint8_t note = 0; note < 128; ++note)
+ 			{
++				const auto index = static_cast<std::size_t>(channel) * 2 + (note >> 6);
++				if (!BIT(m_midi_panic_held_notes[index].load(std::memory_order_acquire), note & 63))
++					continue;
++				queue_byte(static_cast<std::uint8_t>(0x80U | channel));
++				queue_byte(note);
++				queue_byte(0);
+ 			}
+-
+-			if (m_audio_queue.push(frame))
+-				m_diag.audio_frames_written.fetch_add(1, std::memory_order_relaxed);
+-			else
++		}
++		for (std::uint8_t channel = 0; channel < 16; ++channel)
++		{
++			for (const std::uint8_t controller : { std::uint8_t(64), std::uint8_t(123),
++				std::uint8_t(120), std::uint8_t(121) })
+ 			{
+-				m_diag.audio_frames_dropped.fetch_add(1, std::memory_order_relaxed);
+-				m_diag.audio_overflows.fetch_add(1, std::memory_order_relaxed);
++				queue_byte(static_cast<std::uint8_t>(0xb0U | channel));
++				queue_byte(controller);
++				queue_byte(0);
+ 			}
++			queue_byte(static_cast<std::uint8_t>(0xe0U | channel));
++			queue_byte(0);
++			queue_byte(64);
+ 		}
+-		update_audio_queue_diagnostics(m_diag, m_audio_queue.size());
++		m_diag.midi_first_queued_ms.store(now, std::memory_order_relaxed);
++		m_diag.midi_last_queued_ms.store(now, std::memory_order_relaxed);
+ 	}
+ 
+-	void sound_stream_source_update(std::uint32_t, std::int16_t *, int) override {}
+-	void sound_begin_update() override {}
+-	void sound_end_update() override {}
+-
+-	std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) override
++	void reset_post_restore_video_and_input()
+ 	{
+-		if (name != "ves")
++		invalidate_video_jobs();
++		m_mouse_queue.clear();
++		const bool was_pressed = m_diag.mouse_left_down.exchange(false, std::memory_order_acq_rel);
++		m_diag.mouse_release_pending.store(false, std::memory_order_release);
++		m_diag.mouse_current_x.store(-1, std::memory_order_relaxed);
++		m_diag.mouse_current_y.store(-1, std::memory_order_relaxed);
++		m_diag.mouse_pointer_target_index.store(0, std::memory_order_relaxed);
++		m_diag.mouse_hit_item.store(false, std::memory_order_relaxed);
++		m_diag.mouse_hit_input_tag.store(0, std::memory_order_relaxed);
++		m_diag.mouse_hit_input_mask.store(0, std::memory_order_relaxed);
++		m_diag.mouse_input_field_active.store(false, std::memory_order_relaxed);
++
++		ui_event event;
++		while (machine().ui_input().pop_event(&event)) { }
++
++		if (m_video_target != nullptr)
+ 		{
+-			const std::string name_string(name);
+-			osd_printf_warning("Embedded TX81Z test expected MIDI input 'ves', got '%s'\n", name_string.c_str());
++			if (was_pressed)
++				m_video_target->pointer_aborted(osd::ui_event_handler::pointer::MOUSE, 0, 0, 0, 0, 1, 0);
++			const auto view = m_video_target->view();
++			m_video_target->set_view(view);
+ 		}
+-
+-		m_diag.midi_input_open_count.fetch_add(1, std::memory_order_relaxed);
+-		return std::make_unique<memory_midi_input_port>(m_midi_queue, m_diag);
++		m_video_bridge.invalidatePublishedFrames(m_diag);
+ 	}
+ 
+-	std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view) override
++	void process_floppy_requests()
+ 	{
+-		m_diag.midi_output_open_count.fetch_add(1, std::memory_order_relaxed);
+-		return std::make_unique<memory_midi_output_port>();
+-	}
++		FloppyChangeRequest request;
++		if (!m_floppy_requests.pop(request))
++			return;
+ 
+-	std::vector<osd::midi_port_info> list_midi_ports() override
+-	{
+-		return {
+-			osd::midi_port_info { "ves", true, true, true, true }
+-		};
++		FloppyChangeResult result;
++		result.media_type = request.media_type;
++		result.engine_generation = request.engine_generation;
++		result.request_id = request.request_id;
++		device_image_interface *image = nullptr;
++		for (device_image_interface &candidate : image_interface_enumerator(machine().root_device()))
++			if (candidate.brief_instance_name() == request.brief_instance_name)
++			{
++				image = &candidate;
++				break;
++			}
++		if (image == nullptr)
++		{
++			result.error_message = request.media_type == EmbeddedMediaType::CdRom
++				? "CD-ROM image device was not found"
++				: "Floppy image device was not found";
++			m_floppy_results.push(result);
++			return;
++		}
++
++		if (request.path.empty())
++		{
++			image->unload();
++			result.success = true;
++			result.drive_empty = true;
++		}
++		else
++		{
++			auto const [error, message] = image->load(request.path);
++			result.success = !error;
++			result.drive_empty = !result.success;
++			result.applied_path = result.success ? request.path : std::string();
++			result.error_message = message.empty() ? (error ? error.message() : std::string()) : message;
++			result.error_value = error.value();
++		}
++		m_floppy_results.push(result);
+ 	}
+ 
+-private:
+ 	void process_embedded_ui_pointer_events()
+ 	{
+ 		if (m_video_target == nullptr)
+@@ -747,18 +1611,26 @@ private:
+ 			else if (tag == "P5") m_diag.mouse_hit_input_tag.store(5, std::memory_order_relaxed);
+ 			else if (tag == "P6") m_diag.mouse_hit_input_tag.store(6, std::memory_order_relaxed);
+ 			if (auto *field = port->field(mask))
++			{
+ 				m_diag.mouse_input_field_active.store(field->digital_value(), std::memory_order_relaxed);
++			}
+ 			return;
+ 		}
+ 	}
+ 
+ 	void release_video_target()
+ 	{
+-		if (m_video_target != nullptr)
++		if (m_video_target == nullptr)
+ 		{
+-			machine().render().target_free(m_video_target);
+-			m_video_target = nullptr;
++			m_diag.video_render_target_available.store(false, std::memory_order_relaxed);
++			return;
+ 		}
++
++		invalidate_video_jobs();
++		machine().render().target_free(m_video_target);
++		m_video_target = nullptr;
++		m_capture_geometry_valid = false;
++		m_video_target_needs_screen_refresh = false;
+ 		m_diag.video_render_target_available.store(false, std::memory_order_relaxed);
+ 	}
+ 
+@@ -820,7 +1692,7 @@ private:
+ 		m_video_target->compute_minimum_size(minimum_width, minimum_height);
+ 		if (minimum_width > 0 && minimum_height > 0)
+ 		{
+-			const auto height = std::clamp(static_cast<int>(std::llround(static_cast<double>(k_video_width) * minimum_height / minimum_width)), 256, 2048);
++			const auto height = std::clamp(static_cast<int>(std::llround(static_cast<double>(k_video_width) * minimum_height / minimum_width)), 256, 4096);
+ 			m_video_target->set_bounds(k_video_width, height);
+ 			m_diag.video_frame_width.store(static_cast<std::uint64_t>(k_video_width), std::memory_order_relaxed);
+ 			m_diag.video_frame_height.store(static_cast<std::uint64_t>(height), std::memory_order_relaxed);
+@@ -839,9 +1711,53 @@ private:
+ 		m_diag.video_target_pixel_aspect_x1000.store(static_cast<std::uint64_t>(m_video_target->pixel_aspect() * 1000.0f), std::memory_order_relaxed);
+ 		m_diag.video_render_target_available.store(true, std::memory_order_relaxed);
+ 		m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::WaitingForFirstFrame), std::memory_order_relaxed);
++		m_capture_geometry_valid = false;
++		m_video_target_needs_screen_refresh = true;
+ 		return true;
+ 	}
+ 
++	static void mix_video_geometry_signature(std::uint64_t &hash, std::uint64_t value)
++	{
++		hash = (hash ^ value) * 1099511628211ULL;
++	}
++
++	static void mix_video_geometry_float(std::uint64_t &hash, float value)
++	{
++		std::uint32_t bits = 0;
++		std::memcpy(&bits, &value, sizeof(bits));
++		mix_video_geometry_signature(hash, bits);
++	}
++
++	std::uint64_t capture_source_geometry_signature() const
++	{
++		std::uint64_t hash = 1469598103934665603ULL;
++		auto &view = m_video_target->current_view();
++		mix_video_geometry_float(hash, view.bounds().x0);
++		mix_video_geometry_float(hash, view.bounds().y0);
++		mix_video_geometry_float(hash, view.bounds().x1);
++		mix_video_geometry_float(hash, view.bounds().y1);
++		mix_video_geometry_float(hash, view.effective_aspect());
++		for (const auto &item : view.items())
++		{
++			const auto *const screen = item.screen();
++			if (screen == nullptr)
++				continue;
++			const auto bounds = item.bounds();
++			mix_video_geometry_float(hash, bounds.x0);
++			mix_video_geometry_float(hash, bounds.y0);
++			mix_video_geometry_float(hash, bounds.x1);
++			mix_video_geometry_float(hash, bounds.y1);
++			const auto &visible = screen->visible_area();
++			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(visible.min_x));
++			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(visible.max_x));
++			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(visible.min_y));
++			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(visible.max_y));
++			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(screen->screen_type()));
++			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(screen->container().orientation()));
++		}
++		return hash;
++	}
++
+ 
+ 
+ 	void capture_video_frame(bool skip_redraw)
+@@ -860,7 +1776,7 @@ private:
+ 		if (m_diag.video_deadline_reset_requests.exchange(0, std::memory_order_acq_rel) != 0)
+ 			m_next_video_deadline_ms = 0;
+ 
+-		constexpr std::uint64_t interval_ms = 200;
++		const auto interval_ms = std::max<std::uint64_t>(1, m_diag.video_capture_interval_ms.load(std::memory_order_acquire));
+ 		if (m_next_video_deadline_ms == 0)
+ 			m_next_video_deadline_ms = now;
+ 		if (now < m_next_video_deadline_ms)
+@@ -871,7 +1787,6 @@ private:
+ 		const auto missed = (now - m_next_video_deadline_ms) / interval_ms;
+ 		m_next_video_deadline_ms += (missed + 1) * interval_ms;
+ 		m_diag.video_capture_requested.fetch_add(1, std::memory_order_relaxed);
+-
+ 		try
+ 		{
+ 			if (!ensure_video_target())
+@@ -880,66 +1795,101 @@ private:
+ 			if (machine().phase() < machine_phase::RESET)
+ 				return;
+ 
+-			for (screen_device &screen : screen_device_enumerator(machine().root_device()))
++			// finish_screen_updates() refreshes screens immediately before osd().update().
++			// A target created in this update was not live for that refresh, so refresh
++			// screens once for the first capture from this target only.
++			if (m_video_target_needs_screen_refresh)
+ 			{
+-				screen.update_partial(screen.visible_area().max_y);
+-				screen.update_quads();
++				for (screen_device &screen : screen_device_enumerator(machine().root_device()))
++				{
++					screen.update_partial(screen.visible_area().max_y);
++					screen.update_quads();
++				}
++				m_video_target_needs_screen_refresh = false;
+ 			}
+ 
+-			const auto width = std::clamp(static_cast<s32>(m_diag.video_requested_width.load(std::memory_order_acquire)), 1024, 2048);
+-			s32 minimum_width = 0;
+-			s32 minimum_height = 0;
+-			m_video_target->compute_minimum_size(minimum_width, minimum_height);
+-			const auto height = (minimum_width > 0 && minimum_height > 0)
+-				? std::clamp(static_cast<s32>(std::llround(static_cast<double>(width) * minimum_height / minimum_width)), 256, 2048)
+-				: k_video_height;
++			const auto width = std::clamp(static_cast<s32>(m_diag.video_requested_width.load(std::memory_order_acquire)), 256, 4096);
++			const auto target_generation = m_diag.video_target_generation.load(std::memory_order_relaxed);
++			const auto &view = m_video_target->current_view();
++			const auto source_geometry_signature = capture_source_geometry_signature();
++			const bool geometry_changed = !m_capture_geometry_valid
++				|| m_capture_geometry_width != width
++				|| m_capture_geometry_target_generation != target_generation
++				|| m_capture_geometry_view_name != view.name()
++				|| m_capture_geometry_visibility_mask != m_video_target->visibility_mask()
++				|| m_capture_geometry_orientation != m_video_target->orientation()
++				|| m_capture_geometry_pixel_aspect != m_video_target->pixel_aspect()
++				|| m_capture_source_geometry_signature != source_geometry_signature;
++			if (geometry_changed)
++			{
++				s32 minimum_width = 0;
++				s32 minimum_height = 0;
++				m_video_target->compute_minimum_size(minimum_width, minimum_height);
++				m_capture_geometry_height = (minimum_width > 0 && minimum_height > 0)
++					? std::clamp(static_cast<s32>(std::llround(static_cast<double>(width) * minimum_height / minimum_width)), 256, 4096)
++					: k_video_height;
++				m_video_target->set_bounds(width, m_capture_geometry_height);
++				m_capture_geometry_width = width;
++				m_capture_geometry_target_generation = target_generation;
++				m_capture_geometry_view_name = view.name();
++				m_capture_geometry_visibility_mask = m_video_target->visibility_mask();
++				m_capture_geometry_orientation = m_video_target->orientation();
++				m_capture_geometry_pixel_aspect = m_video_target->pixel_aspect();
++				m_capture_source_geometry_signature = source_geometry_signature;
++				m_capture_geometry_valid = true;
++			}
++			const auto height = m_capture_geometry_height;
+ 			if (width <= 0 || height <= 0 || width > 4096 || height > 4096)
+ 				return;
+ 			if (m_failed_video_width == width)
+ 				return;
+ 
+-			const auto begin_status = m_video_bridge.beginFrame(width, height);
+-			if (begin_status == embedded_video_bridge::begin_status::allocation_failed)
++			auto job = std::make_unique<immutable_video_job>();
++			job->width = width;
++			job->height = height;
++			job->token = m_video_job_token.load(std::memory_order_acquire);
++			u32 item_index = 0;
++			u32 static_items = 0;
++			u32 total_items = 0;
++			for (const auto &item : m_video_target->current_view().visible_items())
+ 			{
+-				if (m_failed_video_width != width)
++				const bool display = item.get().screen() != nullptr;
++				const bool unsupported_blend = !display && !cacheable_static_blend(item.get().blend_mode());
++				const bool is_static = !display && !unsupported_blend && !item.get().has_dynamic_dependency();
++				if (job->runs.empty() || job->runs.back().is_static != is_static)
++					job->runs.push_back({ is_static, 0, {} });
++				auto &run = job->runs.back();
++				auto &primlist = m_video_target->get_primitives(item_index, 1, false);
++				for (const render_primitive *primitive = primlist.first(); primitive != nullptr; primitive = primitive->next())
+ 				{
+-					m_diag.video_raster_error_code.store(2, std::memory_order_relaxed);
+-					m_diag.video_last_error_code.store(2, std::memory_order_relaxed);
+-					m_failed_video_width = width;
++					immutable_primitive snapshot;
++					if (!snapshot_primitive(*primitive, snapshot, job->snapshot_bytes))
++					{
++						m_diag.video_raster_error_code.store(3, std::memory_order_relaxed);
++						m_diag.video_last_error_code.store(3, std::memory_order_relaxed);
++						return;
++					}
++					run.primitives.emplace_back(std::move(snapshot));
+ 				}
+-				return;
+-			}
+-			if (begin_status == embedded_video_bridge::begin_status::reader_busy)
+-				return;
+-			m_failed_video_width = 0;
+-
+-			m_video_target->set_bounds(width, height);
+-
+-			auto *const pixels = m_video_bridge.writeBuffer();
+-			if (pixels == nullptr)
+-			{
+-				return;
++				if (is_static)
++					++static_items;
++				++total_items;
++				++item_index;
+ 			}
+-
+-			render_primitive_list &primlist = m_video_target->get_primitives();
++			for (auto &run : job->runs)
++				run.signature = snapshot_signature(run);
++			const auto static_ratio = total_items != 0 ? double(static_items) / total_items : 0.0;
++			const auto static_run_count = static_cast<u32>(std::count_if(job->runs.begin(), job->runs.end(),
++				[] (const auto &run) { return run.is_static; }));
++			job->use_static_cache = static_items >= 3 && static_run_count != 0
++				&& static_run_count <= 32 && static_ratio >= 0.20;
+ 			m_diag.video_capture_started.fetch_add(1, std::memory_order_relaxed);
+ 			m_diag.video_capture_in_progress.store(true, std::memory_order_release);
+-			const auto raster_start = std::chrono::steady_clock::now();
+-			const auto pixel_count = static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
+-			std::fill(pixels, pixels + pixel_count, 0xff000000U);
+-			embedded_video_renderer::draw_primitives(primlist, pixels, static_cast<u32>(width), static_cast<u32>(height), static_cast<u32>(width));
+-
+-			const auto raster_duration_us = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - raster_start).count();
+-			m_diag.video_rasterization_duration_us.store(static_cast<std::uint64_t>(raster_duration_us), std::memory_order_relaxed);
+-			m_diag.video_rasterization_total_us.fetch_add(static_cast<std::uint64_t>(raster_duration_us), std::memory_order_relaxed);
+-			std::uint64_t observed_max = m_diag.video_rasterization_max_us.load(std::memory_order_relaxed);
+-			while (observed_max < static_cast<std::uint64_t>(raster_duration_us)
+-				&& !m_diag.video_rasterization_max_us.compare_exchange_weak(observed_max, static_cast<std::uint64_t>(raster_duration_us), std::memory_order_relaxed)) {}
+-
+-			m_video_bridge.publishWrittenBuffer(m_diag);
+-			m_diag.video_capture_in_progress.store(false, std::memory_order_release);
+-			m_diag.video_capture_completed.fetch_add(1, std::memory_order_relaxed);
+-			m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::Running), std::memory_order_relaxed);
++			const bool submitted = submit_video_job(std::move(job));
++			if (!submitted)
++				m_diag.video_capture_in_progress.store(false, std::memory_order_release);
++			if (submitted && m_diag.video_capture_single_frame.load(std::memory_order_acquire))
++				m_diag.video_capture_enabled.store(false, std::memory_order_release);
+ 			if (m_last_video_capture_ms != 0 && now > m_last_video_capture_ms)
+ 				m_diag.video_measured_frame_rate_x1000.store(1'000'000ULL / (now - m_last_video_capture_ms), std::memory_order_relaxed);
+ 			m_last_video_capture_ms = now;
+@@ -958,12 +1908,48 @@ private:
+ 	midi_byte_queue &m_midi_queue;
+ 	audio_frame_queue &m_audio_queue;
+ 	mouse_event_queue &m_mouse_queue;
++	floppy_request_queue &m_floppy_requests;
++	floppy_result_queue &m_floppy_results;
++	state_request_queue &m_state_requests;
++	state_result_queue &m_state_results;
++	std::atomic<bool> &m_midi_panic_requested;
++	std::array<std::atomic<std::uint64_t>, 32> &m_midi_panic_held_notes;
++	std::array<std::atomic<std::uint64_t>, 32> &m_active_host_midi_notes;
++	StateOperationRequest m_current_state_request;
++	bool m_pending_state_request = false;
++	bool m_restore_waiting_for_clean_timeslice = false;
++	std::uint64_t m_state_scheduler_wait_started_ms = 0;
++	std::string m_state_snapshot;
++	HeldMidiNotes m_state_snapshot_held_notes {};
+ 	embedded_video_bridge &m_video_bridge;
+ 	EngineDiagnostics &m_diag;
++	mutable std::mutex m_startup_output_mutex;
++	std::string m_startup_output;
+ 	render_target *m_video_target = nullptr;
+ 	std::uint64_t m_last_video_capture_ms = 0;
+ 	std::uint64_t m_next_video_deadline_ms = 0;
++	std::uint32_t m_audio_sink_diagnostics_counter = 0;
+ 	int m_failed_video_width = 0;
++	bool m_video_target_needs_screen_refresh = false;
++	bool m_capture_geometry_valid = false;
++	s32 m_capture_geometry_width = 0;
++	s32 m_capture_geometry_height = 0;
++	std::uint64_t m_capture_geometry_target_generation = 0;
++	std::string m_capture_geometry_view_name;
++	u32 m_capture_geometry_visibility_mask = 0;
++	int m_capture_geometry_orientation = 0;
++	float m_capture_geometry_pixel_aspect = 0.0f;
++	std::uint64_t m_capture_source_geometry_signature = 0;
++	std::thread m_video_worker;
++	std::mutex m_video_worker_mutex;
++	std::condition_variable m_video_worker_condition;
++	std::unique_ptr<immutable_video_job> m_pending_video_job;
++	bool m_video_worker_stop = false;
++	std::atomic<std::uint64_t> m_video_job_token { 1 };
++	std::uint64_t m_worker_cache_token = 0;
++	int m_worker_cache_width = 0;
++	int m_worker_cache_height = 0;
++	std::vector<worker_static_run> m_worker_static_runs;
+ 	static constexpr int k_video_width = 1024;
+ 	static constexpr int k_video_height = 576;
+ };
+@@ -1067,9 +2053,12 @@ private:
+ class embedded_machine_manager : public machine_manager
+ {
+ public:
+-		embedded_machine_manager(emu_options &options, osd_interface &osd, EngineDiagnostics &diag, std::string driver_name)
++		embedded_machine_manager(emu_options &options, osd_interface &osd, EngineDiagnostics &diag, std::string driver_name,
++				std::string startup_arguments,
++				std::function<void(EmbeddedStartupDiagnostic)> publish_diagnostic)
+ 		: machine_manager(options, osd), m_driver_name(std::move(driver_name))
+-		, m_diag(diag), m_plugin_host(*this)
++		, m_startup_arguments(std::move(startup_arguments))
++		, m_diag(diag), m_plugin_host(*this), m_publish_diagnostic(std::move(publish_diagnostic))
+ 	{
+ 	}
+ 
+@@ -1081,20 +2070,25 @@ public:
+ 		}
+ 		catch (std::exception const &error)
+ 		{
++			EmbeddedStartupDiagnostic diagnostic;
++			diagnostic.category = EmbeddedStartupError::LuaPlugin;
++			diagnostic.summary = "VES could not initialize the embedded MAME layout plugin.";
++			diagnostic.recovery = "Please reinstall VES.";
++			diagnostic.technical_details = error.what();
++			m_publish_diagnostic(std::move(diagnostic));
+ 			osd_printf_error("Unable to initialize embedded Layout Plugin host: %s\n", error.what());
+ 			m_diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
+ 			return EMU_ERR_FATALERROR;
+ 		}
+ 		const auto driver_index = driver_list::find(m_driver_name.c_str());
+ 		const auto &driver = driver_index >= 0 ? driver_list::driver(driver_index) : GAME_NAME(tx81z);
+-		osd_printf_error("VintageEmulatorStudio driver lookup (execute): requested='%s' index=%d effective='%s' fallback=%s\n",
+-			m_driver_name.c_str(), driver_index, driver.name, driver_index >= 0 ? "no" : "yes");
+ 		machine_config config(driver, m_options);
+ 		running_machine machine(config, *this);
+ 		set_machine(&machine);
+ 		m_diag.machine_started_ms.store(steadyMs(), std::memory_order_relaxed);
+ 		m_diag.machine_started.fetch_add(1, std::memory_order_relaxed);
+ 		const int result = machine.run(false);
++		m_diag.machine_running.store(false, std::memory_order_release);
+ 		m_diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
+ 		m_plugin_host.set_machine(nullptr);
+ 		set_machine(nullptr);
+@@ -1125,8 +2119,10 @@ public:
+ 
+ private:
+ 	std::string m_driver_name;
++	std::string m_startup_arguments;
+ 	EngineDiagnostics &m_diag;
+ 	embedded_plugin_host m_plugin_host;
++	std::function<void(EmbeddedStartupDiagnostic)> m_publish_diagnostic;
+ 	std::unique_ptr<ui_manager> m_ui;
+ };
+ 
+@@ -1141,26 +2137,30 @@ void dispatch_embedded_layout_script(layout_file &file, const char *script)
+ 
+ struct EmbeddedEmulatorEngine::Impl
+ {
+-	explicit Impl(EmbeddedEmulatorEngineSettings engine_settings)
+-		: settings(std::move(engine_settings))
+-	{
+-		diag.audio_ring_capacity_frames.store(audio_frame_queue::capacity(), std::memory_order_relaxed);
+-		diag.juce_sample_rate.store(static_cast<std::uint64_t>(std::max(settings.sample_rate, 0)), std::memory_order_relaxed);
+-		diag.mame_sample_rate.store(static_cast<std::uint64_t>(std::max(settings.sample_rate, 0)), std::memory_order_relaxed);
++		explicit Impl(EmbeddedEmulatorEngineSettings engine_settings)
++			: settings(std::move(engine_settings))
++		{
++			diag.audio_ring_capacity_frames.store(audio_frame_queue::capacity(), std::memory_order_relaxed);
++			diag.juce_sample_rate.store(static_cast<std::uint64_t>(std::max(settings.sample_rate, 0)), std::memory_order_relaxed);
++			diag.mame_sample_rate.store(static_cast<std::uint64_t>(std::max(settings.sample_rate, 0)), std::memory_order_relaxed);
+ 		diag.effective_mame_sample_rate.store(static_cast<std::uint64_t>(std::max(settings.sample_rate, 0)), std::memory_order_relaxed);
+ 	}
+ 
+-	~Impl()
+-	{
+-		stopAndJoin(std::chrono::seconds(5));
+-	}
++		~Impl()
++		{
++			stopAndJoin(std::chrono::seconds(5));
++		}
+ 
+ 	void start()
+ 	{
+ 		mame_result.store(EMU_ERR_FATALERROR, std::memory_order_relaxed);
+ 		mame_thread = std::thread([this]
+ 		{
+-			mame_result.store(runMameThread(), std::memory_order_relaxed);
++#if defined(__APPLE__)
++			pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
++#endif
++			const int result = runMameThread();
++			mame_result.store(result, std::memory_order_relaxed);
+ 		});
+ 	}
+ 
+@@ -1184,11 +2184,32 @@ struct EmbeddedEmulatorEngine::Impl
+ 
+ 		if (mame_thread.joinable())
+ 			mame_thread.join();
++		floppy_requests.clear();
++		floppy_results.clear();
++		floppy_change_pending.store(false, std::memory_order_release);
++		state_requests.clear();
++		state_results.clear();
++		state_operation_pending.store(false, std::memory_order_release);
+ 		return exited;
+ 	}
+ 
+ 	void sendMidiBytes(const std::uint8_t *data, std::size_t size)
+ 	{
++		if (data != nullptr && size >= 3)
++		{
++			const auto status = data[0] & 0xf0U;
++			if (status == 0x80U || status == 0x90U)
++			{
++				const auto channel = data[0] & 0x0fU;
++				const auto note = data[1] & 0x7fU;
++				const auto index = static_cast<std::size_t>(channel) * 2 + (note >> 6);
++				const auto mask = std::uint64_t(1) << (note & 63);
++				if (status == 0x90U && data[2] != 0)
++					active_host_midi_notes[index].fetch_or(mask, std::memory_order_release);
++				else
++					active_host_midi_notes[index].fetch_and(~mask, std::memory_order_release);
++			}
++		}
+ 		const auto now = steadyMs();
+ 		for (std::size_t i = 0; i < size; ++i)
+ 		{
+@@ -1203,6 +2224,16 @@ struct EmbeddedEmulatorEngine::Impl
+ 		}
+ 	}
+ 
++	void sendMidiPanic(const HeldMidiNotes &held_notes)
++	{
++		for (std::size_t i = 0; i < held_notes.size(); ++i)
++		{
++			midi_panic_held_notes[i].store(held_notes[i], std::memory_order_release);
++			active_host_midi_notes[i].store(0, std::memory_order_release);
++		}
++		midi_panic_requested.store(true, std::memory_order_release);
++	}
++
+ 	void resetAudioWindow()
+ 	{
+ 		const auto dropped = audio_queue.clear();
+@@ -1213,6 +2244,27 @@ struct EmbeddedEmulatorEngine::Impl
+ 		diag.audio_frames_read.store(0, std::memory_order_relaxed);
+ 		diag.peak_abs.store(0.0f, std::memory_order_relaxed);
+ 		update_audio_queue_diagnostics(diag, audio_queue.size());
++		resetLatencyDiagnostics();
++	}
++
++	void resetLatencyDiagnostics()
++	{
++		diag.audio_queue_read_low_watermark_frames.store(UINT64_MAX, std::memory_order_relaxed);
++		diag.audio_sink_last_callback_us.store(0, std::memory_order_relaxed);
++		diag.audio_sink_latest_interarrival_us.store(0, std::memory_order_relaxed);
++		diag.audio_sink_max_interarrival_us.store(0, std::memory_order_relaxed);
++		diag.audio_sink_latest_block_frames.store(0, std::memory_order_relaxed);
++		diag.audio_sink_min_block_frames.store(UINT64_MAX, std::memory_order_relaxed);
++		diag.audio_sink_max_block_frames.store(0, std::memory_order_relaxed);
++		diag.audio_sink_recent_max_block_frames.store(0, std::memory_order_relaxed);
++		diag.audio_sink_blocks_approx_240.store(0, std::memory_order_relaxed);
++		diag.audio_sink_blocks_approx_480.store(0, std::memory_order_relaxed);
++		diag.audio_sink_blocks_approx_720.store(0, std::memory_order_relaxed);
++		diag.audio_sink_blocks_960_plus.store(0, std::memory_order_relaxed);
++		diag.audio_sink_blocks_other.store(0, std::memory_order_relaxed);
++		diag.audio_sink_statistics_reset_generation.fetch_add(1, std::memory_order_release);
++		diag.audio_underrun_callbacks.store(0, std::memory_order_relaxed);
++		diag.audio_missing_output_frames.store(0, std::memory_order_relaxed);
+ 	}
+ 
+ 	void resetMidiTimingWindow()
+@@ -1223,8 +2275,6 @@ struct EmbeddedEmulatorEngine::Impl
+ 		diag.midi_last_read_ms.store(0, std::memory_order_relaxed);
+ 		diag.midi_max_queue_to_read_ms.store(0, std::memory_order_relaxed);
+ 		diag.midi_first_read_machine_uptime_ms.store(0, std::memory_order_relaxed);
+-		diag.midi_device_first_delivered_machine_ms.store(0, std::memory_order_relaxed);
+-		diag.midi_device_last_delivered_machine_ms.store(0, std::memory_order_relaxed);
+ 	}
+ 
+ 	void drainAudio(AudioStats &stats)
+@@ -1252,19 +2302,28 @@ struct EmbeddedEmulatorEngine::Impl
+ 
+ 	std::size_t readAudioFrames(StereoFrame *frames, std::size_t max_frames)
+ 	{
++		const auto queued_before_read = audio_queue.size();
++		auto low_watermark = diag.audio_queue_read_low_watermark_frames.load(std::memory_order_relaxed);
++		while (queued_before_read < low_watermark
++			&& !diag.audio_queue_read_low_watermark_frames.compare_exchange_weak(
++				low_watermark, queued_before_read, std::memory_order_relaxed))
++		{
++		}
+ 		const auto count = audio_queue.pop(frames, max_frames);
+ 		diag.audio_frames_read.fetch_add(count, std::memory_order_relaxed);
+ 		if (count < max_frames)
+ 			diag.audio_underruns.fetch_add(1, std::memory_order_relaxed);
+-		update_audio_queue_diagnostics(diag, audio_queue.size());
++		if (++audio_read_diagnostics_counter >= k_audio_read_diagnostics_interval || count < max_frames)
++		{
++			audio_read_diagnostics_counter = 0;
++			update_audio_queue_diagnostics(diag, audio_queue.size());
++		}
+ 		return count;
+ 	}
+ 
+ 	std::size_t queuedAudioFrames()
+ 	{
+-		const auto queued = audio_queue.size();
+-		update_audio_queue_diagnostics(diag, queued);
+-		return queued;
++		return audio_queue.size();
+ 	}
+ 
+ 	std::size_t discardQueuedAudio()
+@@ -1289,12 +2348,14 @@ struct EmbeddedEmulatorEngine::Impl
+ 	{
+ 		const auto safe_rate = static_cast<std::uint64_t>(sample_rate > 0.0 ? std::llround(sample_rate) : settings.sample_rate);
+ 		const auto safe_block = static_cast<std::uint64_t>(std::max(block_size, 0));
+-		const auto target = std::max<std::uint64_t>(512, safe_block);
+-		const auto max_tolerated = std::max<std::uint64_t>(2048, safe_block * 4);
++		const auto target = std::max<std::uint64_t>(1024, safe_block * 2);
++		const auto max_tolerated = std::max<std::uint64_t>(1536, target + safe_block);
+ 		diag.juce_sample_rate.store(safe_rate, std::memory_order_relaxed);
++		diag.juce_configured_block_size.store(safe_block, std::memory_order_relaxed);
+ 		diag.juce_block_size.store(safe_block, std::memory_order_relaxed);
+ 		diag.audio_target_queue_frames.store(target, std::memory_order_relaxed);
+ 		diag.audio_max_tolerated_queue_frames.store(max_tolerated, std::memory_order_relaxed);
++		resetLatencyDiagnostics();
+ 	}
+ 
+ 	std::uint64_t machineUptimeMs() const
+@@ -1309,6 +2370,19 @@ struct EmbeddedEmulatorEngine::Impl
+ 	const EngineDiagnostics &diagnostics() const { return diag; }
+ 	EngineDiagnostics &diagnostics() { return diag; }
+ 	int mameResult() const { return mame_result.load(std::memory_order_relaxed); }
++	const std::string &driverName() const { return settings.driver_name; }
++	std::uint64_t engineGeneration() const { return settings.engine_generation; }
++	EmbeddedStartupDiagnostic startupDiagnostic() const
++	{
++		std::lock_guard<std::mutex> guard(startup_diagnostic_mutex);
++		return startup_diagnostic;
++	}
++
++	void publishStartupDiagnostic(EmbeddedStartupDiagnostic diagnostic)
++	{
++		std::lock_guard<std::mutex> guard(startup_diagnostic_mutex);
++		startup_diagnostic = std::move(diagnostic);
++	}
+ 
+ 	bool copyLatestVideoFrame(VideoFrameSnapshot &snapshot)
+ 	{
+@@ -1327,9 +2401,31 @@ struct EmbeddedEmulatorEngine::Impl
+ 		}
+ 	}
+ 
++	void setVideoCaptureEnabled(bool enabled)
++	{
++		diag.video_capture_enabled.store(enabled, std::memory_order_release);
++		if (enabled)
++			diag.video_deadline_reset_requests.fetch_add(1, std::memory_order_release);
++	}
++
++	void setVideoCaptureSingleFrame(bool single_frame)
++	{
++		diag.video_capture_single_frame.store(single_frame, std::memory_order_release);
++		if (single_frame)
++			diag.video_capture_enabled.store(true, std::memory_order_release);
++	}
++
++	void setVideoCaptureIntervalMs(std::uint64_t interval_ms)
++	{
++		const auto clamped = std::clamp<std::uint64_t>(interval_ms, 50, 10'000);
++		diag.video_capture_interval_ms.store(clamped, std::memory_order_release);
++		diag.video_target_frame_rate.store(1000 / clamped, std::memory_order_relaxed);
++		diag.video_deadline_reset_requests.fetch_add(1, std::memory_order_release);
++	}
++
+ 	void requestVideoCaptureWidth(int width)
+ 	{
+-			diag.video_requested_width.store(static_cast<std::uint64_t>(std::clamp(width, 1024, 2048)), std::memory_order_release);
++			diag.video_requested_width.store(static_cast<std::uint64_t>(std::clamp(width, 256, 4096)), std::memory_order_release);
+ 	}
+ 
+ 	bool enqueueMouseEvent(EmbeddedMouseEventType type, std::int32_t x, std::int32_t y)
+@@ -1376,11 +2472,81 @@ struct EmbeddedEmulatorEngine::Impl
+ 			diag.mouse_release_pending.store(true, std::memory_order_release);
+ 	}
+ 
++	bool requestFloppyChange(const FloppyChangeRequest &request)
++	{
++		if (diag.stop_requested.load(std::memory_order_acquire)
++			|| diag.machine_started.load(std::memory_order_acquire) == 0
++			|| diag.machine_exited.load(std::memory_order_acquire) != 0)
++			return false;
++
++		bool expected = false;
++		if (!floppy_change_pending.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
++			return false;
++
++		if (!floppy_requests.push(request))
++		{
++			floppy_change_pending.store(false, std::memory_order_release);
++			return false;
++		}
++
++		return true;
++	}
++
++	bool pollFloppyChangeResult(FloppyChangeResult &result)
++	{
++		if (!floppy_results.pop(result))
++			return false;
++		floppy_change_pending.store(false, std::memory_order_release);
++		return true;
++	}
++
++	bool isFloppyChangePending() const
++	{
++		return floppy_change_pending.load(std::memory_order_acquire);
++	}
++
++	bool requestStateOperation(const StateOperationRequest &request)
++	{
++		if (!settings.state_operations_allowed
++			|| diag.stop_requested.load(std::memory_order_acquire)
++			|| diag.machine_started.load(std::memory_order_acquire) == 0
++			|| diag.machine_exited.load(std::memory_order_acquire) != 0)
++			return false;
++		bool expected = false;
++		if (!state_operation_pending.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
++			return false;
++		if (!state_requests.push(request))
++		{
++			state_operation_pending.store(false, std::memory_order_release);
++			return false;
++		}
++		if (request.operation == StateOperation::Save)
++			diag.state_save_requests.fetch_add(1, std::memory_order_relaxed);
++		else
++			diag.state_load_requests.fetch_add(1, std::memory_order_relaxed);
++		return true;
++	}
++
++	bool pollStateOperationResult(StateOperationResult &result)
++	{
++		if (!state_results.pop(result))
++			return false;
++		state_operation_pending.store(false, std::memory_order_release);
++		return true;
++	}
++
++	bool isStateOperationPending() const
++	{
++		return state_operation_pending.load(std::memory_order_acquire);
++	}
++
+ private:
+ 	int runMameThread()
+ 	{
+ 		osd_options options;
+-		embedded_osd osd(options, midi_queue, audio_queue, mouse_queue, video_bridge, diag);
++		embedded_osd osd(options, midi_queue, audio_queue, mouse_queue, floppy_requests, floppy_results,
++			state_requests, state_results, midi_panic_requested, midi_panic_held_notes,
++			active_host_midi_notes, video_bridge, diag);
+ 		osd.register_options();
+ 
+ 		std::vector<std::string> args {
+@@ -1396,8 +2562,6 @@ private:
+ 			"-mouseprovider", "none",
+ 			"-lightgunprovider", "none",
+ 			"-joystickprovider", "none",
+-			"-midiin", "ves",
+-			"-midiout", "ves",
+ 			"-plugins",
+ 			"-plugin", "layout",
+ 			"-pluginspath", settings.plugins_path,
+@@ -1412,6 +2576,21 @@ private:
+ 			"-audio_latency", "0",
+ 			"-nonvram_save"
+ 		};
++		if (!settings.native_midi_input_option.empty())
++		{
++			args.emplace_back("-" + settings.native_midi_input_option);
++			args.emplace_back("ves");
++		}
++		if (!settings.native_midi_output_option.empty())
++		{
++			args.emplace_back("-" + settings.native_midi_output_option);
++			args.emplace_back("ves");
++		}
++		if (!settings.retrofit_midi_input_option.empty())
++		{
++			args.emplace_back("-" + settings.retrofit_midi_input_option);
++			args.emplace_back("ves");
++		}
+ 		if (!settings.artwork_path.empty())
+ 		{
+ 			args.emplace_back("-artpath");
+@@ -1425,6 +2604,13 @@ private:
+ 				args.emplace_back(media.path);
+ 			}
+ 		}
++		std::ostringstream startup_arguments;
++		for (const auto &argument : args)
++		{
++			if (startup_arguments.tellp() > 0)
++				startup_arguments << ' ';
++			startup_arguments << '"' << argument << '"';
++		}
+ 		const auto selected_driver_index = driver_list::find(settings.driver_name.c_str());
+ 		const auto &option_driver = selected_driver_index >= 0 ? driver_list::driver(selected_driver_index) : GAME_NAME(tx81z);
+ 		// Image options (including S3000XL's -flop) are registered per machine.
+@@ -1437,11 +2623,31 @@ private:
+ 		}
+ 		catch (const options_exception &error)
+ 		{
++			append_engine_lifecycle_log("[VES startup] event=OPTIONS_EXCEPTION driver=" + settings.driver_name
++				+ " text=\"" + lifecycle_log_field(error.what()) + "\"");
++			EmbeddedStartupDiagnostic diagnostic;
++			diagnostic.category = EmbeddedStartupError::Configuration;
++			diagnostic.summary = "The emulator startup options are invalid.";
++			diagnostic.technical_details = error.what();
++			publishStartupDiagnostic(std::move(diagnostic));
+ 			osd_printf_error("VintageEmulatorStudio startup option error: %s\\n", error.what());
++			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
+ 			return EMU_ERR_INVALID_CONFIG;
+ 		}
+-		osd_printf_error("VintageEmulatorStudio driver lookup (options): requested='%s' index=%d effective='%s' fallback=%s\n",
+-			settings.driver_name.c_str(), selected_driver_index, option_driver.name, selected_driver_index >= 0 ? "no" : "yes");
++		catch (const emu_fatalerror &error)
++		{
++			append_engine_lifecycle_log("[VES startup] event=CONFIG_FATAL driver=" + settings.driver_name
++				+ " exit_code=" + std::to_string(error.exitcode())
++				+ " text=\"" + lifecycle_log_field(error.what()) + "\"");
++			EmbeddedStartupDiagnostic diagnostic;
++			diagnostic.category = EmbeddedStartupError::Configuration;
++			diagnostic.summary = "The emulator startup configuration is invalid.";
++			diagnostic.technical_details = error.what();
++			publishStartupDiagnostic(std::move(diagnostic));
++			osd_printf_error("VintageEmulatorStudio startup configuration error: %s\\n", error.what());
++			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
++			return error.exitcode();
++		}
+ 		options.set_system_name(option_driver.name);
+ 		diag.mame_throttle.store(options.throttle(), std::memory_order_relaxed);
+ 		diag.mame_sleep.store(options.sleep(), std::memory_order_relaxed);
+@@ -1452,12 +2658,109 @@ private:
+ 		diag.mame_audio_latency_us.store(static_cast<std::uint64_t>(std::max(options.audio_latency(), 0.0f) * 1000.0f), std::memory_order_relaxed);
+ 		diag.effective_mame_sample_rate.store(static_cast<std::uint64_t>(std::max(options.sample_rate(), 0)), std::memory_order_relaxed);
+ 
+-		embedded_machine_manager manager(options, osd, diag, settings.driver_name);
+-		manager.start_http_server();
+-		g_active_diag = &diag;
+-		const int result = manager.execute();
+-		g_active_diag = nullptr;
+-		return result;
++		EmbeddedStartupDiagnostic auditDiagnostic;
++		try
++		{
++			auditDiagnostic = auditDriverRomSet(options, option_driver);
++		}
++		catch (const std::exception &error)
++		{
++			auditDiagnostic.category = EmbeddedStartupError::EngineFailure;
++			auditDiagnostic.summary = "The emulator failed to start.";
++			auditDiagnostic.technical_details = std::string("MAME ROM audit failed: ") + error.what();
++		}
++		catch (...)
++		{
++			auditDiagnostic.category = EmbeddedStartupError::Unknown;
++			auditDiagnostic.summary = "The emulator failed to start.";
++			auditDiagnostic.technical_details = "MAME ROM audit failed with an unknown exception.";
++		}
++
++		if (auditDiagnostic.category != EmbeddedStartupError::None)
++		{
++			const bool romSpecificFailure = auditDiagnostic.category == EmbeddedStartupError::MissingRom
++				|| auditDiagnostic.category == EmbeddedStartupError::RomChecksumMismatch
++				|| auditDiagnostic.category == EmbeddedStartupError::InvalidRomSet;
++			publishStartupDiagnostic(std::move(auditDiagnostic));
++			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
++			return romSpecificFailure ? EMU_ERR_MISSING_FILES : EMU_ERR_FATALERROR;
++		}
++
++		try
++		{
++			embedded_machine_manager manager(
++					options,
++					osd,
++					diag,
++					settings.driver_name,
++					startup_arguments.str(),
++					[this] (EmbeddedStartupDiagnostic diagnostic) { publishStartupDiagnostic(std::move(diagnostic)); });
++			manager.start_http_server();
++			const int result = manager.execute();
++			const auto captured_output = osd.startup_output();
++			if (result != 0 && looks_like_media_failure (captured_output))
++			{
++				EmbeddedStartupDiagnostic diagnostic;
++				diagnostic.category = EmbeddedStartupError::MediaLoad;
++				diagnostic.summary = "Media Failure";
++				diagnostic.details = "MAME rejected a configured startup media image.";
++				diagnostic.recovery = "Check that the configured media image is valid and accessible.";
++				diagnostic.technical_details = captured_output;
++				publishStartupDiagnostic (std::move (diagnostic));
++			}
++			if (result != 0 && startupDiagnostic().category == EmbeddedStartupError::None)
++			{
++				EmbeddedStartupDiagnostic diagnostic;
++				diagnostic.category = EmbeddedStartupError::EngineFailure;
++				diagnostic.summary = "The emulator failed to start.";
++				diagnostic.technical_details = util::string_format("MAME returned result %d", result);
++				publishStartupDiagnostic(std::move(diagnostic));
++			}
++			const auto returned_diagnostic = startupDiagnostic();
++			append_engine_lifecycle_log("[VES startup] event=MAME_EXECUTE_RETURN driver=" + settings.driver_name
++				+ " result=" + std::to_string(result)
++				+ " diagnostic_summary=\"" + lifecycle_log_field(returned_diagnostic.summary) + "\""
++				+ " diagnostic_details=\"" + lifecycle_log_field(returned_diagnostic.details) + "\""
++				+ " diagnostic_technical=\"" + lifecycle_log_field(returned_diagnostic.technical_details) + "\""
++				+ " mame_output=\"" + lifecycle_log_field(captured_output) + "\"");
++			return result;
++		}
++		catch (const emu_fatalerror &error)
++		{
++			append_engine_lifecycle_log("[VES startup] event=MAME_FATAL_EXCEPTION driver=" + settings.driver_name
++				+ " exit_code=" + std::to_string(error.exitcode())
++				+ " text=\"" + lifecycle_log_field(error.what()) + "\"");
++			EmbeddedStartupDiagnostic diagnostic;
++			diagnostic.category = EmbeddedStartupError::EngineFailure;
++			diagnostic.summary = "The emulator failed to start.";
++			diagnostic.technical_details = error.what();
++			publishStartupDiagnostic(std::move(diagnostic));
++			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
++			return error.exitcode();
++		}
++		catch (const std::exception &error)
++		{
++			append_engine_lifecycle_log("[VES startup] event=MAME_STD_EXCEPTION driver=" + settings.driver_name
++				+ " text=\"" + lifecycle_log_field(error.what()) + "\"");
++			EmbeddedStartupDiagnostic diagnostic;
++			diagnostic.category = EmbeddedStartupError::EngineFailure;
++			diagnostic.summary = "The emulator failed to start.";
++			diagnostic.technical_details = error.what();
++			publishStartupDiagnostic(std::move(diagnostic));
++			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
++			return EMU_ERR_FATALERROR;
++		}
++		catch (...)
++		{
++			append_engine_lifecycle_log("[VES startup] event=MAME_UNKNOWN_EXCEPTION driver=" + settings.driver_name);
++			EmbeddedStartupDiagnostic diagnostic;
++			diagnostic.category = EmbeddedStartupError::Unknown;
++			diagnostic.summary = "The emulator failed to start.";
++			diagnostic.technical_details = "Unknown exception in embedded MAME startup.";
++			publishStartupDiagnostic(std::move(diagnostic));
++			diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
++			return EMU_ERR_FATALERROR;
++		}
+ 	}
+ 
+ 	template <typename Predicate>
+@@ -1477,10 +2780,22 @@ private:
+ 	midi_byte_queue midi_queue;
+ 	audio_frame_queue audio_queue;
+ 	mouse_event_queue mouse_queue;
++	floppy_request_queue floppy_requests;
++	floppy_result_queue floppy_results;
++	state_request_queue state_requests;
++	state_result_queue state_results;
+ 	embedded_video_bridge video_bridge;
+ 	EngineDiagnostics diag;
++	mutable std::mutex startup_diagnostic_mutex;
++	EmbeddedStartupDiagnostic startup_diagnostic;
++	std::uint32_t audio_read_diagnostics_counter = 0;
+ 	std::thread mame_thread;
+ 	std::atomic<std::uint64_t> mouse_sequence { 0 };
++	std::atomic<bool> floppy_change_pending { false };
++	std::atomic<bool> state_operation_pending { false };
++	std::atomic<bool> midi_panic_requested { false };
++	std::array<std::atomic<std::uint64_t>, 32> midi_panic_held_notes {};
++	std::array<std::atomic<std::uint64_t>, 32> active_host_midi_notes {};
+ 	std::atomic<int> mame_result { EMU_ERR_FATALERROR };
+ };
+ 
+@@ -1489,7 +2804,9 @@ EmbeddedEmulatorEngine::EmbeddedEmulatorEngine(EmbeddedEmulatorEngineSettings se
+ {
+ }
+ 
+-EmbeddedEmulatorEngine::~EmbeddedEmulatorEngine() = default;
++EmbeddedEmulatorEngine::~EmbeddedEmulatorEngine()
++{
++}
+ 
+ void EmbeddedEmulatorEngine::start()
+ {
+@@ -1511,11 +2828,21 @@ void EmbeddedEmulatorEngine::sendMidiBytes(const std::uint8_t *data, std::size_t
+ 	m_impl->sendMidiBytes(data, size);
+ }
+ 
++void EmbeddedEmulatorEngine::sendMidiPanic(const HeldMidiNotes &held_notes)
++{
++	m_impl->sendMidiPanic(held_notes);
++}
++
+ void EmbeddedEmulatorEngine::resetAudioWindow()
+ {
+ 	m_impl->resetAudioWindow();
+ }
+ 
++void EmbeddedEmulatorEngine::resetLatencyDiagnostics()
++{
++	m_impl->resetLatencyDiagnostics();
++}
++
+ void EmbeddedEmulatorEngine::resetMidiTimingWindow()
+ {
+ 	m_impl->resetMidiTimingWindow();
+@@ -1561,6 +2888,21 @@ void EmbeddedEmulatorEngine::setVideoDisplayActive(bool active)
+ 	m_impl->setVideoDisplayActive(active);
+ }
+ 
++void EmbeddedEmulatorEngine::setVideoCaptureEnabled(bool enabled)
++{
++	m_impl->setVideoCaptureEnabled(enabled);
++}
++
++void EmbeddedEmulatorEngine::setVideoCaptureSingleFrame(bool single_frame)
++{
++	m_impl->setVideoCaptureSingleFrame(single_frame);
++}
++
++void EmbeddedEmulatorEngine::setVideoCaptureIntervalMs(std::uint64_t interval_ms)
++{
++	m_impl->setVideoCaptureIntervalMs(interval_ms);
++}
++
+ void EmbeddedEmulatorEngine::requestVideoCaptureWidth(int width)
+ {
+ 	m_impl->requestVideoCaptureWidth(width);
+@@ -1576,6 +2918,51 @@ void EmbeddedEmulatorEngine::requestMouseRelease()
+ 	m_impl->requestMouseRelease();
+ }
+ 
++bool EmbeddedEmulatorEngine::requestFloppyChange(const FloppyChangeRequest &request)
++{
++	return m_impl->requestFloppyChange(request);
++}
++
++bool EmbeddedEmulatorEngine::pollFloppyChangeResult(FloppyChangeResult &result)
++{
++	return m_impl->pollFloppyChangeResult(result);
++}
++
++bool EmbeddedEmulatorEngine::isFloppyChangePending() const
++{
++	return m_impl->isFloppyChangePending();
++}
++
++bool EmbeddedEmulatorEngine::requestMediaChange(const MediaChangeRequest &request)
++{
++	return m_impl->requestFloppyChange(request);
++}
++
++bool EmbeddedEmulatorEngine::pollMediaChangeResult(MediaChangeResult &result)
++{
++	return m_impl->pollFloppyChangeResult(result);
++}
++
++bool EmbeddedEmulatorEngine::isMediaChangePending() const
++{
++	return m_impl->isFloppyChangePending();
++}
++
++bool EmbeddedEmulatorEngine::requestStateOperation(const StateOperationRequest &request)
++{
++	return m_impl->requestStateOperation(request);
++}
++
++bool EmbeddedEmulatorEngine::pollStateOperationResult(StateOperationResult &result)
++{
++	return m_impl->pollStateOperationResult(result);
++}
++
++bool EmbeddedEmulatorEngine::isStateOperationPending() const
++{
++	return m_impl->isStateOperationPending();
++}
++
+ std::uint64_t EmbeddedEmulatorEngine::machineUptimeMs() const
+ {
+ 	return m_impl->machineUptimeMs();
+@@ -1596,6 +2983,21 @@ int EmbeddedEmulatorEngine::mameResult() const
+ 	return m_impl->mameResult();
+ }
+ 
++const std::string &EmbeddedEmulatorEngine::driverName() const
++{
++	return m_impl->driverName();
++}
++
++std::uint64_t EmbeddedEmulatorEngine::engineGeneration() const
++{
++	return m_impl->engineGeneration();
++}
++
++EmbeddedStartupDiagnostic EmbeddedEmulatorEngine::startupDiagnostic() const
++{
++	return m_impl->startupDiagnostic();
++}
++
+ std::uint64_t steadyMs()
+ {
+ 	return static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
+@@ -1603,14 +3005,3 @@ std::uint64_t steadyMs()
+ }
+ 
+ } // namespace ves
+-
+-void ves_embedded_midi_device_delivered(std::uint8_t, double machine_time_seconds)
+-{
+-	if (ves::g_active_diag == nullptr)
+-		return;
+-
+-	const auto machine_ms = static_cast<std::uint64_t>(machine_time_seconds * 1000.0);
+-	if (ves::g_active_diag->midi_device_first_delivered_machine_ms.load(std::memory_order_relaxed) == 0)
+-		ves::g_active_diag->midi_device_first_delivered_machine_ms.store(machine_ms, std::memory_order_relaxed);
+-	ves::g_active_diag->midi_device_last_delivered_machine_ms.store(machine_ms, std::memory_order_relaxed);
+-	ves::g_active_diag->midi_device_delivered_bytes.fetch_add(1, std::memory_order_relaxed);
+diff --git a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h
+index 9006895ff89b069483ce2b922f638effd3ce7762..050840b192fe58fc75c7db6e0c4ffeffb28ce314 100644
+--- a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h
++++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h
+@@ -56,6 +56,66 @@ struct VideoFrameSnapshot
+ 	std::vector<std::uint32_t> pixels;
+ };
+ 
++enum class EmbeddedMediaType : std::uint8_t
++{
++	Floppy,
++	CdRom
++};
++
++struct MediaChangeRequest
++{
++	EmbeddedMediaType media_type = EmbeddedMediaType::Floppy;
++	std::uint64_t engine_generation = 0;
++	std::uint64_t request_id = 0;
++	std::string brief_instance_name = "flop";
++	std::string path;
++};
++
++struct MediaChangeResult
++{
++	EmbeddedMediaType media_type = EmbeddedMediaType::Floppy;
++	std::uint64_t engine_generation = 0;
++	std::uint64_t request_id = 0;
++	bool success = false;
++	bool drive_empty = true;
++	std::string applied_path;
++	std::string error_message;
++	int error_value = 0;
++};
++
++enum class StateOperation : std::uint8_t
++{
++	Save,
++	Load
++};
++
++using HeldMidiNotes = std::array<std::uint64_t, 32>;
++
++struct StateOperationRequest
++{
++	StateOperation operation = StateOperation::Save;
++	std::uint64_t engine_generation = 0;
++	std::uint64_t request_id = 0;
++	std::vector<std::uint8_t> snapshot_blob;
++	HeldMidiNotes held_midi_notes {};
++};
++
++struct StateOperationResult
++{
++	StateOperation operation = StateOperation::Save;
++	std::uint64_t engine_generation = 0;
++	std::uint64_t request_id = 0;
++	bool success = false;
++	bool load_failed_requires_restart = false;
++	std::uint64_t snapshot_size = 0;
++	std::vector<std::uint8_t> snapshot_blob;
++	HeldMidiNotes held_midi_notes {};
++	std::string error_message;
++};
++
++using FloppyChangeRequest = MediaChangeRequest;
++using FloppyChangeResult = MediaChangeResult;
++
+ enum class EmbeddedVideoState : std::uint8_t
+ {
+ 	Disabled,
+@@ -66,6 +126,48 @@ enum class EmbeddedVideoState : std::uint8_t
+ 	Error
+ };
+ 
++enum class EmbeddedStartupError : std::uint8_t
++{
++	None,
++	RuntimeResources,
++	PrimaryRomMissing,
++	MissingRom,
++	RomChecksumMismatch,
++	InvalidRomSet,
++	MediaUnavailable,
++	MediaLoad,
++	Configuration,
++	Nvram,
++	LuaPlugin,
++	DeviceInitialization,
++	AudioInitialization,
++	EngineFailure,
++	StartupTimeout,
++	Unknown
++};
++
++struct EmbeddedStartupIssue
++{
++	std::string name;
++	std::string owner;
++	std::string expected_crc;
++	std::string expected_sha1;
++	std::string actual_crc;
++	std::string actual_sha1;
++	std::uint64_t expected_length = 0;
++	std::uint64_t actual_length = 0;
++};
++
++struct EmbeddedStartupDiagnostic
++{
++	EmbeddedStartupError category = EmbeddedStartupError::None;
++	std::string summary;
++	std::string details;
++	std::string recovery;
++	std::string technical_details;
++	std::vector<EmbeddedStartupIssue> issues;
++};
++
+ struct EngineDiagnostics
+ {
+ 	std::atomic<std::uint64_t> audio_ring_capacity_frames { 0 };
+@@ -83,9 +185,6 @@ struct EngineDiagnostics
+ 	std::atomic<std::uint64_t> midi_last_read_ms { 0 };
+ 	std::atomic<std::uint64_t> midi_max_queue_to_read_ms { 0 };
+ 	std::atomic<std::uint64_t> midi_first_read_machine_uptime_ms { 0 };
+-	std::atomic<std::uint64_t> midi_device_delivered_bytes { 0 };
+-	std::atomic<std::uint64_t> midi_device_first_delivered_machine_ms { 0 };
+-	std::atomic<std::uint64_t> midi_device_last_delivered_machine_ms { 0 };
+ 	std::atomic<std::uint64_t> midi_first_audio_onset_ms { 0 };
+ 	std::atomic<std::uint64_t> midi_to_audio_onset_ms { 0 };
+ 	std::atomic<std::uint64_t> midi_input_open_count { 0 };
+@@ -99,15 +198,30 @@ struct EngineDiagnostics
+ 	std::atomic<std::uint64_t> audio_queued_latency_us { 0 };
+ 	std::atomic<std::uint64_t> audio_max_queued_latency_us { 0 };
+ 	std::atomic<std::uint64_t> audio_target_queue_frames { 512 };
+-	std::atomic<std::uint64_t> audio_max_tolerated_queue_frames { 2048 };
++	std::atomic<std::uint64_t> audio_max_tolerated_queue_frames { 768 };
++	std::atomic<std::uint64_t> audio_trimmed_frames { 0 };
+ 	std::atomic<std::uint64_t> audio_underruns { 0 };
++	std::atomic<std::uint64_t> audio_underrun_callbacks { 0 };
++	std::atomic<std::uint64_t> audio_missing_output_frames { 0 };
+ 	std::atomic<std::uint64_t> audio_overflows { 0 };
+-	std::atomic<std::uint64_t> mame_audio_callback_block_size { 0 };
+-	std::atomic<std::uint64_t> mame_audio_callback_count { 0 };
+-	std::atomic<std::uint64_t> juce_process_block_count { 0 };
++	std::atomic<std::uint64_t> audio_queue_read_low_watermark_frames { UINT64_MAX };
++	std::atomic<std::uint64_t> audio_sink_last_callback_us { 0 };
++	std::atomic<std::uint64_t> audio_sink_latest_interarrival_us { 0 };
++	std::atomic<std::uint64_t> audio_sink_max_interarrival_us { 0 };
++	std::atomic<std::uint64_t> audio_sink_latest_block_frames { 0 };
++	std::atomic<std::uint64_t> audio_sink_min_block_frames { UINT64_MAX };
++	std::atomic<std::uint64_t> audio_sink_max_block_frames { 0 };
++	std::atomic<std::uint64_t> audio_sink_recent_max_block_frames { 0 };
++	std::atomic<std::uint64_t> audio_sink_blocks_approx_240 { 0 };
++	std::atomic<std::uint64_t> audio_sink_blocks_approx_480 { 0 };
++	std::atomic<std::uint64_t> audio_sink_blocks_approx_720 { 0 };
++	std::atomic<std::uint64_t> audio_sink_blocks_960_plus { 0 };
++	std::atomic<std::uint64_t> audio_sink_blocks_other { 0 };
++	std::atomic<std::uint64_t> audio_sink_statistics_reset_generation { 0 };
+ 	std::atomic<std::uint64_t> juce_sample_rate { 0 };
+ 	std::atomic<std::uint64_t> mame_sample_rate { 0 };
+ 	std::atomic<std::uint64_t> effective_mame_sample_rate { 0 };
++	std::atomic<std::uint64_t> juce_configured_block_size { 0 };
+ 	std::atomic<std::uint64_t> juce_block_size { 0 };
+ 	std::atomic<std::uint64_t> boot_ready_queued_frames { 0 };
+ 	std::atomic<std::uint64_t> boot_ready_queued_latency_us { 0 };
+@@ -124,6 +238,8 @@ struct EngineDiagnostics
+ 	std::atomic<std::uint64_t> machine_started { 0 };
+ 	std::atomic<std::uint64_t> machine_exited { 0 };
+ 	std::atomic<std::uint64_t> machine_started_ms { 0 };
++	std::atomic<bool> machine_running { false };
++	std::atomic<std::uint64_t> normal_scheduler_iterations { 0 };
+ 	std::atomic<std::uint64_t> stream_updates { 0 };
+ 	std::atomic<float> peak_abs { 0.0f };
+ 	std::atomic<bool> stop_requested { false };
+@@ -132,6 +248,7 @@ struct EngineDiagnostics
+ 	std::atomic<bool> video_initialized { false };
+ 	std::atomic<bool> video_render_target_available { false };
+ 	std::atomic<bool> video_capture_enabled { false };
++	std::atomic<bool> video_capture_single_frame { false };
+ 	std::atomic<bool> video_editor_display_active { false };
+ 	std::atomic<std::uint64_t> video_state { static_cast<std::uint64_t>(EmbeddedVideoState::Disabled) };
+ 	std::atomic<std::uint64_t> video_capture_requested { 0 };
+@@ -141,6 +258,10 @@ struct EngineDiagnostics
+ 	std::atomic<std::uint64_t> video_rasterization_duration_us { 0 };
+ 	std::atomic<std::uint64_t> video_rasterization_total_us { 0 };
+ 	std::atomic<std::uint64_t> video_rasterization_max_us { 0 };
++	std::atomic<std::uint64_t> video_jobs_submitted { 0 };
++	std::atomic<std::uint64_t> video_jobs_replaced { 0 };
++	std::atomic<std::uint64_t> video_jobs_completed { 0 };
++	std::atomic<std::uint64_t> video_worker_pending_depth { 0 };
+ 	std::atomic<std::uint64_t> video_raster_error_code { 0 };
+ 	std::atomic<std::uint64_t> video_raster_error_index { 0 };
+ 	std::atomic<std::uint64_t> video_deadline_reset_requests { 0 };
+@@ -174,6 +295,8 @@ struct EngineDiagnostics
+ 	std::atomic<std::uint64_t> video_frames_skipped_inactive { 0 };
+ 	std::atomic<std::uint64_t> video_frames_skipped_paused { 0 };
+ 	std::atomic<std::uint64_t> video_frame_generation { 0 };
++	std::atomic<std::uint64_t> video_frame_reset_generation { 0 };
++	std::atomic<std::uint64_t> video_capture_interval_ms { 200 };
+ 	std::atomic<std::uint64_t> video_target_frame_rate { 5 };
+ 	std::atomic<std::uint64_t> video_measured_frame_rate_x1000 { 0 };
+ 	std::atomic<std::uint64_t> video_last_frame_timestamp_ms { 0 };
+@@ -182,6 +305,18 @@ struct EngineDiagnostics
+ 	std::atomic<std::uint64_t> video_target_generation { 0 };
+ 	std::atomic<std::uint64_t> video_target_orientation { 0 };
+ 	std::atomic<std::uint64_t> video_target_pixel_aspect_x1000 { 0 };
++	std::atomic<std::uint64_t> state_save_requests { 0 };
++	std::atomic<std::uint64_t> state_load_requests { 0 };
++	std::atomic<std::uint64_t> state_save_successes { 0 };
++	std::atomic<std::uint64_t> state_save_failures { 0 };
++	std::atomic<std::uint64_t> state_load_successes { 0 };
++	std::atomic<std::uint64_t> state_load_failures { 0 };
++	std::atomic<std::uint64_t> state_snapshot_bytes { 0 };
++	std::atomic<std::uint64_t> state_restore_read_completed_ms { 0 };
++	std::atomic<std::uint64_t> state_restore_first_timeslice_completed_ms { 0 };
++	std::atomic<std::uint64_t> state_restore_first_audio_ms { 0 };
++	std::atomic<std::uint64_t> state_restore_second_audio_ms { 0 };
++	std::atomic<std::uint64_t> state_restore_first_video_ms { 0 };
+ };
+ 
+ struct EmbeddedEmulatorEngineSettings
+@@ -193,12 +328,17 @@ struct EmbeddedEmulatorEngineSettings
+ 	std::string artwork_path;
+ 	std::string driver_name = "tx81z";
+ 	int sample_rate = 48000;
++	std::string native_midi_input_option;
++	std::string native_midi_output_option;
++	std::string retrofit_midi_input_option;
+ 	struct StartupMediaOption
+ 	{
+ 		std::string option_name;
+ 		std::string path;
+ 	};
+ 	std::vector<StartupMediaOption> startup_media_options;
++	std::uint64_t engine_generation = 0;
++	bool state_operations_allowed = false;
+ };
+ 
+ class EmbeddedEmulatorEngine
+@@ -215,7 +355,9 @@ public:
+ 	bool stopAndJoin(std::chrono::milliseconds timeout);
+ 
+ 	void sendMidiBytes(const std::uint8_t *data, std::size_t size);
++	void sendMidiPanic(const HeldMidiNotes &held_notes = {});
+ 	void resetAudioWindow();
++	void resetLatencyDiagnostics();
+ 	void resetMidiTimingWindow();
+ 	void drainAudio(AudioStats &stats);
+ 	std::size_t readAudioFrames(StereoFrame *frames, std::size_t max_frames);
+@@ -225,14 +367,29 @@ public:
+ 	void noteHostAudioConfiguration(double sample_rate, int block_size);
+ 	bool copyLatestVideoFrame(VideoFrameSnapshot &snapshot);
+ 	void setVideoDisplayActive(bool active);
++	void setVideoCaptureEnabled(bool enabled);
++	void setVideoCaptureSingleFrame(bool single_frame);
++	void setVideoCaptureIntervalMs(std::uint64_t interval_ms);
+ 	void requestVideoCaptureWidth(int width);
+ 	bool enqueueMouseEvent(EmbeddedMouseEventType type, std::int32_t x, std::int32_t y);
+ 	void requestMouseRelease();
++	bool requestFloppyChange(const FloppyChangeRequest &request);
++	bool pollFloppyChangeResult(FloppyChangeResult &result);
++	bool isFloppyChangePending() const;
++	bool requestMediaChange(const MediaChangeRequest &request);
++	bool pollMediaChangeResult(MediaChangeResult &result);
++	bool isMediaChangePending() const;
++	bool requestStateOperation(const StateOperationRequest &request);
++	bool pollStateOperationResult(StateOperationResult &result);
++	bool isStateOperationPending() const;
+ 
+ 	std::uint64_t machineUptimeMs() const;
+ 	const EngineDiagnostics &diagnostics() const;
+ 	EngineDiagnostics &diagnostics();
+ 	int mameResult() const;
++	const std::string &driverName() const;
++	std::uint64_t engineGeneration() const;
++	EmbeddedStartupDiagnostic startupDiagnostic() const;
+ 
+ private:
+ 	struct Impl;
+@@ -243,3 +400,4 @@ std::uint64_t steadyMs();
+ 
+ } // namespace ves
+ 
++#endif // VES_EMBEDDED_EMULATOR_ENGINE_H
+diff --git a/src/ves/embeddedinstruments/main.cpp b/src/ves/embeddedinstruments/main.cpp
+index ab85fd0659cac75e6371b2ca3a693a6c5d93aa54..80279abd2ae068ef33d10ffa86c3b4e659ef6881 100644
+--- a/src/ves/embeddedinstruments/main.cpp
++++ b/src/ves/embeddedinstruments/main.cpp
+@@ -49,7 +49,6 @@ struct cycle_summary
+ 	std::uint64_t non_zero_samples = 0;
+ 	std::uint64_t midi_queued = 0;
+ 	std::uint64_t midi_consumed = 0;
+-	std::uint64_t midi_device_delivered = 0;
+ };
+ 
+ struct attempt_result
+@@ -57,10 +56,8 @@ struct attempt_result
+ 	AudioStats audio;
+ 	std::uint64_t queued_delta = 0;
+ 	std::uint64_t consumed_delta = 0;
+-	std::uint64_t delivered_delta = 0;
+ 	std::uint64_t max_queue_to_read_ms = 0;
+ 	std::uint64_t first_read_uptime_ms = 0;
+-	std::uint64_t first_delivered_machine_ms = 0;
+ };
+ 
+ std::string cfg_path(const test_settings &settings, int cycle_index)
+@@ -160,10 +157,8 @@ void print_attempt(EmbeddedEmulatorEngine &engine, int delay, int channel, const
+ 		<< " NoteOff=" << hex_bytes({ off_status, 0x3c, 0x00 })
+ 		<< " queued=" << result.queued_delta
+ 		<< " osdRead=" << result.consumed_delta
+-		<< " midiDeviceDelivered=" << result.delivered_delta
+ 		<< " maxQueueToReadMs=" << result.max_queue_to_read_ms
+ 		<< " firstReadUptimeMs=" << result.first_read_uptime_ms
+-		<< " firstDeviceUptimeMs=" << result.first_delivered_machine_ms
+ 		<< " frames=" << result.audio.frames
+ 		<< " peak=" << result.audio.peak
+ 		<< " rms=" << result.audio.rms
+@@ -191,7 +186,6 @@ attempt_result run_channel_attempt(EmbeddedEmulatorEngine &engine, int channel)
+ 	attempt_result result;
+ 	const auto queued_before = diag.midi_bytes_queued.load(std::memory_order_relaxed);
+ 	const auto consumed_before = diag.midi_bytes_consumed.load(std::memory_order_relaxed);
+-	const auto delivered_before = diag.midi_device_delivered_bytes.load(std::memory_order_relaxed);
+ 	send_midi_bytes(engine, note_on, sizeof(note_on));
+ 	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+ 	send_midi_bytes(engine, note_off, sizeof(note_off));
+@@ -199,10 +193,8 @@ attempt_result run_channel_attempt(EmbeddedEmulatorEngine &engine, int channel)
+ 	engine.drainAudio(result.audio);
+ 	result.queued_delta = diag.midi_bytes_queued.load(std::memory_order_relaxed) - queued_before;
+ 	result.consumed_delta = diag.midi_bytes_consumed.load(std::memory_order_relaxed) - consumed_before;
+-	result.delivered_delta = diag.midi_device_delivered_bytes.load(std::memory_order_relaxed) - delivered_before;
+ 	result.max_queue_to_read_ms = diag.midi_max_queue_to_read_ms.load(std::memory_order_relaxed);
+ 	result.first_read_uptime_ms = diag.midi_first_read_machine_uptime_ms.load(std::memory_order_relaxed);
+-	result.first_delivered_machine_ms = diag.midi_device_first_delivered_machine_ms.load(std::memory_order_relaxed);
+ 	return result;
+ }
+ 
+@@ -276,7 +268,6 @@ cycle_summary run_cycle(const test_settings &settings, int cycle_index)
+ 	const EngineDiagnostics &diag = engine.diagnostics();
+ 	summary.midi_queued = diag.midi_bytes_queued.load(std::memory_order_relaxed);
+ 	summary.midi_consumed = diag.midi_bytes_consumed.load(std::memory_order_relaxed);
+-	summary.midi_device_delivered = diag.midi_device_delivered_bytes.load(std::memory_order_relaxed);
+ 	summary.passed = summary.providers_ready
+ 		&& summary.clean_shutdown
+ 		&& summary.mame_result == EMU_ERR_NONE
+@@ -287,7 +278,6 @@ cycle_summary run_cycle(const test_settings &settings, int cycle_index)
+ 
+ 	std::cout << "MIDI bytes queued total: " << summary.midi_queued << "\n";
+ 	std::cout << "MIDI bytes consumed by OSD port total: " << summary.midi_consumed << "\n";
+-	std::cout << "MIDI bytes delivered to MAME MIDI device total: " << summary.midi_device_delivered << "\n";
+ 	std::cout << "Native audio opened: " << (diag.native_audio_opened.load(std::memory_order_relaxed) ? "yes" : "no") << "\n";
+ 	std::cout << "Native MIDI opened: " << (diag.native_midi_opened.load(std::memory_order_relaxed) ? "yes" : "no") << "\n";
+ 	std::cout << "Clean shutdown: " << (summary.clean_shutdown ? "yes" : "no") << "\n";
+@@ -392,3 +382,4 @@ bool emulator_info::draw_user_interface(running_machine &) { return false; }
+ void emulator_info::periodic_check() {}
+ bool emulator_info::frame_hook() { return false; }
+ void emulator_info::layout_script_cb(layout_file &, const char *) {}
++bool emulator_info::standalone() { return true; }

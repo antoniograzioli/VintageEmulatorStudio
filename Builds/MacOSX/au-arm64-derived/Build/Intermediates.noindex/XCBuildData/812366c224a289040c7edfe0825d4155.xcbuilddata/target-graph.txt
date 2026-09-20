@@ -1,4 +1,0 @@
-Target dependency graph (2 targets)
-Target 'Vintage Emulator Studio - AU' in project 'Vintage Emulator Studio'
-➜ Explicit dependency on target 'Vintage Emulator Studio - Shared Code' in project 'Vintage Emulator Studio'
-Target 'Vintage Emulator Studio - Shared Code' in project 'Vintage Emulator Studio' (no dependencies)
