@@ -149,16 +149,6 @@ namespace ves {
 
 namespace {
 
-std::string lifecycle_pointer_string(const void *pointer)
-{
-	std::ostringstream stream;
-	if (pointer == nullptr)
-		stream << "null";
-	else
-		stream << "0x" << std::hex << reinterpret_cast<std::uintptr_t>(pointer);
-	return stream.str();
-}
-
 void append_engine_lifecycle_log(const std::string &line)
 {
 	const char *home = std::getenv("HOME");
@@ -509,11 +499,7 @@ public:
 		if (diag.state_restore_first_timeslice_completed_ms.load(std::memory_order_acquire) != 0)
 		{
 			std::uint64_t expected = 0;
-			if (diag.state_restore_first_video_ms.compare_exchange_strong(expected, timestamp, std::memory_order_release, std::memory_order_relaxed))
-			{
-				diag.state_restore_first_video_generation.store(generation, std::memory_order_release);
-				osd_printf_verbose("[VES state restore] first post-load video generation=%llu\n", static_cast<unsigned long long>(generation));
-			}
+			diag.state_restore_first_video_ms.compare_exchange_strong(expected, timestamp, std::memory_order_release, std::memory_order_relaxed);
 		}
 	}
 
@@ -790,7 +776,6 @@ public:
 			m_diag.machine_running.store(true, std::memory_order_release);
 			m_diag.normal_scheduler_iterations.fetch_add(1, std::memory_order_release);
 		}
-		m_diag.state_timeslice_exit_ms.store(now, std::memory_order_relaxed);
 		if (m_restore_waiting_for_clean_timeslice)
 		{
 			m_restore_waiting_for_clean_timeslice = false;
@@ -801,20 +786,6 @@ public:
 		process_state_requests();
 		process_midi_panic_request();
 	}
-
-	struct static_layout_run
-	{
-		u32 first_item = 0;
-		u32 item_count = 0;
-		bool is_static = false;
-		int x = 0;
-		int y = 0;
-		int width = 0;
-		int height = 0;
-		// RGB is produced by the embedded renderer; the high byte is a cached
-		// coverage value recovered during the one-time build.
-		std::vector<std::uint32_t> pixels;
-	};
 
 	struct immutable_primitive
 	{
@@ -880,6 +851,11 @@ public:
 	static std::size_t texture_pixel_size(u32 format)
 	{
 		return (format == TEXFORMAT_PALETTE16 || format == TEXFORMAT_YUY16) ? sizeof(std::uint16_t) : sizeof(std::uint32_t);
+	}
+
+	static bool cacheable_static_blend(int blend_mode)
+	{
+		return blend_mode == BLENDMODE_ALPHA || blend_mode == BLENDMODE_NONE;
 	}
 
 	bool snapshot_primitive(const render_primitive &source, immutable_primitive &destination, std::uint64_t &bytes)
@@ -1099,7 +1075,6 @@ public:
 					continue;
 				}
 				m_video_bridge.publishWrittenBuffer(m_diag, job->token);
-				m_diag.video_capture_queue_depth_after.store(m_audio_queue.size(), std::memory_order_relaxed);
 				m_diag.video_jobs_completed.fetch_add(1, std::memory_order_relaxed);
 				m_diag.video_capture_completed.fetch_add(1, std::memory_order_relaxed);
 				m_diag.video_capture_in_progress.store(false, std::memory_order_release);
@@ -1124,534 +1099,6 @@ public:
 		m_video_worker_condition.notify_one();
 		if (m_video_worker.joinable())
 			m_video_worker.join();
-	}
-
-	bool static_cache_supported() const
-	{
-		return m_video_target != nullptr;
-	}
-
-	void invalidate_static_cache()
-	{
-		m_static_cache_valid = false;
-		m_static_cache_fallback = false;
-		m_static_cache_fallback_reason.clear();
-		m_static_runs.clear();
-		m_static_cache_width = 0;
-		m_static_cache_height = 0;
-		m_static_cache_machine_name.clear();
-		m_static_cache_view_name.clear();
-		m_static_cache_visibility_mask = 0;
-		m_static_cache_orientation = 0;
-		m_static_cache_pixel_aspect = 0.0f;
-		m_static_cache_view_aspect = 0.0f;
-		m_static_cache_validation_done = false;
-		m_static_cropped_cache_memory_bytes_estimate = 0;
-		m_static_full_frame_equivalent_bytes = 0;
-		m_static_cache_hits = 0;
-		m_static_dynamic_render_total_us = 0;
-		m_static_dynamic_render_max_us = 0;
-		m_static_dynamic_render_count = 0;
-		m_static_composite_total_us = 0;
-		m_static_composite_max_us = 0;
-		m_static_cached_frame_total_us = 0;
-		m_static_cached_frame_max_us = 0;
-		m_static_cached_frame_count = 0;
-	}
-
-	void stamp_static_cache_context(int width, int height)
-	{
-		m_static_cache_width = width;
-		m_static_cache_height = height;
-		m_static_cache_machine_name = machine().basename();
-		m_static_cache_view_name = m_video_target != nullptr ? m_video_target->current_view().name() : std::string();
-		m_static_cache_visibility_mask = m_video_target != nullptr ? m_video_target->visibility_mask() : 0;
-		m_static_cache_orientation = m_video_target != nullptr ? m_video_target->orientation() : 0;
-		m_static_cache_pixel_aspect = m_video_target != nullptr ? m_video_target->pixel_aspect() : 0.0f;
-		m_static_cache_view_aspect = m_video_target != nullptr ? m_video_target->current_view().effective_aspect() : 0.0f;
-	}
-
-	void append_static_cache_log(const std::string &line) const
-	{
-		const char *home = std::getenv("HOME");
-		if (home == nullptr || *home == '\0')
-			return;
-		const std::string directory = std::string(home) + "/Library/Logs";
-		std::error_code error;
-		std::filesystem::create_directories(directory, error);
-		std::ofstream log(directory + "/VES-static-cache.log", std::ios::app);
-		if (log)
-			log << line << '\n';
-	}
-
-	static bool cacheable_static_blend(int blend_mode)
-	{
-		return blend_mode == BLENDMODE_ALPHA || blend_mode == BLENDMODE_NONE;
-	}
-
-	bool compute_static_run_bounds(static_layout_run &run, int width, int height, std::string &reason)
-	{
-		auto &run_list = m_video_target->get_primitives(run.first_item, run.item_count, false);
-		int min_x = width;
-		int min_y = height;
-		int max_x = -1;
-		int max_y = -1;
-		for (const render_primitive *primitive = run_list.first(); primitive != nullptr; primitive = primitive->next())
-		{
-			if (!std::isfinite(primitive->bounds.x0) || !std::isfinite(primitive->bounds.y0)
-				|| !std::isfinite(primitive->bounds.x1) || !std::isfinite(primitive->bounds.y1)
-				|| primitive->bounds.x1 < primitive->bounds.x0 || primitive->bounds.y1 < primitive->bounds.y0)
-			{
-				reason = util::string_format("invalid primitive bounds first_item=%u item_count=%u", run.first_item, run.item_count);
-				return false;
-			}
-			const int left = std::clamp(static_cast<int>(std::floor(primitive->bounds.x0)) - 1, 0, width);
-			const int top = std::clamp(static_cast<int>(std::floor(primitive->bounds.y0)) - 1, 0, height);
-			const int right = std::clamp(static_cast<int>(std::ceil(primitive->bounds.x1)) + 1, 0, width);
-			const int bottom = std::clamp(static_cast<int>(std::ceil(primitive->bounds.y1)) + 1, 0, height);
-			if (right <= left || bottom <= top)
-				continue;
-			min_x = std::min(min_x, left);
-			min_y = std::min(min_y, top);
-			max_x = std::max(max_x, right);
-			max_y = std::max(max_y, bottom);
-		}
-		if (max_x <= min_x || max_y <= min_y)
-		{
-			reason = util::string_format("empty primitive bounds first_item=%u item_count=%u", run.first_item, run.item_count);
-			return false;
-		}
-		run.x = min_x;
-		run.y = min_y;
-		run.width = max_x - min_x;
-		run.height = max_y - min_y;
-		return true;
-	}
-
-	bool compute_static_run_bounds(std::vector<static_layout_run> &runs, int width, int height, std::uint64_t &cropped_cache_memory_bytes, std::string &reason)
-	{
-		cropped_cache_memory_bytes = 0;
-		for (auto &run : runs)
-		{
-			if (!run.is_static)
-				continue;
-			if (!compute_static_run_bounds(run, width, height, reason))
-				return false;
-			cropped_cache_memory_bytes += static_cast<std::uint64_t>(run.width) * static_cast<std::uint64_t>(run.height) * sizeof(std::uint32_t);
-		}
-		return true;
-	}
-
-	static void composite_cached_rgb_region(std::uint32_t *destination, int destination_width, const static_layout_run &run)
-	{
-		for (int y = 0; y < run.height; ++y)
-			for (int x = 0; x < run.width; ++x)
-			{
-				const auto index = static_cast<std::size_t>(y) * static_cast<std::size_t>(run.width) + x;
-				const auto src = run.pixels[index];
-				const auto alpha = (src >> 24) & 0xffU;
-				if (alpha == 0)
-					continue;
-				const auto destination_index = static_cast<std::size_t>(run.y + y) * static_cast<std::size_t>(destination_width) + static_cast<std::size_t>(run.x + x);
-				if (alpha == 0xffU)
-				{
-					destination[destination_index] = src & 0x00ffffffU;
-					continue;
-				}
-
-				const auto dst = destination[destination_index];
-				const auto inverse = 0xffU - alpha;
-				const auto red = (((src >> 16) & 0xffU) * alpha + ((dst >> 16) & 0xffU) * inverse) / 0xffU;
-				const auto green = (((src >> 8) & 0xffU) * alpha + ((dst >> 8) & 0xffU) * inverse) / 0xffU;
-				const auto blue = ((src & 0xffU) * alpha + (dst & 0xffU) * inverse) / 0xffU;
-				destination[destination_index] = (red << 16) | (green << 8) | blue;
-			}
-	}
-
-	bool build_static_cache(int width, int height)
-	{
-		const bool during_restore = m_diag.state_restore_read_completed_ms.load(std::memory_order_acquire) != 0
-			&& m_diag.state_restore_first_video_ms.load(std::memory_order_acquire) == 0;
-		if (during_restore)
-			m_diag.state_restore_cache_build_start_ms.store(steadyMs(), std::memory_order_release);
-		struct restore_cache_build_scope
-		{
-			EngineDiagnostics &diag;
-			bool active;
-			~restore_cache_build_scope()
-			{
-				if (active)
-					diag.state_restore_cache_build_end_ms.store(steadyMs(), std::memory_order_release);
-			}
-		} restore_scope { m_diag, during_restore };
-		if (!static_cache_supported())
-			return false;
-		stamp_static_cache_context(width, height);
-
-		const auto pixel_count = static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
-		std::vector<static_layout_run> runs;
-		u32 static_items = 0;
-		u32 stateful_items = 0;
-		u32 display_items = 0;
-		u32 unsupported_blend_items = 0;
-		u32 item_index = 0;
-		for (const auto &item : m_video_target->current_view().visible_items())
-		{
-			const bool display = item.get().screen() != nullptr;
-			const bool unsupported_blend = !display && !cacheable_static_blend(item.get().blend_mode());
-			const bool dynamic = display || unsupported_blend || item.get().has_dynamic_dependency();
-			const auto classification = display ? "DISPLAY" : (dynamic ? "STATEFUL" : "STATIC");
-			osd_printf_verbose("[VES static cache item] index=%u id=%s class=%s bounds=%.6f,%.6f,%.6f,%.6f\n",
-				item_index, item.get().id().c_str(), classification,
-				item.get().bounds().x0, item.get().bounds().y0,
-				item.get().bounds().x1, item.get().bounds().y1);
-			if (display)
-				++display_items;
-			else if (dynamic)
-			{
-				++stateful_items;
-				if (unsupported_blend)
-					++unsupported_blend_items;
-			}
-			else
-				++static_items;
-
-			if (runs.empty() || runs.back().is_static != !dynamic)
-				runs.push_back({ item_index, 1, !dynamic, {} });
-			else
-				++runs.back().item_count;
-			++item_index;
-		}
-
-		u32 static_run_count = 0;
-		for (const auto &run : runs)
-			if (run.is_static)
-				++static_run_count;
-		const auto full_frame_equivalent_bytes = static_cast<std::uint64_t>(static_run_count) * static_cast<std::uint64_t>(pixel_count) * sizeof(std::uint32_t);
-		std::uint64_t cropped_cache_memory_bytes = 0;
-		std::string bounds_failure_reason;
-		if (!compute_static_run_bounds(runs, width, height, cropped_cache_memory_bytes, bounds_failure_reason))
-		{
-			m_static_cache_valid = false;
-			m_static_cache_fallback = true;
-			m_static_cache_validation_done = true;
-			m_static_cropped_cache_memory_bytes_estimate = 0;
-			m_static_full_frame_equivalent_bytes = full_frame_equivalent_bytes;
-			m_static_cache_fallback_reason = "unsupported " + bounds_failure_reason;
-			append_static_cache_log(util::string_format("[VES static cache validation] machine=%s view=\"%s\" static_items=%u stateful_items=%u display_items=%u static_runs=%u old_full_frame_equivalent_bytes=%llu actual_cropped_cache_bytes=0 unsupported_blend_items=%u result=FALLBACK reason=\"%s\"",
-				machine().basename(), m_video_target->current_view().name().c_str(), static_items, stateful_items, display_items, static_run_count,
-				static_cast<unsigned long long>(full_frame_equivalent_bytes),
-				unsupported_blend_items, m_static_cache_fallback_reason.c_str()));
-			return false;
-		}
-		const auto total_items = static_items + stateful_items + display_items;
-		const double static_ratio = total_items != 0 ? double(static_items) / double(total_items) : 0.0;
-		constexpr std::uint64_t cropped_memory_limit_bytes = 64ULL * 1024ULL * 1024ULL;
-		const bool compact_many_runs = static_run_count <= 64
-			&& static_ratio >= 0.30
-			&& cropped_cache_memory_bytes <= 32ULL * 1024ULL * 1024ULL;
-		if (static_items < 3 || static_run_count == 0 || (static_run_count > 32 && !compact_many_runs) || cropped_cache_memory_bytes > cropped_memory_limit_bytes || static_ratio < 0.20)
-		{
-			m_static_cache_valid = false;
-			m_static_cache_fallback = true;
-			m_static_cache_validation_done = true;
-			m_static_cropped_cache_memory_bytes_estimate = cropped_cache_memory_bytes;
-			m_static_full_frame_equivalent_bytes = full_frame_equivalent_bytes;
-			m_static_cache_fallback_reason = util::string_format("efficiency static_items=%u static_runs=%u static_ratio=%.4f old_full_frame_equivalent_bytes=%llu actual_cropped_cache_bytes=%llu",
-				static_items, static_run_count, static_ratio,
-				static_cast<unsigned long long>(full_frame_equivalent_bytes),
-				static_cast<unsigned long long>(cropped_cache_memory_bytes));
-			append_static_cache_log(util::string_format("[VES static cache validation] machine=%s view=\"%s\" static_items=%u stateful_items=%u display_items=%u static_runs=%u old_full_frame_equivalent_bytes=%llu actual_cropped_cache_bytes=%llu memory_reduction_percent=%.2f unsupported_blend_items=%u result=FALLBACK reason=\"%s\"",
-				machine().basename(), m_video_target->current_view().name().c_str(), static_items, stateful_items, display_items, static_run_count,
-				static_cast<unsigned long long>(full_frame_equivalent_bytes),
-				static_cast<unsigned long long>(cropped_cache_memory_bytes),
-				full_frame_equivalent_bytes != 0 ? 100.0 * (1.0 - double(cropped_cache_memory_bytes) / double(full_frame_equivalent_bytes)) : 0.0,
-				unsupported_blend_items, m_static_cache_fallback_reason.c_str()));
-			return false;
-		}
-
-		const auto build_start = std::chrono::steady_clock::now();
-		std::uint64_t full_render_equivalent_us = 0;
-		try
-		{
-			// Establish a one-time baseline for the diagnostic without changing
-			// the normal path used by any other machine or view.
-			const auto full_start = std::chrono::steady_clock::now();
-			auto &full_list = m_video_target->get_primitives();
-			std::vector<std::uint32_t> baseline(pixel_count, 0xff000000U);
-			embedded_video_renderer::draw_primitives(full_list, baseline.data(), static_cast<u32>(width), static_cast<u32>(height), static_cast<u32>(width));
-			full_render_equivalent_us = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - full_start).count());
-
-			u32 static_run_index = 0;
-			for (auto &run : runs)
-			{
-				if (!run.is_static)
-					continue;
-				std::vector<std::uint32_t> black(pixel_count, 0U);
-				std::vector<std::uint32_t> white(pixel_count, 0x00ffffffU);
-				auto &run_list = m_video_target->get_primitives(run.first_item, run.item_count, false);
-				embedded_video_renderer::draw_primitives(run_list, black.data(), static_cast<u32>(width), static_cast<u32>(height), static_cast<u32>(width));
-				embedded_video_renderer::draw_primitives(run_list, white.data(), static_cast<u32>(width), static_cast<u32>(height), static_cast<u32>(width));
-				const auto cropped_pixel_count = static_cast<std::size_t>(run.width) * static_cast<std::size_t>(run.height);
-				run.pixels.resize(cropped_pixel_count);
-				std::size_t covered_pixels = 0;
-				for (int y = 0; y < run.height; ++y)
-					for (int x = 0; x < run.width; ++x)
-					{
-						const auto full_index = static_cast<std::size_t>(run.y + y) * static_cast<std::size_t>(width) + static_cast<std::size_t>(run.x + x);
-						const auto cropped_index = static_cast<std::size_t>(y) * static_cast<std::size_t>(run.width) + static_cast<std::size_t>(x);
-						const auto black_pixel = black[full_index];
-						const auto white_pixel = white[full_index];
-						const auto alpha_from_channel = [] (unsigned black_channel, unsigned white_channel)
-						{
-							const int difference = static_cast<int>(white_channel) - static_cast<int>(black_channel);
-							return difference >= 0 ? 0xffU - std::min(0xff, difference) : 0xffU;
-						};
-						const auto alpha_r = alpha_from_channel((black_pixel >> 16) & 0xffU, (white_pixel >> 16) & 0xffU);
-						const auto alpha_g = alpha_from_channel((black_pixel >> 8) & 0xffU, (white_pixel >> 8) & 0xffU);
-						const auto alpha_b = alpha_from_channel(black_pixel & 0xffU, white_pixel & 0xffU);
-						const auto alpha = std::max({ alpha_r, alpha_g, alpha_b });
-						const auto red = alpha != 0 ? std::min(0xffU, (((black_pixel >> 16) & 0xffU) * 0xffU) / alpha) : 0U;
-						const auto green = alpha != 0 ? std::min(0xffU, (((black_pixel >> 8) & 0xffU) * 0xffU) / alpha) : 0U;
-						const auto blue = alpha != 0 ? std::min(0xffU, ((black_pixel & 0xffU) * 0xffU) / alpha) : 0U;
-						run.pixels[cropped_index] = (alpha << 24) | (red << 16) | (green << 8) | blue;
-						if (alpha != 0)
-							++covered_pixels;
-					}
-				osd_printf_verbose("[VES static cache run] index=%u first_item=%u item_count=%u bbox=%d,%d %dx%d pixels=%u\n",
-					static_run_index++, run.first_item, run.item_count, run.x, run.y, run.width, run.height, static_cast<unsigned>(cropped_pixel_count));
-				append_static_cache_log(util::string_format("run machine=%s view=\"%s\" first_item=%u item_count=%u bbox=%d,%d %dx%d cropped_pixels=%llu covered_pixels=%llu coverage_percent=%.4f",
-					machine().basename(), m_video_target->current_view().name().c_str(),
-					run.first_item, run.item_count, run.x, run.y, run.width, run.height,
-					static_cast<unsigned long long>(cropped_pixel_count),
-					static_cast<unsigned long long>(covered_pixels),
-					cropped_pixel_count != 0 ? (100.0 * covered_pixels) / cropped_pixel_count : 0.0));
-			}
-		}
-		catch (...)
-		{
-			m_static_cache_valid = false;
-			m_static_runs.clear();
-			m_static_cache_fallback = true;
-			m_static_cache_validation_done = true;
-			m_static_cache_fallback_reason = "cache build exception";
-			append_static_cache_log(util::string_format("[VES static cache validation] machine=%s view=\"%s\" result=FALLBACK reason=\"%s\"",
-				m_static_cache_machine_name.c_str(), m_static_cache_view_name.c_str(), m_static_cache_fallback_reason.c_str()));
-			return false;
-		}
-
-		m_static_runs = std::move(runs);
-		m_static_cache_valid = true;
-		m_static_cache_fallback = false;
-		m_static_items = static_items;
-		m_static_stateful_items = stateful_items;
-		m_static_display_items = display_items;
-		m_static_unsupported_blend_items = unsupported_blend_items;
-		m_static_run_count = static_run_count;
-		m_static_cache_build_us = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - build_start).count());
-		m_static_full_render_equivalent_us = full_render_equivalent_us;
-		m_static_cache_memory_bytes = 0;
-		for (const auto &run : m_static_runs)
-			m_static_cache_memory_bytes += run.pixels.size() * sizeof(std::uint32_t);
-		m_static_full_frame_equivalent_bytes = full_frame_equivalent_bytes;
-		m_static_cropped_cache_memory_bytes_estimate = cropped_cache_memory_bytes;
-		append_static_cache_log(util::string_format("cache_build machine=%s view=\"%s\" static_items=%u stateful_items=%u display_items=%u static_runs=%u cache_build_us=%llu old_full_frame_equivalent_bytes=%llu actual_cropped_cache_bytes=%llu cropped_cache_memory_bytes_estimate=%llu memory_reduction_percent=%.2f full_render_equivalent_us=%llu unsupported_blend_items=%u",
-			m_static_cache_machine_name.c_str(), m_static_cache_view_name.c_str(),
-			m_static_items, m_static_stateful_items, m_static_display_items, m_static_run_count,
-			static_cast<unsigned long long>(m_static_cache_build_us),
-			static_cast<unsigned long long>(m_static_full_frame_equivalent_bytes),
-			static_cast<unsigned long long>(m_static_cache_memory_bytes),
-			static_cast<unsigned long long>(m_static_cropped_cache_memory_bytes_estimate),
-			m_static_full_frame_equivalent_bytes != 0 ? 100.0 * (1.0 - double(m_static_cache_memory_bytes) / double(m_static_full_frame_equivalent_bytes)) : 0.0,
-			static_cast<unsigned long long>(m_static_full_render_equivalent_us),
-			m_static_unsupported_blend_items));
-		return true;
-	}
-
-	bool compare_static_cache_frames(const std::uint32_t *cached_pixels, const std::uint32_t *full_pixels, int width, int height, std::uint64_t comparison_us)
-	{
-		const auto pixel_count = static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
-		std::uint64_t different_pixels = 0;
-		std::uint32_t maximum_channel_difference = 0;
-		std::uint64_t severe_pixels_gt2 = 0;
-		std::uint64_t severe_pixels_gt4 = 0;
-		std::uint64_t severe_pixels_gt8 = 0;
-		std::uint64_t total_channel_absolute_error = 0;
-		long double total_channel_squared_error = 0.0L;
-		int min_x = width;
-		int min_y = height;
-		int max_x = -1;
-		int max_y = -1;
-		for (int y = 0; y < height; ++y)
-			for (int x = 0; x < width; ++x)
-			{
-				const auto cached_pixel = cached_pixels[static_cast<std::size_t>(y) * width + x];
-				const auto full_pixel = full_pixels[static_cast<std::size_t>(y) * width + x];
-				const auto red_difference = static_cast<unsigned>(std::abs(int((cached_pixel >> 16) & 0xffU) - int((full_pixel >> 16) & 0xffU)));
-				const auto green_difference = static_cast<unsigned>(std::abs(int((cached_pixel >> 8) & 0xffU) - int((full_pixel >> 8) & 0xffU)));
-				const auto blue_difference = static_cast<unsigned>(std::abs(int(cached_pixel & 0xffU) - int(full_pixel & 0xffU)));
-				const auto pixel_difference = std::max({ red_difference, green_difference, blue_difference });
-				total_channel_absolute_error += red_difference + green_difference + blue_difference;
-				total_channel_squared_error += static_cast<long double>(red_difference * red_difference)
-					+ static_cast<long double>(green_difference * green_difference)
-					+ static_cast<long double>(blue_difference * blue_difference);
-				maximum_channel_difference = std::max(maximum_channel_difference, pixel_difference);
-				if (pixel_difference != 0)
-				{
-					++different_pixels;
-					if (pixel_difference > 2)
-						++severe_pixels_gt2;
-					if (pixel_difference > 4)
-						++severe_pixels_gt4;
-					if (pixel_difference > 8)
-						++severe_pixels_gt8;
-					min_x = std::min(min_x, x);
-					min_y = std::min(min_y, y);
-					max_x = std::max(max_x, x);
-					max_y = std::max(max_y, y);
-				}
-			}
-		const double difference_percent = pixel_count != 0 ? (100.0 * different_pixels) / pixel_count : 0.0;
-		const double severe_percent_gt2 = pixel_count != 0 ? (100.0 * severe_pixels_gt2) / pixel_count : 0.0;
-		const double severe_percent_gt4 = pixel_count != 0 ? (100.0 * severe_pixels_gt4) / pixel_count : 0.0;
-		const double severe_percent_gt8 = pixel_count != 0 ? (100.0 * severe_pixels_gt8) / pixel_count : 0.0;
-		const auto channel_count = pixel_count * 3;
-		const double mean_absolute_channel_error = channel_count != 0 ? static_cast<double>(total_channel_absolute_error) / static_cast<double>(channel_count) : 0.0;
-		const double rms_channel_error = channel_count != 0 ? std::sqrt(static_cast<double>(total_channel_squared_error / static_cast<long double>(channel_count))) : 0.0;
-		const bool rounding_noise_only = maximum_channel_difference <= 2
-			&& severe_pixels_gt2 == 0
-			&& mean_absolute_channel_error <= 1.0
-			&& rms_channel_error <= 1.5;
-		const bool minor_noise_only = maximum_channel_difference <= 8
-			&& severe_percent_gt8 <= 0.0001
-			&& severe_percent_gt4 <= 0.001
-			&& severe_percent_gt2 <= 0.01
-			&& mean_absolute_channel_error <= 0.10
-			&& rms_channel_error <= 0.50;
-		const bool accepted = rounding_noise_only || minor_noise_only;
-		osd_printf_verbose("[VES static cache compare] different_pixels=%llu percentage=%.4f bbox=%d,%d-%d,%d max_channel_difference=%u mean_abs_channel_error=%.6f rms_channel_error=%.6f severe_percent_gt2=%.6f severe_percent_gt4=%.6f severe_percent_gt8=%.6f result=%s\n",
-			static_cast<unsigned long long>(different_pixels),
-			difference_percent,
-			min_x, min_y, max_x, max_y, maximum_channel_difference,
-			mean_absolute_channel_error, rms_channel_error,
-			severe_percent_gt2, severe_percent_gt4, severe_percent_gt8,
-			accepted ? "ACCEPTED" : "FALLBACK");
-		append_static_cache_log(util::string_format("[VES static cache validation] machine=%s view=\"%s\" static_items=%u stateful_items=%u display_items=%u static_runs=%u different_pixels=%llu difference_percent=%.4f severe_pixels_gt2=%llu severe_percent_gt2=%.6f severe_pixels_gt4=%llu severe_percent_gt4=%.6f severe_pixels_gt8=%llu severe_percent_gt8=%.6f bbox=%d,%d-%d,%d max_channel_difference=%u mean_abs_channel_error=%.6f rms_channel_error=%.6f cache_build_us=%llu old_full_frame_equivalent_bytes=%llu actual_cropped_cache_bytes=%llu cache_memory_bytes=%llu cropped_cache_memory_bytes_estimate=%llu memory_reduction_percent=%.2f full_render_reference_us=%llu cached_dynamic_render_us_avg=%llu cached_dynamic_render_us_max=%llu cached_composite_us_avg=%llu cached_composite_us_max=%llu total_cached_frame_us_avg=%llu total_cached_frame_us_max=%llu unsupported_blend_items=%u result=%s comparison_us=%llu",
-			m_static_cache_machine_name.c_str(), m_static_cache_view_name.c_str(),
-			m_static_items, m_static_stateful_items, m_static_display_items, m_static_run_count,
-			static_cast<unsigned long long>(different_pixels), difference_percent,
-			static_cast<unsigned long long>(severe_pixels_gt2), severe_percent_gt2,
-			static_cast<unsigned long long>(severe_pixels_gt4), severe_percent_gt4,
-			static_cast<unsigned long long>(severe_pixels_gt8), severe_percent_gt8,
-			min_x, min_y, max_x, max_y, maximum_channel_difference,
-			mean_absolute_channel_error, rms_channel_error,
-			static_cast<unsigned long long>(m_static_cache_build_us),
-			static_cast<unsigned long long>(m_static_full_frame_equivalent_bytes),
-			static_cast<unsigned long long>(m_static_cache_memory_bytes),
-			static_cast<unsigned long long>(m_static_cache_memory_bytes),
-			static_cast<unsigned long long>(m_static_cropped_cache_memory_bytes_estimate),
-			m_static_full_frame_equivalent_bytes != 0 ? 100.0 * (1.0 - double(m_static_cache_memory_bytes) / double(m_static_full_frame_equivalent_bytes)) : 0.0,
-			static_cast<unsigned long long>(m_static_full_render_equivalent_us),
-			static_cast<unsigned long long>(m_static_dynamic_render_count != 0 ? m_static_dynamic_render_total_us / m_static_dynamic_render_count : 0),
-			static_cast<unsigned long long>(m_static_dynamic_render_max_us),
-			static_cast<unsigned long long>(m_static_cached_frame_count != 0 ? m_static_composite_total_us / m_static_cached_frame_count : 0),
-			static_cast<unsigned long long>(m_static_composite_max_us),
-			static_cast<unsigned long long>(m_static_cached_frame_count != 0 ? m_static_cached_frame_total_us / m_static_cached_frame_count : 0),
-			static_cast<unsigned long long>(m_static_cached_frame_max_us),
-			m_static_unsupported_blend_items,
-			accepted ? "ACCEPTED" : "FALLBACK",
-			static_cast<unsigned long long>(comparison_us)));
-		if (!accepted)
-		{
-			m_static_cache_valid = false;
-			m_static_runs.clear();
-			m_static_cache_fallback = true;
-			m_static_cache_fallback_reason = util::string_format("validation different_pixels=%llu difference_percent=%.4f severe_percent_gt2=%.6f severe_percent_gt4=%.6f severe_percent_gt8=%.6f max_channel_difference=%u mean_abs_channel_error=%.6f rms_channel_error=%.6f",
-				static_cast<unsigned long long>(different_pixels), difference_percent,
-				severe_percent_gt2, severe_percent_gt4, severe_percent_gt8,
-				maximum_channel_difference, mean_absolute_channel_error, rms_channel_error);
-		}
-		m_static_cache_validation_done = true;
-		return accepted;
-	}
-
-	bool render_static_cached_frame(int width, int height, std::uint32_t *pixels, std::uint64_t &dynamic_us, std::uint64_t &composite_us)
-	{
-		const auto pixel_count = static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
-		dynamic_us = 0;
-		composite_us = 0;
-		std::fill(pixels, pixels + pixel_count, 0xff000000U);
-		for (const auto &run : m_static_runs)
-		{
-			if (run.is_static)
-			{
-				const auto composite_start = std::chrono::steady_clock::now();
-				composite_cached_rgb_region(pixels, width, run);
-				composite_us += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - composite_start).count());
-				++m_static_cache_hits;
-			}
-			else
-			{
-				const auto dynamic_start = std::chrono::steady_clock::now();
-				auto &run_list = m_video_target->get_primitives(run.first_item, run.item_count, false);
-				embedded_video_renderer::draw_primitives(run_list, pixels, static_cast<u32>(width), static_cast<u32>(height), static_cast<u32>(width));
-				dynamic_us += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - dynamic_start).count());
-			}
-		}
-		return true;
-	}
-
-	bool render_static_cached(int width, int height, std::uint32_t *pixels)
-	{
-		if (!static_cache_supported())
-			return false;
-		const auto &view = m_video_target->current_view();
-		const bool cache_context_changed = (m_static_cache_valid || m_static_cache_fallback)
-			&& (m_static_cache_machine_name != machine().basename()
-				|| m_static_cache_view_name != view.name()
-				|| m_static_cache_visibility_mask != m_video_target->visibility_mask()
-				|| m_static_cache_orientation != m_video_target->orientation()
-				|| m_static_cache_pixel_aspect != m_video_target->pixel_aspect()
-				|| m_static_cache_view_aspect != view.effective_aspect()
-				|| m_static_cache_width != width
-				|| m_static_cache_height != height);
-		if (cache_context_changed)
-			invalidate_static_cache();
-		if (m_static_cache_fallback)
-			return false;
-		if (!m_static_cache_valid || m_static_cache_width != width || m_static_cache_height != height)
-			if (!build_static_cache(width, height))
-				return false;
-
-		const auto cached_start = std::chrono::steady_clock::now();
-		std::uint64_t dynamic_us = 0;
-		std::uint64_t composite_us = 0;
-		render_static_cached_frame(width, height, pixels, dynamic_us, composite_us);
-		const auto cached_us = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - cached_start).count());
-		m_static_dynamic_render_total_us += dynamic_us;
-		m_static_dynamic_render_max_us = std::max(m_static_dynamic_render_max_us, dynamic_us);
-		m_static_composite_total_us += composite_us;
-		m_static_composite_max_us = std::max(m_static_composite_max_us, composite_us);
-		m_static_cached_frame_total_us += cached_us;
-		m_static_cached_frame_max_us = std::max(m_static_cached_frame_max_us, cached_us);
-		++m_static_dynamic_render_count;
-		++m_static_cached_frame_count;
-
-		if (!m_static_cache_validation_done)
-		{
-			const auto comparison_start = std::chrono::steady_clock::now();
-			const auto pixel_count = static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
-			std::vector<std::uint32_t> full_pixels(pixel_count, 0xff000000U);
-			auto &full_list = m_video_target->get_primitives();
-			embedded_video_renderer::draw_primitives(full_list, full_pixels.data(), static_cast<u32>(width), static_cast<u32>(height), static_cast<u32>(width));
-			if (!compare_static_cache_frames(pixels, full_pixels.data(), width, height,
-				static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - comparison_start).count())))
-			{
-				std::copy(full_pixels.begin(), full_pixels.end(), pixels);
-				return false;
-			}
-		}
-		return true;
 	}
 
 	void input_update(bool relative_reset) override
@@ -1838,7 +1285,6 @@ private:
 				return;
 			m_pending_state_request = true;
 			m_state_scheduler_wait_started_ms = steadyMs();
-			m_diag.state_request_received_ms.store(m_state_scheduler_wait_started_ms, std::memory_order_relaxed);
 			if (m_current_state_request.operation == StateOperation::Load)
 			{
 				m_audio_queue.clear();
@@ -1855,8 +1301,6 @@ private:
 			timeout_result.operation = m_current_state_request.operation;
 			timeout_result.engine_generation = m_current_state_request.engine_generation;
 			timeout_result.request_id = m_current_state_request.request_id;
-			timeout_result.scheduler_wait_ms = waited_ms;
-			timeout_result.total_duration_ms = waited_ms;
 			timeout_result.error_message = "Timed out waiting for a safe scheduler save-state boundary";
 			const bool save = timeout_result.operation == StateOperation::Save;
 			(save ? m_diag.state_save_failures : m_diag.state_load_failures).fetch_add(1, std::memory_order_relaxed);
@@ -1869,7 +1313,6 @@ private:
 		result.operation = m_current_state_request.operation;
 		result.engine_generation = m_current_state_request.engine_generation;
 		result.request_id = m_current_state_request.request_id;
-		result.scheduler_wait_ms = steadyMs() - m_state_scheduler_wait_started_ms;
 		if (result.operation == StateOperation::Save)
 		{
 			std::ostringstream stream(std::ios::binary);
@@ -1904,32 +1347,13 @@ private:
 			m_diag.state_restore_first_audio_ms.store(0, std::memory_order_release);
 			m_diag.state_restore_second_audio_ms.store(0, std::memory_order_release);
 			m_diag.state_restore_first_video_ms.store(0, std::memory_order_release);
-			m_diag.state_restore_first_video_generation.store(0, std::memory_order_release);
-			m_diag.state_restore_cache_build_start_ms.store(0, std::memory_order_release);
-			m_diag.state_restore_cache_build_end_ms.store(0, std::memory_order_release);
-			m_diag.state_restore_mouse_queue_cleared.store(0, std::memory_order_release);
-			m_diag.state_restore_pointer_reset.store(false, std::memory_order_release);
-			m_diag.state_restore_view_rebound.store(false, std::memory_order_release);
-			m_diag.state_restore_interactive_items_before.store(0, std::memory_order_release);
-			m_diag.state_restore_interactive_items_after.store(0, std::memory_order_release);
-			m_diag.state_restore_first_mouse_event_ms.store(0, std::memory_order_release);
-			m_diag.state_restore_first_input_hit_ms.store(0, std::memory_order_release);
-			const auto stream_started_ms = steadyMs();
-			m_diag.state_restore_read_started_ms.store(stream_started_ms, std::memory_order_release);
 			const auto error = machine().save().read_stream(stream);
-			result.stream_duration_ms = steadyMs() - stream_started_ms;
 			if (error == STATERR_NONE)
 			{
 				m_diag.state_restore_read_completed_ms.store(steadyMs(), std::memory_order_release);
-				unsigned midi_transport_resets = 0;
 				for (device_t &device : device_enumerator(machine().root_device()))
 					if (auto *midi_input = dynamic_cast<midiin_device *>(&device))
-					{
 						midi_input->reset_transport_after_state_load();
-						++midi_transport_resets;
-					}
-				if (midi_transport_resets != 0)
-					append_engine_lifecycle_log("[state restore] MIDI transport reset driver=" + std::string(machine().basename()));
 				reset_post_restore_video_and_input();
 				m_restore_waiting_for_clean_timeslice = true;
 				result.success = true;
@@ -1943,10 +1367,6 @@ private:
 				result.load_failed_requires_restart = true;
 			}
 		}
-		result.total_duration_ms = m_current_state_request.requested_at_ms != 0
-			? steadyMs() - m_current_state_request.requested_at_ms
-			: result.scheduler_wait_ms + result.stream_duration_ms;
-
 		const bool save = result.operation == StateOperation::Save;
 		(save ? (result.success ? m_diag.state_save_successes : m_diag.state_save_failures)
 		      : (result.success ? m_diag.state_load_successes : m_diag.state_load_failures)).fetch_add(1, std::memory_order_relaxed);
@@ -2002,8 +1422,7 @@ private:
 	void reset_post_restore_video_and_input()
 	{
 		invalidate_video_jobs();
-		const auto mouse_cleared = m_mouse_queue.clear();
-		m_diag.state_restore_mouse_queue_cleared.store(mouse_cleared, std::memory_order_release);
+		m_mouse_queue.clear();
 		const bool was_pressed = m_diag.mouse_left_down.exchange(false, std::memory_order_acq_rel);
 		m_diag.mouse_release_pending.store(false, std::memory_order_release);
 		m_diag.mouse_current_x.store(-1, std::memory_order_relaxed);
@@ -2019,22 +1438,12 @@ private:
 
 		if (m_video_target != nullptr)
 		{
-			const auto before = m_video_target->current_view().interactive_items().size();
 			if (was_pressed)
 				m_video_target->pointer_aborted(osd::ui_event_handler::pointer::MOUSE, 0, 0, 0, 0, 1, 0);
 			const auto view = m_video_target->view();
 			m_video_target->set_view(view);
-			m_diag.state_restore_interactive_items_before.store(before, std::memory_order_relaxed);
-			m_diag.state_restore_interactive_items_after.store(m_video_target->current_view().interactive_items().size(), std::memory_order_relaxed);
-			m_diag.state_restore_view_rebound.store(true, std::memory_order_release);
 		}
-		m_diag.state_restore_pointer_reset.store(true, std::memory_order_release);
 		m_video_bridge.invalidatePublishedFrames(m_diag);
-		osd_printf_verbose("[VES state restore] mouse queue cleared=%llu pointer reset=yes view rebound=%s interactive_items=%llu->%llu\n",
-			static_cast<unsigned long long>(mouse_cleared),
-			m_video_target != nullptr ? "yes" : "no",
-			static_cast<unsigned long long>(m_diag.state_restore_interactive_items_before.load(std::memory_order_relaxed)),
-			static_cast<unsigned long long>(m_diag.state_restore_interactive_items_after.load(std::memory_order_relaxed)));
 	}
 
 	void process_floppy_requests()
@@ -2143,12 +1552,6 @@ private:
 		EmbeddedMouseEvent event;
 		while (m_diag.mouse_forwarding_enabled.load(std::memory_order_acquire) && m_mouse_queue.pop(event))
 		{
-			if (m_diag.state_restore_read_completed_ms.load(std::memory_order_acquire) != 0)
-			{
-				std::uint64_t expected = 0;
-				if (m_diag.state_restore_first_mouse_event_ms.compare_exchange_strong(expected, steadyMs(), std::memory_order_release, std::memory_order_relaxed))
-					osd_printf_verbose("[VES state restore] first mouse event consumed\n");
-			}
 			const auto left_down = event.type == EmbeddedMouseEventType::LeftDown;
 			const auto left_up = event.type == EmbeddedMouseEventType::LeftUp;
 			const auto buttons = (left_down || (!left_up && m_diag.mouse_left_down.load(std::memory_order_relaxed))) ? 1U : 0U;
@@ -2210,12 +1613,6 @@ private:
 			if (auto *field = port->field(mask))
 			{
 				m_diag.mouse_input_field_active.store(field->digital_value(), std::memory_order_relaxed);
-				if (m_diag.state_restore_read_completed_ms.load(std::memory_order_acquire) != 0)
-				{
-					std::uint64_t expected = 0;
-					if (m_diag.state_restore_first_input_hit_ms.compare_exchange_strong(expected, steadyMs(), std::memory_order_release, std::memory_order_relaxed))
-						osd_printf_verbose("[VES state restore] first input-field hit\n");
-				}
 			}
 			return;
 		}
@@ -2223,14 +1620,17 @@ private:
 
 	void release_video_target()
 	{
-		if (m_video_target != nullptr)
-			invalidate_video_jobs();
-		invalidate_static_cache();
-		if (m_video_target != nullptr)
+		if (m_video_target == nullptr)
 		{
-			machine().render().target_free(m_video_target);
-			m_video_target = nullptr;
+			m_diag.video_render_target_available.store(false, std::memory_order_relaxed);
+			return;
 		}
+
+		invalidate_video_jobs();
+		machine().render().target_free(m_video_target);
+		m_video_target = nullptr;
+		m_capture_geometry_valid = false;
+		m_video_target_needs_screen_refresh = false;
 		m_diag.video_render_target_available.store(false, std::memory_order_relaxed);
 	}
 
@@ -2311,7 +1711,51 @@ private:
 		m_diag.video_target_pixel_aspect_x1000.store(static_cast<std::uint64_t>(m_video_target->pixel_aspect() * 1000.0f), std::memory_order_relaxed);
 		m_diag.video_render_target_available.store(true, std::memory_order_relaxed);
 		m_diag.video_state.store(static_cast<std::uint64_t>(EmbeddedVideoState::WaitingForFirstFrame), std::memory_order_relaxed);
+		m_capture_geometry_valid = false;
+		m_video_target_needs_screen_refresh = true;
 		return true;
+	}
+
+	static void mix_video_geometry_signature(std::uint64_t &hash, std::uint64_t value)
+	{
+		hash = (hash ^ value) * 1099511628211ULL;
+	}
+
+	static void mix_video_geometry_float(std::uint64_t &hash, float value)
+	{
+		std::uint32_t bits = 0;
+		std::memcpy(&bits, &value, sizeof(bits));
+		mix_video_geometry_signature(hash, bits);
+	}
+
+	std::uint64_t capture_source_geometry_signature() const
+	{
+		std::uint64_t hash = 1469598103934665603ULL;
+		auto &view = m_video_target->current_view();
+		mix_video_geometry_float(hash, view.bounds().x0);
+		mix_video_geometry_float(hash, view.bounds().y0);
+		mix_video_geometry_float(hash, view.bounds().x1);
+		mix_video_geometry_float(hash, view.bounds().y1);
+		mix_video_geometry_float(hash, view.effective_aspect());
+		for (const auto &item : view.items())
+		{
+			const auto *const screen = item.screen();
+			if (screen == nullptr)
+				continue;
+			const auto bounds = item.bounds();
+			mix_video_geometry_float(hash, bounds.x0);
+			mix_video_geometry_float(hash, bounds.y0);
+			mix_video_geometry_float(hash, bounds.x1);
+			mix_video_geometry_float(hash, bounds.y1);
+			const auto &visible = screen->visible_area();
+			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(visible.min_x));
+			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(visible.max_x));
+			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(visible.min_y));
+			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(visible.max_y));
+			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(screen->screen_type()));
+			mix_video_geometry_signature(hash, static_cast<std::uint32_t>(screen->container().orientation()));
+		}
+		return hash;
 	}
 
 
@@ -2343,7 +1787,6 @@ private:
 		const auto missed = (now - m_next_video_deadline_ms) / interval_ms;
 		m_next_video_deadline_ms += (missed + 1) * interval_ms;
 		m_diag.video_capture_requested.fetch_add(1, std::memory_order_relaxed);
-		m_diag.video_capture_queue_depth_before.store(m_audio_queue.size(), std::memory_order_relaxed);
 		try
 		{
 			if (!ensure_video_target())
@@ -2352,25 +1795,55 @@ private:
 			if (machine().phase() < machine_phase::RESET)
 				return;
 
-			for (screen_device &screen : screen_device_enumerator(machine().root_device()))
+			// finish_screen_updates() refreshes screens immediately before osd().update().
+			// A target created in this update was not live for that refresh, so refresh
+			// screens once for the first capture from this target only.
+			if (m_video_target_needs_screen_refresh)
 			{
-				screen.update_partial(screen.visible_area().max_y);
-				screen.update_quads();
+				for (screen_device &screen : screen_device_enumerator(machine().root_device()))
+				{
+					screen.update_partial(screen.visible_area().max_y);
+					screen.update_quads();
+				}
+				m_video_target_needs_screen_refresh = false;
 			}
 
 			const auto width = std::clamp(static_cast<s32>(m_diag.video_requested_width.load(std::memory_order_acquire)), 256, 4096);
-			s32 minimum_width = 0;
-			s32 minimum_height = 0;
-			m_video_target->compute_minimum_size(minimum_width, minimum_height);
-			const auto height = (minimum_width > 0 && minimum_height > 0)
-				? std::clamp(static_cast<s32>(std::llround(static_cast<double>(width) * minimum_height / minimum_width)), 256, 4096)
-				: k_video_height;
+			const auto target_generation = m_diag.video_target_generation.load(std::memory_order_relaxed);
+			const auto &view = m_video_target->current_view();
+			const auto source_geometry_signature = capture_source_geometry_signature();
+			const bool geometry_changed = !m_capture_geometry_valid
+				|| m_capture_geometry_width != width
+				|| m_capture_geometry_target_generation != target_generation
+				|| m_capture_geometry_view_name != view.name()
+				|| m_capture_geometry_visibility_mask != m_video_target->visibility_mask()
+				|| m_capture_geometry_orientation != m_video_target->orientation()
+				|| m_capture_geometry_pixel_aspect != m_video_target->pixel_aspect()
+				|| m_capture_source_geometry_signature != source_geometry_signature;
+			if (geometry_changed)
+			{
+				s32 minimum_width = 0;
+				s32 minimum_height = 0;
+				m_video_target->compute_minimum_size(minimum_width, minimum_height);
+				m_capture_geometry_height = (minimum_width > 0 && minimum_height > 0)
+					? std::clamp(static_cast<s32>(std::llround(static_cast<double>(width) * minimum_height / minimum_width)), 256, 4096)
+					: k_video_height;
+				m_video_target->set_bounds(width, m_capture_geometry_height);
+				m_capture_geometry_width = width;
+				m_capture_geometry_target_generation = target_generation;
+				m_capture_geometry_view_name = view.name();
+				m_capture_geometry_visibility_mask = m_video_target->visibility_mask();
+				m_capture_geometry_orientation = m_video_target->orientation();
+				m_capture_geometry_pixel_aspect = m_video_target->pixel_aspect();
+				m_capture_source_geometry_signature = source_geometry_signature;
+				m_capture_geometry_valid = true;
+			}
+			const auto height = m_capture_geometry_height;
 			if (width <= 0 || height <= 0 || width > 4096 || height > 4096)
 				return;
 			if (m_failed_video_width == width)
 				return;
 
-			m_video_target->set_bounds(width, height);
 			auto job = std::make_unique<immutable_video_job>();
 			job->width = width;
 			job->height = height;
@@ -2457,6 +1930,16 @@ private:
 	std::uint64_t m_next_video_deadline_ms = 0;
 	std::uint32_t m_audio_sink_diagnostics_counter = 0;
 	int m_failed_video_width = 0;
+	bool m_video_target_needs_screen_refresh = false;
+	bool m_capture_geometry_valid = false;
+	s32 m_capture_geometry_width = 0;
+	s32 m_capture_geometry_height = 0;
+	std::uint64_t m_capture_geometry_target_generation = 0;
+	std::string m_capture_geometry_view_name;
+	u32 m_capture_geometry_visibility_mask = 0;
+	int m_capture_geometry_orientation = 0;
+	float m_capture_geometry_pixel_aspect = 0.0f;
+	std::uint64_t m_capture_source_geometry_signature = 0;
 	std::thread m_video_worker;
 	std::mutex m_video_worker_mutex;
 	std::condition_variable m_video_worker_condition;
@@ -2467,38 +1950,6 @@ private:
 	int m_worker_cache_width = 0;
 	int m_worker_cache_height = 0;
 	std::vector<worker_static_run> m_worker_static_runs;
-	bool m_static_cache_valid = false;
-	bool m_static_cache_fallback = false;
-	bool m_static_cache_validation_done = false;
-	int m_static_cache_width = 0;
-	int m_static_cache_height = 0;
-	std::string m_static_cache_machine_name;
-	std::string m_static_cache_view_name;
-	std::string m_static_cache_fallback_reason;
-	u32 m_static_cache_visibility_mask = 0;
-	int m_static_cache_orientation = 0;
-	float m_static_cache_pixel_aspect = 0.0f;
-	float m_static_cache_view_aspect = 0.0f;
-	std::vector<static_layout_run> m_static_runs;
-	std::uint32_t m_static_items = 0;
-	std::uint32_t m_static_stateful_items = 0;
-	std::uint32_t m_static_display_items = 0;
-	std::uint32_t m_static_unsupported_blend_items = 0;
-	std::uint32_t m_static_run_count = 0;
-	std::uint64_t m_static_cache_build_us = 0;
-	std::uint64_t m_static_full_render_equivalent_us = 0;
-	std::uint64_t m_static_cache_memory_bytes = 0;
-	std::uint64_t m_static_cropped_cache_memory_bytes_estimate = 0;
-	std::uint64_t m_static_full_frame_equivalent_bytes = 0;
-	std::uint64_t m_static_cache_hits = 0;
-	std::uint64_t m_static_dynamic_render_total_us = 0;
-	std::uint64_t m_static_dynamic_render_max_us = 0;
-	std::uint64_t m_static_dynamic_render_count = 0;
-	std::uint64_t m_static_composite_total_us = 0;
-	std::uint64_t m_static_composite_max_us = 0;
-	std::uint64_t m_static_cached_frame_total_us = 0;
-	std::uint64_t m_static_cached_frame_max_us = 0;
-	std::uint64_t m_static_cached_frame_count = 0;
 	static constexpr int k_video_width = 1024;
 	static constexpr int k_video_height = 576;
 };
@@ -2636,21 +2087,9 @@ public:
 		set_machine(&machine);
 		m_diag.machine_started_ms.store(steadyMs(), std::memory_order_relaxed);
 		m_diag.machine_started.fetch_add(1, std::memory_order_relaxed);
-		append_engine_lifecycle_log("[VES startup] event=BEFORE_MACHINE_RUN driver=" + m_driver_name
-			+ " machine_started=" + std::to_string(m_diag.machine_started.load(std::memory_order_relaxed))
-			+ " arguments=\"" + lifecycle_log_field(m_startup_arguments) + "\"");
 		const int result = machine.run(false);
 		m_diag.machine_running.store(false, std::memory_order_release);
-		const auto exited = m_diag.machine_exited.fetch_add(1, std::memory_order_relaxed) + 1;
-		append_engine_lifecycle_log("[VES startup] event=AFTER_MACHINE_RUN driver=" + m_driver_name
-			+ " result=" + std::to_string(result)
-			+ " machine_exited=" + std::to_string(exited)
-			+ " machine_running=" + std::to_string(m_diag.machine_running.load(std::memory_order_relaxed) ? 1 : 0)
-			+ " normal_scheduler_iterations=" + std::to_string(m_diag.normal_scheduler_iterations.load(std::memory_order_relaxed))
-			+ " audio_sink_open_count=" + std::to_string(m_diag.audio_sink_open_count.load(std::memory_order_relaxed))
-			+ " midi_input_open_count=" + std::to_string(m_diag.midi_input_open_count.load(std::memory_order_relaxed))
-			+ " video_initialized=" + std::to_string(m_diag.video_initialized.load(std::memory_order_relaxed) ? 1 : 0)
-			+ " video_frames_produced=" + std::to_string(m_diag.video_frames_produced.load(std::memory_order_relaxed)));
+		m_diag.machine_exited.fetch_add(1, std::memory_order_relaxed);
 		m_plugin_host.set_machine(nullptr);
 		set_machine(nullptr);
 		return result;
@@ -2701,11 +2140,6 @@ struct EmbeddedEmulatorEngine::Impl
 		explicit Impl(EmbeddedEmulatorEngineSettings engine_settings)
 			: settings(std::move(engine_settings))
 		{
-			append_engine_lifecycle_log("[VES lifecycle] event=EMBEDDED_ENGINE_IMPL_CONSTRUCTOR engine_impl="
-				+ lifecycle_pointer_string(this)
-				+ " driver=" + settings.driver_name
-				+ " engine_generation=" + std::to_string(settings.engine_generation)
-				+ " sample_rate=" + std::to_string(settings.sample_rate));
 			diag.audio_ring_capacity_frames.store(audio_frame_queue::capacity(), std::memory_order_relaxed);
 			diag.juce_sample_rate.store(static_cast<std::uint64_t>(std::max(settings.sample_rate, 0)), std::memory_order_relaxed);
 			diag.mame_sample_rate.store(static_cast<std::uint64_t>(std::max(settings.sample_rate, 0)), std::memory_order_relaxed);
@@ -2714,11 +2148,6 @@ struct EmbeddedEmulatorEngine::Impl
 
 		~Impl()
 		{
-			append_engine_lifecycle_log("[VES lifecycle] event=EMBEDDED_ENGINE_IMPL_DESTRUCTOR engine_impl="
-				+ lifecycle_pointer_string(this)
-				+ " driver=" + settings.driver_name
-				+ " engine_generation=" + std::to_string(settings.engine_generation)
-				+ " sample_rate=" + std::to_string(settings.sample_rate));
 			stopAndJoin(std::chrono::seconds(5));
 		}
 
@@ -2836,8 +2265,6 @@ struct EmbeddedEmulatorEngine::Impl
 		diag.audio_sink_statistics_reset_generation.fetch_add(1, std::memory_order_release);
 		diag.audio_underrun_callbacks.store(0, std::memory_order_relaxed);
 		diag.audio_missing_output_frames.store(0, std::memory_order_relaxed);
-		diag.video_capture_queue_depth_before.store(0, std::memory_order_relaxed);
-		diag.video_capture_queue_depth_after.store(0, std::memory_order_relaxed);
 	}
 
 	void resetMidiTimingWindow()
@@ -3184,8 +2611,6 @@ private:
 				startup_arguments << ' ';
 			startup_arguments << '"' << argument << '"';
 		}
-		append_engine_lifecycle_log("[VES startup] event=MAME_ARGUMENTS driver=" + settings.driver_name
-			+ " arguments=\"" + lifecycle_log_field(startup_arguments.str()) + "\"");
 		const auto selected_driver_index = driver_list::find(settings.driver_name.c_str());
 		const auto &option_driver = selected_driver_index >= 0 ? driver_list::driver(selected_driver_index) : GAME_NAME(tx81z);
 		// Image options (including S3000XL's -flop) are registered per machine.
@@ -3377,16 +2802,10 @@ private:
 EmbeddedEmulatorEngine::EmbeddedEmulatorEngine(EmbeddedEmulatorEngineSettings settings)
 	: m_impl(std::make_unique<Impl>(std::move(settings)))
 {
-	append_engine_lifecycle_log("[VES lifecycle] event=EMBEDDED_ENGINE_CONSTRUCTOR engine="
-		+ lifecycle_pointer_string(this)
-		+ " engine_impl=" + lifecycle_pointer_string(m_impl.get()));
 }
 
 EmbeddedEmulatorEngine::~EmbeddedEmulatorEngine()
 {
-	append_engine_lifecycle_log("[VES lifecycle] event=EMBEDDED_ENGINE_DESTRUCTOR engine="
-		+ lifecycle_pointer_string(this)
-		+ " engine_impl=" + lifecycle_pointer_string(m_impl.get()));
 }
 
 void EmbeddedEmulatorEngine::start()

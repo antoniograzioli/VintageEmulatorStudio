@@ -112,14 +112,6 @@ struct EmbeddedDiagnosticSnapshot
     uint64_t audioSinkBlocksApprox720 = 0;
     uint64_t audioSinkBlocks960Plus = 0;
     uint64_t audioSinkBlocksOther = 0;
-    bool audioJitterPrimed = false;
-    uint64_t audioJitterPrimeLevelFrames = 0;
-    uint64_t audioJitterReprimeCount = 0;
-    uint64_t audioJitterConsecutiveUnderrunCallbacks = 0;
-    uint64_t audioJitterLongestUnderrunRun = 0;
-    uint64_t audioJitterReprimeSilencedCallbacks = 0;
-    uint64_t videoCaptureQueueDepthBefore = 0;
-    uint64_t videoCaptureQueueDepthAfter = 0;
     float audioPeak = 0.0f;
     uint64_t midiToAudioOnsetMs = 0;
     uint64_t bootReadyQueuedFrames = 0;
@@ -149,30 +141,9 @@ struct EmbeddedDiagnosticSnapshot
     uint64_t videoRasterizationDurationUs = 0;
     uint64_t videoRasterizationTotalUs = 0;
     uint64_t videoRasterizationMaxUs = 0;
-    uint64_t videoScreenUpdatePartialTotalUs = 0;
-    uint64_t videoScreenUpdatePartialMaxUs = 0;
-    uint64_t videoScreenUpdatePartialCount = 0;
-    uint64_t videoScreenUpdateQuadsTotalUs = 0;
-    uint64_t videoScreenUpdateQuadsMaxUs = 0;
-    uint64_t videoScreenUpdateQuadsCount = 0;
-    uint64_t videoPrimitiveBuildTotalUs = 0;
-    uint64_t videoPrimitiveBuildMaxUs = 0;
-    uint64_t videoPrimitiveBuildCount = 0;
-    uint64_t videoCaptureTotalUs = 0;
-    uint64_t videoCaptureMaxUs = 0;
-    uint64_t videoCaptureTimingCount = 0;
-    uint64_t videoPrepareTotalUs = 0;
-    uint64_t videoPrepareMaxUs = 0;
-    uint64_t videoSnapshotTotalUs = 0;
-    uint64_t videoSnapshotMaxUs = 0;
-    uint64_t videoSnapshotBytes = 0;
     uint64_t videoJobsSubmitted = 0;
     uint64_t videoJobsReplaced = 0;
     uint64_t videoJobsCompleted = 0;
-    uint64_t videoWorkerRasterUs = 0;
-    uint64_t videoWorkerStaticCompositeUs = 0;
-    uint64_t videoWorkerTotalUs = 0;
-    uint64_t videoWorkerMaxUs = 0;
     uint64_t videoWorkerPendingDepth = 0;
     uint64_t videoRasterError = 0;
     uint64_t videoRasterErrorIndex = 0;
@@ -216,31 +187,6 @@ struct EmbeddedVideoFrameForEditor
     uint64_t engineGeneration = 0;
     uint64_t timestampMs = 0;
     std::vector<uint32_t> pixels;
-};
-
-struct MidiAudioLatencyPendingEvent
-{
-    uint64_t sessionRevision = 0;
-    uint64_t inputSamplePosition = 0;
-    uint64_t inputBlockIndex = 0;
-    uint64_t midiTimestampNs = 0;
-    uint8_t noteNumber = 0;
-    uint8_t velocity = 0;
-};
-
-struct MidiAudioLatencyResult
-{
-    uint64_t sessionRevision = 0;
-    uint64_t inputSamplePosition = 0;
-    uint64_t outputSamplePosition = 0;
-    uint64_t inputBlockIndex = 0;
-    uint64_t outputBlockIndex = 0;
-    uint64_t midiTimestampNs = 0;
-    uint64_t audioTimestampNs = 0;
-    uint64_t sampleRate = 0;
-    uint64_t blockSize = 0;
-    uint8_t noteNumber = 0;
-    uint8_t velocity = 0;
 };
 
 class VintageEmulatorStudioProcessor final : public juce::AudioProcessor,
@@ -360,7 +306,6 @@ private:
     void startEngineIfNeeded (double sampleRate, const juce::String& caller, const juce::String& reason);
     void stopEngine (const juce::String& caller, const juce::String& reason);
     void restartSelectedMachine (const juce::String& caller, const juce::String& reason);
-    void logLifecycleEvent (const juce::String& event, const juce::String& caller, const juce::String& reason) const;
     bool prepareNvramState (const juce::File& runtimeNvramDirectory);
     juce::File getRomsDirectory() const;
     juce::File getNvramSeedFile() const;
@@ -390,24 +335,14 @@ private:
     void trackHostMidiMessage (const juce::MidiMessage& message);
     ves::HeldMidiNotes captureActiveMidiNotes() const;
     void clearActiveMidiNotes();
-    static int countHeldMidiNotes (const ves::HeldMidiNotes& notes);
     void trimAudioBacklog (ves::EmbeddedEmulatorEngine& localEngine);
     void flushAudioForTransportBoundary (ves::EmbeddedEmulatorEngine& localEngine);
-    void enqueueMidiAudioLatencyEvent (const MidiAudioLatencyPendingEvent& event);
-    void expireMidiAudioLatencyEvent (uint64_t currentSamplePosition, uint64_t nowNs);
-    void completeMidiAudioLatencyEvent (uint64_t outputSamplePosition, uint64_t outputBlockIndex, uint64_t audioTimestampNs);
-    void flushMidiAudioLatencyResults();
-    void recordVideoRuntimeDiagnostics();
-    void recordAudioRateDiagnostics();
     void tryStandaloneAutosaveRestore();
     void saveStandaloneAutosaveOnShutdown();
     bool isDawPluginWrapper() const;
-    void tryDawSnapshotRefresh();
     void tryDawPendingRestore();
-    void flushPluginStateDiagnostics();
     void timerCallback() override;
 
-    const uint64_t lifecycleInstanceId;
     std::shared_ptr<ves::EmbeddedEmulatorEngine> engine;
     std::atomic<uint64_t> videoEngineGeneration { 0 };
     mutable std::atomic<int> state { static_cast<int> (EmbeddedEngineState::Stopped) };
@@ -450,10 +385,7 @@ private:
     uint64_t experimentalStateGenerationBeforeRestore = 0;
     uint64_t experimentalStateGenerationAfterRestore = 0;
     uint64_t experimentalStateGuardStartedMs = 0;
-    uint64_t experimentalStateReadCompletedMs = 0;
-    uint64_t experimentalStateSchedulerWaitMs = 0;
-    uint64_t experimentalStateReadStreamMs = 0;
-    enum class ExperimentalStateTarget { Autosave, DawSnapshot, DawRestore, StandaloneSwitchSave };
+    enum class ExperimentalStateTarget { Autosave, DawRestore, StandaloneSwitchSave };
     ExperimentalStateTarget experimentalStateTarget = ExperimentalStateTarget::Autosave;
     uint64_t standaloneAutosaveRestoreAttemptedGeneration = 0;
     mutable juce::CriticalSection dawStateLock;
@@ -474,17 +406,6 @@ private:
     bool dawPendingRestoreArmed = false;
     juce::String pendingStandaloneSwitchDriver;
     juce::String pendingStandaloneSwitchTarget;
-    uint64_t dawSnapshotLastRequestMs = 0;
-    uint64_t dawSnapshotRequestCount = 0;
-    std::atomic<bool> pluginStateGetDiagnosticPending { false };
-    std::atomic<bool> pluginStateGetIncludedBlob { false };
-    std::atomic<uint64_t> pluginStateGetBlobSize { 0 };
-    std::atomic<uint64_t> pluginStateGetSnapshotAgeMs { 0 };
-    std::atomic<uint64_t> pluginStateGetTotalSize { 0 };
-    std::atomic<bool> pluginStateSetDiagnosticPending { false };
-    std::atomic<bool> pluginStateSetBlobFound { false };
-    std::atomic<bool> pluginStateSetBlobAccepted { false };
-    std::atomic<bool> pluginStateSetRestoreArmed { false };
     juce::String lastError;
     // This is deliberately invalid until JUCE has opened its selected device and
     // called prepareToPlay.  In particular, standalone state restoration must
@@ -492,54 +413,6 @@ private:
     double currentSampleRate = 0.0;
     int maxBlockSize = 0;
     std::array<ves::StereoFrame, 8192> audioScratch {};
-
-    static constexpr std::size_t midiAudioLatencyPendingCapacity = 64;
-    static constexpr std::size_t midiAudioLatencyResultCapacity = 64;
-    static constexpr uint64_t midiAudioLatencyMeasurementCount = 20;
-    static constexpr float midiAudioLatencyThreshold = 0.001f;
-    std::array<MidiAudioLatencyPendingEvent, midiAudioLatencyPendingCapacity> midiAudioLatencyPending {};
-    std::array<MidiAudioLatencyResult, midiAudioLatencyResultCapacity> midiAudioLatencyResults {};
-    std::size_t midiAudioLatencyPendingHead = 0;
-    std::size_t midiAudioLatencyPendingTail = 0;
-    std::atomic<std::size_t> midiAudioLatencyResultWrite { 0 };
-    std::atomic<std::size_t> midiAudioLatencyResultRead { 0 };
-    std::atomic<uint64_t> midiAudioLatencyCompletedCount { 0 };
-    std::atomic<uint64_t> midiAudioLatencyDroppedResults { 0 };
-    std::atomic<bool> midiAudioLatencyResetRequested { false };
-    std::atomic<uint64_t> midiAudioLatencySessionRevision { 0 };
-    uint64_t midiAudioLatencyWrittenRevision = 0;
-    std::array<MidiAudioLatencyResult, midiAudioLatencyMeasurementCount> midiAudioLatencySessionResults {};
-    std::size_t midiAudioLatencySessionResultCount = 0;
-    bool midiAudioLatencyAudioWasAboveThreshold = false;
-    uint64_t hostAudioSamplePosition = 0;
-    uint64_t hostAudioBlockIndex = 0;
-    uint64_t videoConfigLoggedEngineGeneration = 0;
-    uint64_t videoConfigLoggedTargetGeneration = 0;
-    uint64_t videoConfigLoggedCaptureCount = 0;
-    uint64_t audioRateWindowStartedNs = 0;
-    uint64_t audioRateLoggedEngineGeneration = 0;
-    uint64_t audioRateLastProducerFrames = 0;
-    uint64_t audioRateLastConsumerFrames = 0;
-    uint64_t audioRateLastHostCallbacks = 0;
-    uint64_t audioRateLastSinkCallbacks = 0;
-    uint64_t audioRateLastSinkGapTotalUs = 0;
-    uint64_t audioRateLastSinkGapCount = 0;
-    uint64_t audioRateLastSinkGapGt7500 = 0;
-    uint64_t audioRateLastSinkGapGt10000 = 0;
-    uint64_t audioRateLastSinkGapGt15000 = 0;
-    uint64_t audioRateLastSchedulerUpdates = 0;
-    uint64_t audioRateLastSchedulerGapTotalUs = 0;
-    uint64_t audioRateLastSchedulerGapCount = 0;
-    uint64_t audioRateLastSchedulerGapGt7500 = 0;
-    uint64_t audioRateLastSchedulerGapGt10000 = 0;
-    uint64_t audioRateLastSchedulerGapGt15000 = 0;
-    std::array<uint64_t, 5> audioRateLastSinkHistogram {};
-    uint64_t audioRateLastReprimes = 0;
-    uint64_t audioRateLastUnderrunCallbacks = 0;
-    uint64_t audioRateLastSilencedCallbacks = 0;
-    bool audioRateInitializedSentinelLogged = false;
-    bool audioRateReadySentinelLogged = false;
-    bool audioRateBaselineSentinelLogged = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VintageEmulatorStudioProcessor)
 };

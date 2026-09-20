@@ -25,6 +25,19 @@ case "$(basename "$series_dir")" in
         ;;
 esac
 
+source_target=$target
+check_tree=
+if $check_only; then
+    git -C "$target" diff --quiet && git -C "$target" diff --cached --quiet || {
+        echo "--check requires a clean MAME checkout" >&2
+        exit 1
+    }
+    check_tree=$(mktemp -d "${TMPDIR:-/tmp}/ves-mame-patch-check.XXXXXX")
+    git -C "$target" worktree add --quiet --detach "$check_tree" HEAD
+    trap 'git -C "$source_target" worktree remove --force "$check_tree" >/dev/null 2>&1 || true' EXIT HUP INT TERM
+    target=$check_tree
+fi
+
 while IFS= read -r patch; do
     [ -n "$patch" ] || continue
     case "$patch" in \#*) continue;; esac
@@ -35,5 +48,6 @@ while IFS= read -r patch; do
     else
         echo "applying $patch"
     fi
-    if $check_only; then git -C "$target" apply --check "$file"; else git -C "$target" apply "$file"; fi
+    git -C "$target" apply --check "$file"
+    git -C "$target" apply "$file"
 done < "$series_dir/series"

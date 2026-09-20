@@ -10,7 +10,7 @@ index 8a12ed28..c654f274 100644
  		ext_includedir("asio"),
  		ext_includedir("expat"),
  		ext_includedir("lua"),
-@@ -206,4 +207,52 @@ function standalone()
+@@ -206,3 +207,52 @@ function standalone()
  		MAME_DIR .. "src/devices/imagedev/midiout.cpp",
  		MAME_DIR .. "src/devices/imagedev/midiout.h",
  	}
@@ -62,4 +62,4 @@ index 8a12ed28..c654f274 100644
 +
 +	dependency(ves_layout_dependencies)
 +	custombuildtask(ves_layout_tasks)
- end
++end

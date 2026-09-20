@@ -15,6 +15,9 @@
 /Builds/MacOSX/build/
 /Builds/MacOSX/release-validation/
 /Builds/MacOSX/validation-derived/
+/Builds/MacOSX/*-arm64*/
+/Builds/MacOSX/*-derived/
+/Builds/MacOSX/DerivedData/
 /Builds/MacOSX-Intel/release-validation_x86_64/
 /Builds/MacOSX-Intel/release-validation-x86_64/
 /Builds/LinuxMakefile/build/
