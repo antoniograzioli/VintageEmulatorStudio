@@ -27,6 +27,11 @@
 
 #include <algorithm>
 
+#if defined(__APPLE__)
+#include <pthread.h>
+#include <sys/qos.h>
+#endif
+
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
@@ -1022,6 +1027,9 @@ void sound_manager::output_push(int id, sound_stream &stream)
 
 void sound_manager::run_effects()
 {
+#if defined(__APPLE__) && !defined(SOUND_DISABLE_THREADING)
+	pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
+#endif
 #ifndef SOUND_DISABLE_THREADING
 	std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
 	for(;;) {

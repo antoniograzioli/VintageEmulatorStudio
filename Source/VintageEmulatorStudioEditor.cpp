@@ -1324,19 +1324,11 @@ VintageEmulatorStudioEditor::VintageEmulatorStudioEditor (VintageEmulatorStudioP
             safeThis->showOptionsMenu();
     };
 
-    for (auto* button : { &saveStateButton, &loadStateButton, &saveStateFileButton, &loadStateFileButton })
-    {
-        addAndMakeVisible (*button);
-        button->setColour (juce::TextButton::buttonColourId, juce::Colour::fromRGB (29, 31, 36));
-        button->setColour (juce::TextButton::textColourOffId, juce::Colour::fromRGB (226, 232, 236));
-    }
-    addAndMakeVisible (stateStatusLabel);
-    stateStatusLabel.setFont (lookAndFeel.regularFont (12.0f));
-    stateStatusLabel.setColour (juce::Label::textColourId, juce::Colour::fromRGB (142, 150, 158));
-    saveStateButton.onClick = [safeThis] { if (safeThis != nullptr) safeThis->processor.requestExperimentalStateSave(); };
-    loadStateButton.onClick = [safeThis] { if (safeThis != nullptr) safeThis->processor.requestExperimentalStateLoad(); };
-    saveStateFileButton.onClick = [safeThis] { if (safeThis != nullptr) safeThis->processor.requestExperimentalStateSaveToFile(); };
-    loadStateFileButton.onClick = [safeThis] { if (safeThis != nullptr) safeThis->processor.requestExperimentalStateLoadFromFile(); };
+    addAndMakeVisible (midiPanicButton);
+    midiPanicButton.setColour (juce::TextButton::buttonColourId, juce::Colour::fromRGB (29, 31, 36));
+    midiPanicButton.setColour (juce::TextButton::textColourOffId, juce::Colour::fromRGB (226, 232, 236));
+    midiPanicButton.onClick = [safeThis] { if (safeThis != nullptr) safeThis->processor.sendMidiPanic(); };
+    midiPanicButton.setTooltip ("Clear queued MIDI and silence/reset all MIDI channels");
 
     addAndMakeVisible (versionLabel);
     versionLabel.setText (vesDisplayVersion(), juce::dontSendNotification);
@@ -1597,11 +1589,7 @@ void VintageEmulatorStudioEditor::resized()
                             optionsBarBounds.getY(),
                             versionLabelWidth,
                             optionsBarHeight);
-    saveStateButton.setBounds (versionLabel.getRight() + 8, optionsBarBounds.getY() + 3, 92, optionsBarHeight - 6);
-    loadStateButton.setBounds (saveStateButton.getRight() + 6, optionsBarBounds.getY() + 3, 92, optionsBarHeight - 6);
-    saveStateFileButton.setBounds (loadStateButton.getRight() + 6, optionsBarBounds.getY() + 3, 126, optionsBarHeight - 6);
-    loadStateFileButton.setBounds (saveStateFileButton.getRight() + 6, optionsBarBounds.getY() + 3, 138, optionsBarHeight - 6);
-    stateStatusLabel.setBounds (loadStateFileButton.getRight() + 8, optionsBarBounds.getY(), 460, optionsBarHeight);
+    midiPanicButton.setBounds (versionLabel.getRight() + 8, optionsBarBounds.getY() + 3, 96, optionsBarHeight - 6);
 #if JucePlugin_Build_Standalone
     const auto sliderHeight = 22;
     const auto sliderY = optionsBarBounds.getY() + (optionsBarHeight - sliderHeight) / 2;
@@ -2373,20 +2361,8 @@ void VintageEmulatorStudioEditor::updateControlState()
 
     dismissUnsupportedToolbarPopup();
 
-    const auto showState = processor.selectedMachineSupportsExperimentalState();
-    const auto stateEnabled = showState && processor.isReady() && ! processor.isExperimentalStatePending();
-    saveStateButton.setVisible (showState);
-    loadStateButton.setVisible (showState);
-    saveStateFileButton.setVisible (showState);
-    loadStateFileButton.setVisible (showState);
-    stateStatusLabel.setVisible (showState);
-    saveStateButton.setEnabled (stateEnabled);
-    loadStateButton.setEnabled (stateEnabled);
-    saveStateFileButton.setEnabled (stateEnabled);
-    loadStateFileButton.setEnabled (stateEnabled);
-    const auto stateStatus = processor.getExperimentalStateStatus();
-    stateStatusLabel.setText (stateStatus, juce::dontSendNotification);
-    stateStatusLabel.setTooltip (stateStatus);
+    midiPanicButton.setEnabled (processor.isReady());
+
 }
 
 void VintageEmulatorStudioEditor::updateStatus()

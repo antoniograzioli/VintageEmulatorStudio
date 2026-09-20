@@ -1,0 +1,816 @@
+<?xml version="1.0"?>
+<!-- license:CC0-1.0 -->
+<mamelayout version="2">
+
+<!-- Layout for AKAI S2000 MIDI Stereo Digital Sampler Rack Unit (1993)
+     by Guru (https://gurudumps.otenko.com/)
+     (thanks to robcfg for real unit reference photos and infos)
+-->
+
+
+
+    <element name="akailogo">
+        <image file="akai.png" />
+    </element>
+
+
+	
+
+
+
+
+
+
+
+	<!-- 3 1/2" FDD Module -->
+	<element name="floppycutout"><rect></rect></element>
+	<element name="floppy">
+	<image><data><![CDATA[
+	<svg width="1255" height="335" viewBox="0 0 1255 335">
+		<rect x="0" y="0" width="1255" height="325" fill="#c4c0ab" stroke="#c4c0ab" stroke-width="5"/>
+		<line x1="35" y1="35" x2="80" y2="100" stroke="#d9d5c0" stroke-width="5"/>
+		<line x1="1220" y1="35" x2="1175" y2="100" stroke="#d9d5c0" stroke-width="5"/>
+		<line x1="40" y1="170" x2="80" y2="130" stroke="#d9d5c0" stroke-width="5"/>
+		<line x1="1215" y1="170" x2="1175" y2="130" stroke="#d9d5c0" stroke-width="5"/>
+		<rect x="70" y="90" width="1115" height="50" fill="black" stroke="black" stroke-width="5" rx="10" ry="10"/>
+		<rect x="30" y="30" width="1195" height="140" fill="none" stroke="#d9d5c0" stroke-width="5" rx="20" ry="20"/>
+		<rect x="407.5" y="30" width="440" height="50" fill="#b3ae99" stroke="#b3ae99" stroke-width="5"/>
+		<rect x="407.5" y="200" width="440" height="90" fill="#cfcbb7" stroke="#cfcbb7" stroke-width="5"/>
+		<rect x="280" y="80" width="695" height="70" fill="black" stroke="black" stroke-width="5"/>
+		<rect x="240" y="230" width="100" height="50" fill="none" stroke="#d9d5c0" stroke-width="5"/>
+		<line x1="242" y1="230" x2="340" y2="230" stroke="#8e8673" stroke-width="5"/>
+		<rect x="885" y="215" width="190" height="75" fill="black" stroke="black" stroke-width="5" rx="10" ry="10"/>
+		<rect x="897" y="227" width="166" height="51" fill="#c4c0ab" stroke="#c4c0ab" stroke-width="5" rx="5" ry="5"/>
+		<rect x="407.5" y="170" width="440" height="30" fill="#c4c0ab" stroke="#d9d5c0" stroke-width="5"/>
+		<rect x="407.5" y="60" width="440" height="110" fill="black" stroke="black" stroke-width="5"/>
+		<line x1="406" y1="170" x2="406" y2="290" stroke="#8e8673" stroke-width="5"/>
+		<line x1="847.5" y1="170" x2="847.5" y2="290" stroke="#8e8673" stroke-width="5"/>
+		<line x1="410" y1="170" x2="406" y2="290" stroke="#8e8673" stroke-width="5"/>
+		<line x1="843.5" y1="170" x2="847.5" y2="290" stroke="#8e8673" stroke-width="5"/>
+		<line x1="414" y1="170" x2="406" y2="290" stroke="#8e8673" stroke-width="5"/>
+		<line x1="839.5" y1="170" x2="847.5" y2="290" stroke="#8e8673" stroke-width="5"/>
+		<line x1="406" y1="30" x2="406" y2="60" stroke="#8e8673" stroke-width="5"/>
+		<line x1="847.5" y1="30" x2="847.5" y2="60" stroke="#8e8673" stroke-width="5"/>
+	</svg>
+	]]></data></image>
+	</element>
+
+	<!-- Power switch -->
+	<element name="powerswitch">
+	<image><data><![CDATA[
+	<svg width="280" height="365" viewBox="0 0 285 370">
+		<rect x="0" y="0" width="280" height="365" fill="#9b8a67" stroke="#9b8a67" stroke-width="5" rx="30" ry="30"/>
+		<rect x="10" y="10" width="260" height="345" fill="#c8b88e" stroke="#c8b88e" stroke-width="5" rx="20" ry="20"/>
+		<rect x="45" y="60" width="190" height="245" fill="black" stroke="black" stroke-width="15" rx="20" ry="20"/>
+		<rect x="50" y="65" width="180" height="235" fill="#c8b88e" stroke="#c8b88e" stroke-width="5" rx="18" ry="18"/>
+		<path d="M50,270 V282 A 18 18 0 0 0 68,300 H212 A 18 18 0 0 0 230,282 V270 H50 Z" stroke="#9b8a67" stroke-width="5" fill="#9b8a67"/>
+		<line x1="50" y1="270" x2="230" y2="270" stroke="#e1dac2" stroke-width="7" fill-opacity="0.7" />
+	</svg>
+	]]></data></image>
+	</element>
+
+	<!-- LEDs -->
+	<element name="fddled"><rect></rect></element>
+	<element name="led"><disk></disk></element>
+
+	<!-- Basic Elements -->
+	<element name="line"><rect><color red="0" green="0" blue="0"/></rect></element>
+	<element name="vline"><rect><color red="0" green="0" blue="0"/></rect></element>
+
+	<!-- Slots with screws (at different angles)... so the unit doesn't fall down and break your foot ;-) -->
+	<element name="slot1">
+		<image><data><![CDATA[
+		<svg width="130" height="104" viewBox="0 0 130 104">
+			<rect x="0" y="10" width="130" height="80" rx="40" ry="40" fill="black"/>
+			<ellipse cx="65" cy="52" rx="52" ry="52" fill="#6e6e6e"/>
+			<ellipse cx="65" cy="52" rx="45" ry="45" fill="#a9a9a9"/>
+			<ellipse cx="65" cy="52" rx="37" ry="37" fill="#b8b8b8"/>
+			<g>
+			<rect x="58" y="25" width="14" height="27" fill="black"/>
+			<rect x="58" y="52" width="14" height="27" fill="black"/>
+			<rect x="39" y="45" width="27" height="14" fill="black"/>
+			<rect x="65" y="45" width="27" height="14" fill="black"/>
+			<polygon points="65,42 78,52 65,62 52,52" fill="grey" transform="rotate(45 65 52)"/>
+			</g>
+		</svg>
+		]]></data>
+		</image>
+	</element>
+	<element name="slot2">
+		<image><data><![CDATA[
+		<svg width="130" height="104" viewBox="0 0 130 104">
+			<rect x="0" y="10" width="130" height="80" rx="40" ry="40" fill="black"/>
+			<ellipse cx="65" cy="52" rx="52" ry="52" fill="#6e6e6e"/>
+			<ellipse cx="65" cy="52" rx="45" ry="45" fill="#a9a9a9"/>
+			<ellipse cx="65" cy="52" rx="37" ry="37" fill="#b8b8b8"/>
+			<g transform="rotate(15 65 52)">
+			<rect x="58" y="25" width="14" height="27" fill="black"/>
+			<rect x="58" y="52" width="14" height="27" fill="black"/>
+			<rect x="39" y="45" width="27" height="14" fill="black"/>
+			<rect x="65" y="45" width="27" height="14" fill="black"/>
+			<polygon points="65,42 78,52 65,62 52,52" fill="grey" transform="rotate(45 65 52)"/>
+			</g>
+		</svg>
+		]]></data>
+		</image>
+	</element>
+	<element name="slot3">
+		<image><data><![CDATA[
+		<svg width="130" height="104" viewBox="0 0 130 104">
+		<rect x="0" y="10" width="130" height="80" rx="40" ry="40" fill="black"/>
+		<ellipse cx="65" cy="52" rx="52" ry="52" fill="#6e6e6e"/>
+		<ellipse cx="65" cy="52" rx="45" ry="45" fill="#a9a9a9"/>
+		<ellipse cx="65" cy="52" rx="37" ry="37" fill="#b8b8b8"/>
+		<g transform="rotate(30 65 52)">
+		<rect x="58" y="25" width="14" height="27" fill="black"/>
+		<rect x="58" y="52" width="14" height="27" fill="black"/>
+		<rect x="39" y="45" width="27" height="14" fill="black"/>
+		<rect x="65" y="45" width="27" height="14" fill="black"/>
+		<polygon points="65,42 78,52 65,62 52,52" fill="grey" transform="rotate(45 65 52)"/>
+		</g>
+		</svg>
+		]]></data>
+		</image>
+	</element>
+	<element name="slot4">
+		<image><data><![CDATA[
+		<svg width="130" height="104" viewBox="0 0 130 104">
+		<rect x="0" y="10" width="130" height="80" rx="40" ry="40" fill="black"/>
+		<ellipse cx="65" cy="52" rx="52" ry="52" fill="#6e6e6e"/>
+		<ellipse cx="65" cy="52" rx="45" ry="45" fill="#a9a9a9"/>
+		<ellipse cx="65" cy="52" rx="37" ry="37" fill="#b8b8b8"/>
+		<g transform="rotate(45 65 52)">
+		<rect x="58" y="25" width="14" height="27" fill="black"/>
+		<rect x="58" y="52" width="14" height="27" fill="black"/>
+		<rect x="39" y="45" width="27" height="14" fill="black"/>
+		<rect x="65" y="45" width="27" height="14" fill="black"/>
+		<polygon points="65,42 78,52 65,62 52,52" fill="grey" transform="rotate(45 65 52)"/>
+		</g>
+		</svg>
+		]]></data>
+		</image>
+	</element>
+
+	<!-- Off-white buttons with rounded corners -->
+	<element name="rectbutton-owhite" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="140" height="56" viewBox="0 0 140 56">
+				<rect x="0" y="0" width="140" height="56" rx="10" ry="10" fill="rgb(192,181,137)" stroke="rgb(192,181,137)" stroke-width="0.6"/>
+				<line x1="0" y1="30" x2="140" y2="30" stroke="#e8ddb1" stroke-width="6" />
+				<line x1="5" y1="53" x2="130" y2="53" stroke="#e8ddb1" stroke-width="6" />
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="140" height="56" viewBox="0 0 140 56">
+			  <rect x="0" y="0" width="140" height="56" rx="10" ry="10" fill="rgb(202,191,147)" stroke="rgb(202,191,147)" stroke-width="0.6"/>
+				<line x1="0" y1="30" x2="140" y2="30" stroke="#e8ddb1" stroke-width="6" />
+				<line x1="5" y1="53" x2="130" y2="53" stroke="#e8ddb1" stroke-width="6" />
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="rectbutton-black">
+		<image><data><![CDATA[
+			<svg width="145" height="76">
+			  <rect x="0" y="0" width="145" height="76" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<!-- Square buttons with rounded corners -->
+	<element name="squarebutton-owhite" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="140" height="112">
+				<rect x="0" y="0" width="140" height="112" rx="10" ry="10" fill="rgb(192,181,137)" stroke="rgb(192,181,137)" stroke-width="0.6"/>
+				<ellipse cx="70" cy="53" rx="43" ry="33" fill="rgb(150,134,96)"/>
+				<ellipse cx="70" cy="57" rx="41" ry="29" fill="rgb(184,168,126)"/>
+				<ellipse cx="70" cy="66" rx="26" ry="11" fill="rgb(248,236,204)" fill-opacity="0.5"/>
+				<line x1="5" y1="106" x2="130" y2="106" stroke="rgb(224,216,184)" stroke-width="11" />
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="140" height="112">
+			  <rect x="0" y="0" width="140" height="112" rx="10" ry="10" fill="rgb(202,191,147)" stroke="rgb(202,191,147)" stroke-width="0.6"/>
+				<ellipse cx="70" cy="53" rx="43" ry="33" fill="rgb(160,144,106)"/>
+				<ellipse cx="70" cy="57" rx="41" ry="29" fill="rgb(194,178,136)"/>
+				<ellipse cx="70" cy="66" rx="26" ry="11" fill="rgb(258,246,214)" fill-opacity="0.5"/>
+				<line x1="5" y1="106" x2="130" y2="106" stroke="rgb(234,226,194)" stroke-width="11" />
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="squarebutton-black">
+		<image><data><![CDATA[
+			<svg width="145" height="152">
+			  <rect x="0" y="0" width="145" height="152" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<!-- All Texts -->
+	<element name="knob-volume-text"><text align="0" string="MAIN VOLUME" /></element>
+	<element name="knob-gain-text"><text align="0" string="REC GAIN" /></element>
+	<element name="knob-min-text"><text align="0" string="MIN" /></element>
+	<element name="knob-max-text"><text align="0" string="MAX" /></element>
+	<element name="lmono-text"><text align="0" string="L/MONO" /></element>
+	<element name="r-text"><text align="0" string="R" /></element>
+	<element name="phones-text"><text align="0" string="PHONES" /></element>
+	<element name="select-text"><text align="0" string="SELECT" /></element>
+	<element name="data-text"><text align="0" string="DATA" /></element>
+	<element name="group-text"><text align="0" string="GROUP" /></element>
+	<element name="play-text"><text align="0" string="PLAY" /></element>
+	<element name="page-text"><text align="0" string="PAGE" /></element>
+	<element name="effects-text"><text align="0" string="EFFECTS" /></element>
+	<element name="load-text"><text align="0" string="LOAD" /></element>
+	<element name="sample-text"><text align="0" string="SAMPLE" /></element>
+	<element name="save-text"><text align="0" string="SAVE" /></element>
+	<element name="multi-text"><text align="0" string="MULTI" /></element>
+	<element name="global-text"><text align="0" string="GLOBAL" /></element>
+	<element name="single-text"><text align="0" string="SINGLE" /></element>
+	<element name="edit-text"><text align="0" string="EDIT" /></element>
+	<element name="f1-text"><text align="0" string="F1" /></element>
+	<element name="f2-text"><text align="0" string="F2" /></element>
+	<element name="cursor-text"><text align="0" string="CURSOR" /></element>
+	<element name="power-text"><text align="0" string="POWER" /></element>
+	<element name="professional-text"><text align="2" string="professional" /></element>
+	<element name="msds"><text align="1" string="MIDI STEREO DIGITAL SAMPLER" /></element>
+
+	<!-- Knobs -->
+	<element name="gain">
+		<image><data><![CDATA[
+		<svg width="500" height="500" viewBox="0 0 500 500">
+		<g fill="black" stroke="rgb(192,181,137)" stroke-width="5" transform="translate(250, 250)">
+		<circle cx="0" cy="0" r="165" fill="black" stroke="black"/>
+		<circle cx="0" cy="0" r="150" fill="rgb(192,181,137)" stroke="rgb(192,181,137)"/>
+		<rect x="-30" y="-120" width="60" height="220" fill="#cdc191" stroke="#cdc191"/>
+		<line x1="0" y1="-150" x2="0" y2="-80" stroke="#ac2414" stroke-width="14"/>
+		<line x1="-30" y1="95" x2="30" y2="95" stroke="rgb(234,226,194)" stroke-width="14" fill-opacity="0.5"/>
+		<path d="M -60,-135 L -75.8,130 L -54.59,141.21 L -35,100 L -35,-110 A 25 25 0 0 0 -60,-135 Z" stroke="#b9a97d" stroke-width="5" fill="#b9a97d"/>
+		<path d="M -60,-135 L -75.8,130" stroke="rgb(199,188,143)" stroke-width="11" fill="none" fill-opacity="0.5"/>
+		<path d="M 60,-135 L 75.8,130 L 54.59,141.21 L 35,100 L 35,-110 A 25 25 0 0 0 60,-135 Z" stroke="#b9a97d" stroke-width="5" fill="#b9a97d"/>
+		<path d="M 60,-135 L 75.8,130" stroke="rgb(199,188,143)" stroke-width="11" fill="none" fill-opacity="0.5"/>
+		<circle transform="rotate(0)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(30)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(60)" cx="200" cy="0" r="12"/>
+		<circle transform="rotate(120)" cx="200" cy="0" r="12"/>
+		<circle transform="rotate(150)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(180)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(210)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(240)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(270)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(300)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(330)" cx="200" cy="0" r="7"/>
+		</g>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="volume">
+		<image><data><![CDATA[
+		<svg width="500" height="500" viewBox="0 0 500 500">
+		<g fill="black" stroke="rgb(192,181,137)" stroke-width="5" transform="translate(250, 250)">
+		<circle cx="0" cy="0" r="165" fill="black" stroke="black"/>
+		<circle cx="0" cy="0" r="150" fill="rgb(192,181,137)" stroke="rgb(192,181,137)"/>
+		<rect x="-30" y="-120" width="60" height="220" fill="#cdc191" stroke="#cdc191"/>
+		<line x1="0" y1="-150" x2="0" y2="-80" stroke="#2227b5" stroke-width="14"/>
+		<line x1="-30" y1="95" x2="30" y2="95" stroke="rgb(234,226,194)" stroke-width="14" fill-opacity="0.5"/>
+		<path d="M -60,-135 L -75.8,130 L -54.59,141.21 L -35,100 L -35,-110 A 25 25 0 0 0 -60,-135 Z" stroke="#b9a97d" stroke-width="5" fill="#b9a97d"/>
+		<path d="M -60,-135 L -75.8,130" stroke="rgb(199,188,143)" stroke-width="11" fill="none" fill-opacity="0.5"/>
+		<path d="M 60,-135 L 75.8,130 L 54.59,141.21 L 35,100 L 35,-110 A 25 25 0 0 0 60,-135 Z" stroke="#b9a97d" stroke-width="5" fill="#b9a97d"/>
+		<path d="M 60,-135 L 75.8,130" stroke="rgb(199,188,143)" stroke-width="11" fill="none" fill-opacity="0.5"/>
+		<circle transform="rotate(0)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(30)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(60)" cx="200" cy="0" r="12"/>
+		<circle transform="rotate(120)" cx="200" cy="0" r="12"/>
+		<circle transform="rotate(150)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(180)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(210)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(240)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(270)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(300)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(330)" cx="200" cy="0" r="7"/>
+		</g>
+		</svg>
+		]]></data></image>
+	</element>
+
+	<!-- Bezel / Panel Elements -->
+	<element name="bezel"><rect><bounds x="0" y="0" width="72" height="208" /></rect></element>
+	<element name="panel"><rect></rect></element>
+	<element name="bezel-highlightbr">
+		<image><data><![CDATA[
+			<svg width="50" height="50" viewBox="0 0 60 60">
+				<path d="M 0,0 L 50,50 Z" fill="none" stroke="#595b4c" stroke-width="12"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+
+
+
+
+
+
+
+
+
+	
+	<element name="bezel-highlightbl">
+		<image><data><![CDATA[
+			<svg width="50" height="50" viewBox="0 0 60 60">
+				<path d="M50,0 L 0,50 Z" fill="none" stroke="#595b4c" stroke-width="12"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="bezel-highlighttl">
+		<image><data><![CDATA[
+			<svg width="50" height="50" viewBox="0 0 60 60">
+				<path d="M 0,0 L 50,50 Z" fill="none" stroke="#595b4c" stroke-width="12"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="bezel-highlighttr">
+		<image><data><![CDATA[
+			<svg width="50" height="50" viewBox="0 0 60 60">
+				<path d="M50,0 L 0,50 Z" fill="none" stroke="#595b4c" stroke-width="12"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="jack">
+		<disk><bounds x="0" y="0" width="140" height="140" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="7" y="7" width="126" height="126" /><color red="0.709" green="0.674" blue="0.611" /></disk>
+		<disk><bounds x="12.5" y="12.5" width="115" height="115" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="15" y="15" width="110" height="110" /><color red="0.317" green="0.290" blue="0.227" /></disk>
+		<disk><bounds x="27.5" y="27.5" width="85" height="85" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+	<element name="cursor-down-arrow">
+		<image>
+			<bounds xc="7.5" yc="5" width="20" height="10" />
+			<data><![CDATA[
+			<svg>
+			  <path d="M 2,2 L 5,8 L 8,2" fill="none" stroke="black" stroke-width="0.6" />
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="cursor-up-arrow">
+		<image>
+			<bounds xc="7.5" yc="5" width="20" height="10" />
+			<data><![CDATA[
+				<svg>
+					<path d="M 2,8 L 5,2 L 8,8" fill="none" stroke="black" stroke-width="0.6" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="cursor-left-arrow">
+		<image>
+			<bounds xc="7.5" yc="5" width="10" height="20" />
+			<data><![CDATA[
+				<svg>
+					<path d="M 8,8 L 2,5 L 8,2" fill="none" stroke="black" stroke-width="0.6" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="cursor-right-arrow">
+		<image>
+			<bounds xc="7.5" yc="5" width="10" height="20" />
+			<data><![CDATA[
+				<svg>
+					<path d="M 2,8 L 8,5 L 2,2" fill="none" stroke="black" stroke-width="0.6" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<!-- Screen Assembly -->
+	<group name="group-screen">
+		<bounds x="0" y="0" width="940" height="300" />
+		<element ref="bezel"><bounds x="0" y="0" width="940" height="300" /><color red="0" green="0" blue="0" /></element>
+		<element ref="bezel"><bounds x="10" y="10" width="920" height="280" /><color red="0.290" green="0.278" blue="0.254" /></element>
+		<element ref="bezel"><bounds x="15" y="15" width="910" height="270" /><color red="0.207" green="0.207" blue="0.192" /></element>
+		<element ref="bezel"><bounds x="23" y="23" width="894" height="254" /><color red="0.290" green="0.278" blue="0.254" /></element>
+		<element ref="bezel"><bounds x="31" y="31" width="878" height="238" /><color red="0.207" green="0.207" blue="0.192" /></element>
+		<element ref="bezel-highlighttl"><bounds x="14" y="14" width="20" height="20" /></element>
+		<element ref="bezel-highlighttr"><bounds x="910" y="14" width="20" height="20" /></element>
+		<element ref="bezel-highlightbl"><bounds x="14" y="273" width="20" height="20" /></element>
+		<element ref="bezel-highlightbr"><bounds x="910" y="273" width="20" height="20" /></element>
+		<screen index="0"><bounds x="110" y="37" width="720" height="160" /></screen>
+	</group>
+
+	<!-- Data/Select Symbol -->
+	<element name="data_select_symbol">
+		<image state="0"><data><![CDATA[
+			<svg width="100" height="100"  viewBox="0 -30 100 100" stroke-width="7" stroke="black" >
+				<line x1="49" y1="-30" x2="49" y2="5" />
+				<ellipse cx="50" cy="35" rx="12" ry="12" fill="black"/>
+				<line x1="49" y1="50" x2="49" y2="78" />
+				<svg width="100" height="100">
+				<path d="M 25,60 A 35,35 0 1 1 75,60"
+				fill="none" stroke="black" stroke-width="6"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<!-- Build Encoder Wheel -->
+	<element name="dataentry_bottom" clickthrough="no"><disk><color red="0" green="0" blue="0"/></disk></element>
+	<element name="dataentry_top" clickthrough="no"><disk><color red="0.741" green="0.678" blue="0.513"/></disk></element>
+	<element name="dataentry_outer" clickthrough="no"><disk><color red="0.772" green="0.725" blue="0.603"/></disk></element>
+	<element name="outer_ring"><disk><color red="0.741" green="0.678" blue="0.513"/></disk></element>
+	<element name="outer_ring_top"><disk><color red="0.870" green="0.823" blue="0.674"/></disk></element>
+	<element name="dataentry_hitarea" clickthrough="no"><rect><color alpha="0" /></rect></element>
+	<group name="volumeknob"><bounds x="0" y="0" width="500" height="500"/>
+		<element ref="volume"><bounds x="0" y="30" width="500" height="500"/></element>
+	</group>
+	<group name="gainknob">
+	<bounds x="0" y="0" width="500" height="500"/>
+		<element ref="gain"><bounds x="0" y="30" width="500" height="500"/></element>
+	</group>
+	<element name="ringleft">
+		<rect state="0"><bounds x="290" y="0" width="10" height="30" /><color red="0" green="0" blue="0" /></rect>
+		<rect state="1"><bounds x="290" y="0" width="10" height="30" /><color red="0.741" green="0.678" blue="0.513"/></rect>
+		<rect state="1"><bounds x="0" y="0" width="290" height="580" /><color red="1" green="1" blue="1" alpha="0" /></rect>
+		<rect state="1"><bounds x="0" y="285" width="30" height="10" /><color red="0" green="0" blue="0" /></rect>
+	</element>
+	<element name="ringright">
+		<rect state="1"><bounds x="290" y="0" width="10" height="30" /><color red="0.741" green="0.678" blue="0.513"/></rect>
+		<rect state="1"><bounds x="290" y="0" width="290" height="580" /><color red="1" green="1" blue="1" alpha="0" /></rect>
+		<rect state="1"><bounds x="550" y="285" width="30" height="10" /><color red="0" green="0" blue="0" /></rect>
+	</element>
+	<group name="outerknob">
+		<bounds x="0" y="0" width="580" height="580" />
+		<element ref="outer_ring" ><bounds x="0" y="0" width="580" height="580"/></element>
+		<element ref="outer_ring_top" ><bounds x="50" y="50" width="480" height="480"/></element>
+		<element ref="ringleft" inputtag="C5" inputmask="0x02"><bounds x="0" y="0" width="295" height="580" /></element>
+		<element ref="ringright" inputtag="C2" inputmask="0x02"><bounds x="285" y="0" width="295" height="580" /></element>
+	</group>
+	<group name="select_data_knob">
+		<bounds x="0" y="0" width="590" height="590" />
+		<element ref="dataentry_bottom" clickthrough="no" ><bounds x="0" y="0" width="590" height="590"/></element>
+		<group ref="outerknob" ><bounds x="15" y="15" width="560" height="560"/></group>
+		<element ref="dataentry_bottom" ><bounds x="80" y="80" width="430" height="430"/></element>
+		<element ref="dataentry_outer" clickthrough="no" ><bounds x="90" y="90" width="410" height="410"/></element>
+		<element ref="dataentry_top" clickthrough="no" ><bounds x="105" y="105" width="380" height="380"/></element>
+		<element ref="dataentry_hitarea" id="dataentry_hitarea" clickthrough="no">
+			<bounds x="0" y="0" width="590" height="590"/></element>
+	</group>
+
+	<!-- Show Everything -->
+	<view name="Default Layout">
+
+		<!-- Screen and Panel -->
+		<element ref="panel"><bounds x="0" y="0" width="6000" height="1112" /><color red="0.745" green="0.729" blue="0.654" /></element>
+
+
+
+<element ref="akailogo">
+          <bounds x="390" y="104" width="400" height="110"/>
+        </element>
+
+
+
+		
+		<group ref="group-screen"><bounds x="2248" y="175" width="940" height="300" /></group>
+		<element ref="slot1"><bounds x="35" y="22" width="130" height="104" /></element>
+		<element ref="slot2"><bounds x="35" y="997" width="130" height="104" /></element>
+		<element ref="slot3"><bounds x="5830" y="22" width="130" height="104" /></element>
+		<element ref="slot4"><bounds x="5830" y="997" width="130" height="104" /></element>
+		<element ref="vline"><bounds x="315" y="0" width="10" height="1112" /></element>
+		<element ref="vline"><bounds x="5670" y="0" width="10" height="1112" /></element>
+		<element ref="cursor-left-arrow"><bounds x="2560" y="550" width="37" height="45" /></element>
+		<element ref="cursor-right-arrow"><bounds x="2840" y="550" width="37" height="45" /></element>
+		<element ref="cursor-up-arrow"><bounds x="3352" y="150" width="50" height="28" /></element>
+		<element ref="cursor-up-arrow"><bounds x="3687" y="150" width="50" height="28" /></element>
+		<element ref="cursor-down-arrow"><bounds x="3352" y="493" width="50" height="28" /></element>
+		<element ref="cursor-down-arrow"><bounds x="3687" y="493" width="50" height="28" /></element>
+		<element ref="jack"><bounds x="4880" y="575" width="150" height="150" /></element>
+		<element ref="jack"><bounds x="4880" y="815" width="150" height="150" /></element>
+		<element ref="jack"><bounds x="5290" y="815" width="150" height="150" /></element>
+		<group ref="gainknob"><bounds x="4765" y="70" width="375" height="375" /></group>
+		<group ref="volumeknob"><bounds x="5185" y="70" width="375" height="375" /></group>
+		<group ref="select_data_knob"><bounds x="3915" y="220" width="680" height="680" /></group>
+		<element ref="data_select_symbol"><bounds x="4234" y="100" width="50" height="50" /></element>
+		
+
+
+		<element ref="professional-text"><bounds x="785" y="178" width="230" height="50" /><color red="0.902" green="0.117" blue="0.149" /></element>
+
+
+
+
+
+
+		<element ref="msds"><bounds x="1085" y="180" width="650" height="51.50" /><color red="0" green="0" blue="0" /></element>
+		
+		<element ref="knob-volume-text"><bounds x="5220" y="65" width="300" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="knob-gain-text"><bounds x="4835" y="65" width="250" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="knob-min-text"><bounds x="4745" y="430" width="200" height="35" /><color red="0" green="0" blue="0" /></element>
+		<element ref="knob-max-text"><bounds x="4970" y="430" width="200" height="35" /><color red="0" green="0" blue="0" /></element>
+		<element ref="knob-min-text"><bounds x="5160" y="430" width="200" height="35" /><color red="0" green="0" blue="0" /></element>
+		<element ref="knob-max-text"><bounds x="5383" y="430" width="200" height="35" /><color red="0" green="0" blue="0" /></element>
+		<element ref="lmono-text"><bounds x="4855" y="510" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="r-text"><bounds x="4855" y="755" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="phones-text"><bounds x="5270" y="755" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="select-text"><bounds x="4165" y="50" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="data-text"><bounds x="4160" y="150" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="page-text"><bounds x="3280" y="310" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="group-text"><bounds x="3615" y="310" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="play-text"><bounds x="3610" y="838" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="sample-text"><bounds x="2930" y="647" width="250" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="effects-text"><bounds x="3260" y="647" width="250" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="load-text"><bounds x="3280" y="838" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="save-text"><bounds x="2950" y="838" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="multi-text"><bounds x="2625" y="647" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="global-text"><bounds x="2625" y="838" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="single-text"><bounds x="2290" y="647" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="edit-text"><bounds x="2290" y="838" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="f1-text"><bounds x="2240" y="542" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="cursor-text"><bounds x="2600" y="542" width="250" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="f2-text"><bounds x="3002" y="542" width="200" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="3243" y="937" width="25" height="25" /><animate name="led0" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="3243" y="745" width="25" height="25" /><animate name="led1" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="2912" y="937" width="25" height="25" /><animate name="led2" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="2912" y="745" width="25" height="25" /><animate name="led3" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="2581" y="937" width="25" height="25" /><animate name="led4" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="2581" y="745" width="25" height="25" /><animate name="led5" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="2250" y="937" width="25" height="25" /><animate name="led6" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="2250" y="745" width="25" height="25" /><animate name="led7" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1" green="0" blue="0" /></element>
+
+		<!-- Floppy Drive -->
+		<element ref="floppycutout"><bounds x="841.5" y="601.5" width="1277" height="337" /><color red="0" green="0" blue="0" /></element>
+		<element ref="floppy"><bounds x="853" y="612" width="1255" height="325" /></element>
+		<element ref="fddled"><bounds x="1110" y="845" width="70" height="25" /><animate name="drive_led" /><color state="0" red="0.0" green="0.4" blue="0" /><color state="1" red="0" green="1" blue="0" /></element>
+
+		<!-- Power Switch -->
+		<element ref="powerswitch"><bounds x="475" y="605" width="280" height="335" /></element>
+		<element ref="power-text"><bounds x="492" y="750" width="250" height="45" /><color red="0" green="0" blue="0" /></element>
+
+		<!-- Buttons -->
+		<!-- F1 -->
+		<element ref="rectbutton-black"><bounds x="2375" y="535" width="145" height="76" /></element>
+		<element ref="rectbutton-owhite" inputtag="C5" inputmask="0x02"><bounds x="2380" y="545" width="130" height="56" /></element>
+		<!-- F2 -->
+		<element ref="rectbutton-black"><bounds x="2916" y="535" width="145" height="76" /></element>
+		<element ref="rectbutton-owhite" inputtag="C2" inputmask="0x02"><bounds x="2921" y="545" width="130" height="56" /></element>
+		<!-- Page Up -->
+		<element ref="rectbutton-black"><bounds x="3305" y="203" width="145" height="76" /></element>
+		<element ref="rectbutton-owhite" inputtag="C6" inputmask="0x01"><bounds x="3312" y="213" width="130" height="56" /></element>
+		<!-- Page Down -->
+		<element ref="rectbutton-black"><bounds x="3305" y="393" width="145" height="76" /></element>
+		<element ref="rectbutton-owhite" inputtag="C7" inputmask="0x01"><bounds x="3312" y="403" width="130" height="56" /></element>
+		<!-- Group Up -->
+		<element ref="rectbutton-black"><bounds x="3640" y="203" width="145" height="76" /></element>
+		<element ref="rectbutton-owhite" inputtag="C2" inputmask="0x01"><bounds x="3647" y="213" width="130" height="56" /></element>
+		<!-- Group Up -->
+		<element ref="rectbutton-black"><bounds x="3640" y="393" width="145" height="76" /></element>
+		<element ref="rectbutton-owhite" inputtag="C3" inputmask="0x01"><bounds x="3647" y="403" width="130" height="56" /></element>
+		<!-- Single -->
+		<element ref="squarebutton-black"><bounds x="2315" y="708" width="145" height="107" /></element>
+		<element ref="squarebutton-owhite" inputtag="C6" inputmask="0x02"><bounds x="2322" y="718" width="130" height="87" /></element>
+		<!-- Edit -->
+		<element ref="squarebutton-black"><bounds x="2315" y="900" width="145" height="107" /></element>
+		<element ref="squarebutton-owhite" inputtag="C7" inputmask="0x02"><bounds x="2322" y="910" width="130" height="87" /></element>
+		<!-- Multi -->
+		<element ref="squarebutton-black"><bounds x="2646" y="708" width="145" height="107" /></element>
+		<element ref="squarebutton-owhite" inputtag="C3" inputmask="0x02"><bounds x="2653" y="718" width="130" height="87" /></element>
+		<!-- Global -->
+		<element ref="squarebutton-black"><bounds x="2646" y="900" width="145" height="107" /></element>
+		<element ref="squarebutton-owhite" inputtag="C4" inputmask="0x02"><bounds x="2653" y="910" width="130" height="87" /></element>
+		<!-- Sample -->
+		<element ref="squarebutton-black"><bounds x="2977" y="708" width="145" height="107" /></element>
+		<element ref="squarebutton-owhite" inputtag="C0" inputmask="0x02"><bounds x="2984" y="718" width="130" height="87" /></element>
+		<!-- Save -->
+		<element ref="squarebutton-black"><bounds x="2977" y="900" width="145" height="107" /></element>
+		<element ref="squarebutton-owhite" inputtag="C1" inputmask="0x02"><bounds x="2984" y="910" width="130" height="87" /></element>
+		<!-- Effects -->
+		<element ref="squarebutton-black"><bounds x="3308" y="708" width="145" height="107" /></element>
+		<element ref="squarebutton-owhite" inputtag="C4" inputmask="0x01"><bounds x="3315" y="718" width="130" height="87" /></element>
+		<!-- Load -->
+		<element ref="squarebutton-black"><bounds x="3308" y="900" width="145" height="107" /></element>
+		<element ref="squarebutton-owhite" inputtag="C5" inputmask="0x01"><bounds x="3315" y="910" width="130" height="87" /></element>
+		<!-- Play -->
+		<element ref="squarebutton-black"><bounds x="3639" y="900" width="145" height="107" /></element>
+		<element ref="squarebutton-owhite" inputtag="C1" inputmask="0x01"><bounds x="3646" y="910" width="130" height="87" /></element>
+
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				local view = file.views["Default Layout"]
+				add_relative_dial(view, "dataentry_hitarea", "DATAENTRY", 45)
+				install_slider_callbacks(view)
+			end)
+
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-----------------------------------------------------------------------
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_adjuster_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
+		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+			table.insert(widgets, {
+				clickarea = get_layout_item(view, clickarea_id),
+				field     = get_adjuster_port_field(port_name),
+				is_knob   = true,
+				scale     = scale })
+		end
+
+		function add_relative_dial(view, clickarea_id, port_name, detents_per_sweep)
+			local field, port = get_input_field(port_name)
+			local clickarea = get_layout_item(view, clickarea_id)
+			if field == nil or port == nil or clickarea == nil then
+				emu.print_error("DATAENTRY relative dial registration failed")
+				return
+			end
+			local widget = {
+				clickarea       = clickarea,
+				field           = field,
+				kind            = "relative_dial",
+				detents_per_sweep = detents_per_sweep,
+				units_per_step  = nil,
+				synthetic_value = port:read() & 0xff }
+			table.insert(widgets, widget)
+			return widget
+		end
+
+		local function end_dataentry_drag(id)
+			pointers[id] = nil
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_input_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			if field == nil then
+				emu.print_error("Port: '" .. port_name .. "' has no input field.")
+				return nil
+			end
+			return field, port
+		end
+
+		function get_adjuster_port_field(port_name)
+			local field = get_input_field(port_name)
+			return field
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						if widgets[i].kind == "relative_dial" then
+							widgets[i].units_per_step = math.max(
+								widgets[i].clickarea.bounds.height / widgets[i].detents_per_sweep,
+								0.0001)
+							pointers[id] = {
+								selected_widget = i,
+								last_y = y,
+								remainder = 0,
+								dragging = true }
+						else
+							pointers[id] = {
+								selected_widget = i,
+								relative = relative,
+								start_y = y,
+								start_value = widgets[i].field.user_value }
+						end
+						break
+					end
+				end
+			end
+
+			local pointer = pointers[id]
+			if pointer ~= nil and widgets[pointer.selected_widget].kind == "relative_dial" then
+				local widget = widgets[pointer.selected_widget]
+				if up & 1 ~= 0 then
+					end_dataentry_drag(id)
+					return
+				end
+				local delta_y = pointer.last_y - y
+				pointer.last_y = y
+				pointer.remainder = pointer.remainder + delta_y
+				local steps = 0
+				if pointer.remainder >= widget.units_per_step then
+					steps = math.floor(pointer.remainder / widget.units_per_step)
+				elseif pointer.remainder <= -widget.units_per_step then
+					steps = math.ceil(pointer.remainder / widget.units_per_step)
+				end
+				if steps ~= 0 then
+					widget.synthetic_value = (widget.synthetic_value + steps) & 0xff
+					widget.field:set_value(widget.synthetic_value)
+					pointer.remainder = pointer.remainder - (steps * widget.units_per_step)
+				end
+				return
+			end
+
+			if pointer == nil then
+				return
+			end
+
+			if up & 1 ~= 0 then
+				pointers[id] = nil
+				return
+			end
+
+			local widget = widgets[pointer.selected_widget]
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
+			widget.field.user_value = new_value
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			end_dataentry_drag(id)
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			end_dataentry_drag(id)
+		end
+
+		local function forget_pointers()
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
+
+</mamelayout>

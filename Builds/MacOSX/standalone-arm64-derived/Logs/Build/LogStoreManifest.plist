@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>12</integer>
+	<key>logs</key>
+	<dict>
+		<key>18138539-1E8C-461A-A44A-4A226065E408</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>18138539-1E8C-461A-A44A-4A226065E408.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>W</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>190</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Vintage Emulator Studio project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Vintage Emulator Studio - Standalone Plugin</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - Standalone Plugin and configuration Release</string>
+			<key>timeStartedRecording</key>
+			<real>811501365.51263595</real>
+			<key>timeStoppedRecording</key>
+			<real>811501474.44722402</real>
+			<key>title</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - Standalone Plugin and configuration Release</string>
+			<key>uniqueIdentifier</key>
+			<string>18138539-1E8C-461A-A44A-4A226065E408</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

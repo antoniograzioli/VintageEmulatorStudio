@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>12</integer>
+	<key>logs</key>
+	<dict>
+		<key>2803AAA5-4EC9-4CB3-AD23-4ED4BA5A0E71</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>2803AAA5-4EC9-4CB3-AD23-4ED4BA5A0E71.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Vintage Emulator Studio project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Vintage Emulator Studio - All</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - All and configuration Release</string>
+			<key>timeStartedRecording</key>
+			<real>811544864.69244301</real>
+			<key>timeStoppedRecording</key>
+			<real>811544883.54528797</real>
+			<key>title</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - All and configuration Release</string>
+			<key>uniqueIdentifier</key>
+			<string>2803AAA5-4EC9-4CB3-AD23-4ED4BA5A0E71</string>
+		</dict>
+		<key>3B51BFB8-9BF7-419F-B791-C108679C0198</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>3B51BFB8-9BF7-419F-B791-C108679C0198.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Vintage Emulator Studio project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Vintage Emulator Studio - All</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - All and configuration Release</string>
+			<key>timeStartedRecording</key>
+			<real>811544680.86694098</real>
+			<key>timeStoppedRecording</key>
+			<real>811544849.14761901</real>
+			<key>title</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - All and configuration Release</string>
+			<key>uniqueIdentifier</key>
+			<string>3B51BFB8-9BF7-419F-B791-C108679C0198</string>
+		</dict>
+		<key>81452DAF-57CA-4495-92DE-643C6CCACF2E</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>81452DAF-57CA-4495-92DE-643C6CCACF2E.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>E</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>1</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Vintage Emulator Studio project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Vintage Emulator Studio - All</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - All and configuration Release</string>
+			<key>timeStartedRecording</key>
+			<real>811544555.58864999</real>
+			<key>timeStoppedRecording</key>
+			<real>811544622.01251698</real>
+			<key>title</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - All and configuration Release</string>
+			<key>uniqueIdentifier</key>
+			<string>81452DAF-57CA-4495-92DE-643C6CCACF2E</string>
+		</dict>
+		<key>B174764D-B364-4F5E-AE50-5B6A6F717D07</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>B174764D-B364-4F5E-AE50-5B6A6F717D07.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>E</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>1</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Vintage Emulator Studio project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Vintage Emulator Studio - All</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - All and configuration Release</string>
+			<key>timeStartedRecording</key>
+			<real>811544446.84086096</real>
+			<key>timeStoppedRecording</key>
+			<real>811544530.27713096</real>
+			<key>title</key>
+			<string>Building project Vintage Emulator Studio with scheme Vintage Emulator Studio - All and configuration Release</string>
+			<key>uniqueIdentifier</key>
+			<string>B174764D-B364-4F5E-AE50-5B6A6F717D07</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

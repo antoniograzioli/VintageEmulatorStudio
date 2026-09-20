@@ -38,6 +38,10 @@ public:
 
 	auto input_callback() { return m_input_cb.bind(); }
 
+	// External MIDI input is transient across save-state restores.  Clear only
+	// the serial transport; leave the image source and emulated machine intact.
+	void reset_transport_after_state_load();
+
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;

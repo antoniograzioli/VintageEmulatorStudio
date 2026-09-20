@@ -89,6 +89,8 @@ enum class StateOperation : std::uint8_t
 	Load
 };
 
+using HeldMidiNotes = std::array<std::uint64_t, 32>;
+
 struct StateOperationRequest
 {
 	StateOperation operation = StateOperation::Save;
@@ -96,6 +98,7 @@ struct StateOperationRequest
 	std::uint64_t request_id = 0;
 	std::uint64_t requested_at_ms = 0;
 	std::vector<std::uint8_t> snapshot_blob;
+	HeldMidiNotes held_midi_notes {};
 };
 
 struct StateOperationResult
@@ -104,11 +107,13 @@ struct StateOperationResult
 	std::uint64_t engine_generation = 0;
 	std::uint64_t request_id = 0;
 	bool success = false;
+	bool load_failed_requires_restart = false;
 	std::uint64_t snapshot_size = 0;
 	std::uint64_t scheduler_wait_ms = 0;
 	std::uint64_t stream_duration_ms = 0;
 	std::uint64_t total_duration_ms = 0;
 	std::vector<std::uint8_t> snapshot_blob;
+	HeldMidiNotes held_midi_notes {};
 	std::string error_message;
 };
 
@@ -413,6 +418,7 @@ struct EmbeddedEmulatorEngineSettings
 	};
 	std::vector<StartupMediaOption> startup_media_options;
 	std::uint64_t engine_generation = 0;
+	bool state_operations_allowed = false;
 };
 
 class EmbeddedEmulatorEngine
@@ -429,6 +435,7 @@ public:
 	bool stopAndJoin(std::chrono::milliseconds timeout);
 
 	void sendMidiBytes(const std::uint8_t *data, std::size_t size);
+	void sendMidiPanic(const HeldMidiNotes &held_notes = {});
 	void resetAudioWindow();
 	void resetLatencyDiagnostics();
 	void resetMidiTimingWindow();

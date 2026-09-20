@@ -280,6 +280,7 @@ public:
     juce::String getLastError() const;
     uint64_t getBootElapsedMs() const;
     bool isReady() const;
+    void sendMidiPanic();
     juce::String getSelectedMachineDriverName() const;
     juce::String getSelectedMachineName() const;
     juce::String getMachineNameForDisplayPosition (int displayPosition) const;
@@ -306,13 +307,8 @@ public:
     juce::String getFloppyHotSwapMessage() const;
     bool processFloppyHotSwapResults();
     uint64_t getFloppyHotSwapRevision() const { return floppyHotSwapRevision.load (std::memory_order_acquire); }
-    bool selectedMachineSupportsExperimentalState() const;
-    bool requestExperimentalStateSave();
-    bool requestExperimentalStateLoad();
-    bool requestExperimentalStateSaveToFile();
-    bool requestExperimentalStateLoadFromFile();
-    bool isExperimentalStatePending() const { return experimentalStatePending.load (std::memory_order_acquire); }
-    juce::String getExperimentalStateStatus() const { return experimentalStateStatus; }
+    bool selectedMachineSupportsSaveState() const;
+    bool selectedMachineSupportsStandaloneAutosave() const;
     bool processExperimentalStateResults();
     void finishExperimentalStateRestoreIfReady();
     juce::String getSelectedCdRomPath() const;
@@ -389,6 +385,12 @@ private:
     void clearStartupDiagnostic();
     void setStartupDiagnostic (StartupDiagnostic diagnostic);
     void handleReadyTransition (ves::EmbeddedEmulatorEngine& localEngine);
+    void sendMidiPanic (const char* source, ves::EmbeddedEmulatorEngine* readyEngine = nullptr,
+                        const ves::HeldMidiNotes* snapshotHeldNotes = nullptr);
+    void trackHostMidiMessage (const juce::MidiMessage& message);
+    ves::HeldMidiNotes captureActiveMidiNotes() const;
+    void clearActiveMidiNotes();
+    static int countHeldMidiNotes (const ves::HeldMidiNotes& notes);
     void trimAudioBacklog (ves::EmbeddedEmulatorEngine& localEngine);
     void flushAudioForTransportBoundary (ves::EmbeddedEmulatorEngine& localEngine);
     void enqueueMidiAudioLatencyEvent (const MidiAudioLatencyPendingEvent& event);
@@ -397,11 +399,11 @@ private:
     void flushMidiAudioLatencyResults();
     void recordVideoRuntimeDiagnostics();
     void recordAudioRateDiagnostics();
-    void tryStandaloneFb01AutosaveRestore();
-    void saveStandaloneFb01AutosaveOnShutdown();
+    void tryStandaloneAutosaveRestore();
+    void saveStandaloneAutosaveOnShutdown();
     bool isDawPluginWrapper() const;
-    void tryDawFb01SnapshotRefresh();
-    void tryDawFb01PendingRestore();
+    void tryDawSnapshotRefresh();
+    void tryDawPendingRestore();
     void flushPluginStateDiagnostics();
     void timerCallback() override;
 
@@ -417,6 +419,7 @@ private:
     std::atomic<uint64_t> juceMidiLastReceivedMs { 0 };
     std::atomic<uint64_t> lastMidiSentToEngineMs { 0 };
     std::atomic<bool> waitingForMidiAudioOnset { false };
+    std::array<std::atomic<std::uint64_t>, 32> activeHostMidiNotes {};
     std::atomic<bool> lastTransportPlaying { false };
     std::atomic<int> editorWidth { 1700 };
     std::atomic<int> editorHeight { 1100 };
@@ -450,15 +453,27 @@ private:
     uint64_t experimentalStateReadCompletedMs = 0;
     uint64_t experimentalStateSchedulerWaitMs = 0;
     uint64_t experimentalStateReadStreamMs = 0;
-    enum class ExperimentalStateTarget { Memory, File, Autosave, DawSnapshot, DawRestore };
-    ExperimentalStateTarget experimentalStateTarget = ExperimentalStateTarget::Memory;
+    enum class ExperimentalStateTarget { Autosave, DawSnapshot, DawRestore, StandaloneSwitchSave };
+    ExperimentalStateTarget experimentalStateTarget = ExperimentalStateTarget::Autosave;
     uint64_t standaloneAutosaveRestoreAttemptedGeneration = 0;
     mutable juce::CriticalSection dawStateLock;
-    std::shared_ptr<const std::vector<std::uint8_t>> dawCachedSnapshot;
+    struct CachedStateSnapshot
+    {
+        juce::String driver;
+        uint64_t engineGeneration = 0;
+        uint32_t compatibilityRevision = 0;
+        std::shared_ptr<const std::vector<std::uint8_t>> blob;
+        ves::HeldMidiNotes heldMidiNotes {};
+        uint64_t capturedAtMs = 0;
+    };
+    CachedStateSnapshot dawCachedSnapshot;
     std::vector<std::uint8_t> dawPendingRestoreSnapshot;
+    juce::String dawPendingRestoreDriver;
+    uint32_t dawPendingRestoreCompatibilityRevision = 0;
+    ves::HeldMidiNotes dawPendingRestoreHeldMidiNotes {};
     bool dawPendingRestoreArmed = false;
-    uint64_t dawCachedSnapshotAtMs = 0;
-    uint64_t dawCachedSnapshotEngineGeneration = 0;
+    juce::String pendingStandaloneSwitchDriver;
+    juce::String pendingStandaloneSwitchTarget;
     uint64_t dawSnapshotLastRequestMs = 0;
     uint64_t dawSnapshotRequestCount = 0;
     std::atomic<bool> pluginStateGetDiagnosticPending { false };

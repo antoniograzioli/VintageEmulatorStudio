@@ -53,17 +53,17 @@ constexpr auto standaloneMasterVolumePreferenceKey = "standalone.masterVolume";
 
 ves::standalone_resources::Payload standaloneRuntimeResourcesPayload;
 
-juce::File experimentalFb01StateFile()
+juce::File stateFileForDriver (const juce::String& driver)
 {
     return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
         .getChildFile ("VintageEmulatorStudio")
         .getChildFile ("experimental-states")
-        .getChildFile ("fb01.state");
+        .getChildFile (driver + ".state");
 }
 
-juce::File experimentalFb01AutosaveFile()
+juce::File autosaveFileForDriver (const juce::String& driver)
 {
-    return experimentalFb01StateFile().getSiblingFile ("fb01-autosave.state");
+    return stateFileForDriver (driver).getSiblingFile (driver + "-autosave.state");
 }
 
 void writeLittleEndian32 (juce::OutputStream& stream, std::uint32_t value)
@@ -98,23 +98,64 @@ bool readLittleEndian64 (const std::uint8_t*& cursor, const std::uint8_t* end, s
     return true;
 }
 
+juce::String heldMidiNotesToHex (const ves::HeldMidiNotes& notes)
+{
+    static constexpr char digits[] = "0123456789abcdef";
+    juce::String result;
+    result.preallocateBytes (notes.size() * 16);
+    for (const auto word : notes)
+        for (int shift = 60; shift >= 0; shift -= 4)
+            result += juce::String::charToString (digits[(word >> shift) & 0xf]);
+    return result;
+}
+
+bool heldMidiNotesFromHex (const juce::String& text, ves::HeldMidiNotes& notes)
+{
+    notes.fill (0);
+    if (text.isEmpty())
+        return true;
+    if (text.length() != static_cast<int> (notes.size() * 16))
+        return false;
+    for (std::size_t wordIndex = 0; wordIndex < notes.size(); ++wordIndex)
+    {
+        std::uint64_t word = 0;
+        for (int digitIndex = 0; digitIndex < 16; ++digitIndex)
+        {
+            const auto c = text[static_cast<int> (wordIndex * 16) + digitIndex];
+            const int value = c >= '0' && c <= '9' ? c - '0'
+                            : c >= 'a' && c <= 'f' ? c - 'a' + 10
+                            : c >= 'A' && c <= 'F' ? c - 'A' + 10 : -1;
+            if (value < 0)
+                return false;
+            word = (word << 4) | static_cast<std::uint64_t> (value);
+        }
+        notes[wordIndex] = word;
+    }
+    return true;
+}
+
 struct DawStatePayload
 {
     juce::MemoryBlock xmlState;
     std::vector<std::uint8_t> snapshot;
+    juce::String driver;
+    std::uint32_t compatibilityRevision = 0;
+    ves::HeldMidiNotes heldMidiNotes {};
     bool containerFound = false;
     bool snapshotAccepted = false;
     juce::String validationResult { "no embedded blob" };
 };
 
 void writeDawStatePayload (juce::MemoryBlock& destination, const juce::MemoryBlock& xmlState,
-                           const std::vector<std::uint8_t>& snapshot)
+                           const juce::String& driver, const std::vector<std::uint8_t>& snapshot,
+                           const ves::HeldMidiNotes& heldMidiNotes)
 {
     auto metadataObject = std::make_unique<juce::DynamicObject>();
-    metadataObject->setProperty ("machineDriver", "fb01");
+    metadataObject->setProperty ("machineDriver", driver);
     metadataObject->setProperty ("saveStateCompatibilityRevision", static_cast<int> (experimentalStateFormatVersion));
     metadataObject->setProperty ("mameVersion", embeddedMameVersion);
     metadataObject->setProperty ("vesStateFormatRevision", static_cast<int> (dawStateFormatVersion));
+    metadataObject->setProperty ("heldMidiNotes", heldMidiNotesToHex (heldMidiNotes));
     const auto metadata = juce::JSON::toString (juce::var (metadataObject.release()), false);
     const auto metadataSize = static_cast<std::uint32_t> (metadata.getNumBytesAsUTF8());
 
@@ -172,15 +213,15 @@ DawStatePayload readDawStatePayload (const void* data, int sizeInBytes)
         payload.validationResult = "rejected: unsupported VES state-format revision";
     else if (snapshotSize == 0 || snapshotSize > maximumExperimentalStateBlobSize
              || static_cast<std::uint64_t> (end - cursor) != snapshotSize)
-        payload.validationResult = "rejected: invalid or truncated FB-01 blob";
+        payload.validationResult = "rejected: invalid or truncated state blob";
     else
     {
         const auto parsed = juce::JSON::parse (metadata);
         const auto* object = parsed.getDynamicObject();
         if (object == nullptr)
             payload.validationResult = "rejected: invalid compatibility metadata";
-        else if (object->getProperty ("machineDriver").toString() != "fb01")
-            payload.validationResult = "rejected: wrong machine driver";
+        else if (object->getProperty ("machineDriver").toString().isEmpty())
+            payload.validationResult = "rejected: missing machine driver";
         else if (static_cast<int> (object->getProperty ("saveStateCompatibilityRevision"))
                  != static_cast<int> (experimentalStateFormatVersion))
             payload.validationResult = "rejected: unsupported save-state compatibility revision";
@@ -191,6 +232,14 @@ DawStatePayload readDawStatePayload (const void* data, int sizeInBytes)
             payload.validationResult = "rejected: incompatible VES state-format revision";
         else
         {
+            payload.driver = object->getProperty ("machineDriver").toString();
+            payload.compatibilityRevision = static_cast<std::uint32_t> (
+                static_cast<int> (object->getProperty ("saveStateCompatibilityRevision")));
+            if (! heldMidiNotesFromHex (object->getProperty ("heldMidiNotes").toString(), payload.heldMidiNotes))
+            {
+                payload.validationResult = "rejected: invalid held-note metadata";
+                return payload;
+            }
             payload.snapshot.assign (cursor, end);
             payload.snapshotAccepted = true;
             payload.validationResult = "accepted";
@@ -200,16 +249,19 @@ DawStatePayload readDawStatePayload (const void* data, int sizeInBytes)
 }
 
 bool writeExperimentalStateFile (const juce::File& file, const std::vector<std::uint8_t>& blob,
-                                 double sampleRate, std::uint64_t engineGeneration, juce::String& error)
+                                 const juce::String& driver, double sampleRate,
+                                 std::uint64_t engineGeneration, const ves::HeldMidiNotes& heldMidiNotes,
+                                 juce::String& error)
 {
     auto metadataObject = std::make_unique<juce::DynamicObject>();
     metadataObject->setProperty ("vesVersion", JucePlugin_VersionString);
     metadataObject->setProperty ("mameVersion", embeddedMameVersion);
-    metadataObject->setProperty ("machineDriver", "fb01");
+    metadataObject->setProperty ("machineDriver", driver);
     metadataObject->setProperty ("saveStateCompatibilityRevision", static_cast<int> (experimentalStateFormatVersion));
     metadataObject->setProperty ("sampleRate", sampleRate);
     metadataObject->setProperty ("engineGeneration", static_cast<juce::int64> (engineGeneration));
     metadataObject->setProperty ("blobSize", static_cast<juce::int64> (blob.size()));
+    metadataObject->setProperty ("heldMidiNotes", heldMidiNotesToHex (heldMidiNotes));
     const auto metadata = juce::JSON::toString (juce::var (metadataObject.release()), true);
     const auto metadataBytes = metadata.toRawUTF8();
     const auto metadataSize = static_cast<std::uint32_t> (metadata.getNumBytesAsUTF8());
@@ -254,7 +306,9 @@ bool writeExperimentalStateFile (const juce::File& file, const std::vector<std::
     return true;
 }
 
-bool readExperimentalStateFile (const juce::File& file, std::vector<std::uint8_t>& blob, juce::String& error)
+bool readExperimentalStateFile (const juce::File& file, const juce::String& expectedDriver,
+                                std::vector<std::uint8_t>& blob, ves::HeldMidiNotes& heldMidiNotes,
+                                juce::String& error)
 {
     if (! file.existsAsFile())
     {
@@ -299,13 +353,18 @@ bool readExperimentalStateFile (const juce::File& file, std::vector<std::uint8_t
     cursor += metadataSize;
     const auto metadata = juce::JSON::parse (metadataText);
     const auto* object = metadata.getDynamicObject();
-    if (object == nullptr || object->getProperty ("machineDriver").toString() != "fb01"
+    if (object == nullptr || object->getProperty ("machineDriver").toString() != expectedDriver
         || object->getProperty ("vesVersion").toString() != JucePlugin_VersionString
         || object->getProperty ("mameVersion").toString() != embeddedMameVersion
         || static_cast<int> (object->getProperty ("saveStateCompatibilityRevision")) != static_cast<int> (experimentalStateFormatVersion)
         || static_cast<std::uint64_t> (static_cast<juce::int64> (object->getProperty ("blobSize"))) != blobSize)
     {
         error = "Incompatible state file: metadata mismatch";
+        return false;
+    }
+    if (! heldMidiNotesFromHex (object->getProperty ("heldMidiNotes").toString(), heldMidiNotes))
+    {
+        error = "Incompatible state file: invalid held-note metadata";
         return false;
     }
     blob.assign (cursor, end);
@@ -712,6 +771,7 @@ juce::File artworkPathSettingsFile()
 
 struct EmbeddedMachineProfile
 {
+	enum class SaveStateSupport { Unsupported, Experimental, Validated };
 	struct MidiOptionNames
 	{
 		const char* inputOptionName;
@@ -746,6 +806,7 @@ struct EmbeddedMachineProfile
 	const MidiOptionNames* nativeMidiOptions = nullptr;
 	// Hidden profiles remain addressable by driver name so existing sessions can restore.
 	bool visibleInSelector = true;
+	SaveStateSupport saveStateSupport = SaveStateSupport::Unsupported;
 };
 
 constexpr EmbeddedMachineProfile::MidiOptionNames dd9MidiOptions { "", "" };
@@ -808,43 +869,70 @@ constexpr EmbeddedMachineProfile machineProfiles[] {
     { "Akai S2000", "s2000", false, true, true, true, false, nullptr, akaiSamplerMediaDevices, static_cast<int> (std::size (akaiSamplerMediaDevices)) },
     { "Akai S3000", "s3000", false, true, true, true, false, nullptr, akaiSamplerMediaDevices, static_cast<int> (std::size (akaiSamplerMediaDevices)) },
     { "Akai S3000XL", "s3000xl", false, true, true, true, false, nullptr, s3000xlMediaDevices, static_cast<int> (std::size (s3000xlMediaDevices)) },
-    { "Casio AP-10", "ap10", false, false, true },
+    { "Casio AP-10", "ap10", false, false, true, false, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Validated },
     { "Yamaha TX81Z", "tx81z", true, false, true, true },
-    { "Yamaha FB-01", "fb01", false, false, true, true, false, nullptr, nullptr, 0, &fb01MidiOptions },
+    { "Yamaha FB-01", "fb01", false, false, true, true, false, nullptr, nullptr, 0, &fb01MidiOptions,
+      true, EmbeddedMachineProfile::SaveStateSupport::Validated },
     { "Yamaha TG100", "tg100", false, false, true, true },
-    { "Casio RZ-1", "rz1", false, false, true },
-    { "Casio CT-8000", "ct8000", false, false, true },
-    { "Casio CT-FK1", "ctfk1", false, false, true },
-    { "Casio CZ-101", "cz101", false, false, true },
-    { "Casio CZ-1", "cz1", false, false, true },
-    { "Casio CZ-230S", "cz230s", false, false, true },
+    { "Casio RZ-1", "rz1", false, false, true, false, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Casio CT-8000", "ct8000", false, false, true, false, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Casio CT-FK1", "ctfk1", false, false, true, false, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Casio CZ-101", "cz101", false, false, true, false, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Casio CZ-1", "cz1", false, false, true, false, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Casio CZ-230S", "cz230s", false, false, true, false, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
     { "Ensoniq ESQ-1", "esq1", false, false, true, true },
     { "PAiA FatMan", "fatman", false, false, true, true, false, nullptr, nullptr, 0, nullptr, false },
     { "Ensoniq VFX", "vfx", false, false, true, true },
     { "Ensoniq VFX-SD", "vfxsd", false, false, true, true, false, nullptr, ensoniqFloppyMediaDevices, static_cast<int> (std::size (ensoniqFloppyMediaDevices)) },
-    { "LinnDrum", "linndrum", false, false, false, false, true, "midiin" },
-	{ "Oberheim DMX", "obdmx", false, false, false, false, true, "midiin" },
-    { "Roland TR-707", "tr707", false, false, true, true },
-    { "Roland TR-727", "tr727", false, false, true, true },
-    { "Sequential Prophet-5", "prophet5r30", false, false, false, false, true, "midiin" },
-    { "Sequential Six-Trak", "sixtrak", false, false, true, true },
-    { "Yamaha DD-9", "dd9", false, false, false, false, false, nullptr, nullptr, 0, &dd9MidiOptions },
+    { "LinnDrum", "linndrum", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+	{ "Oberheim DMX", "obdmx", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+	  true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Roland TR-707", "tr707", false, false, true, true, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Roland TR-727", "tr727", false, false, true, true, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Sequential Prophet-5", "prophet5r30", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Sequential Six-Trak", "sixtrak", false, false, true, true, false, nullptr, nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha DD-9", "dd9", false, false, false, false, false, nullptr, nullptr, 0, &dd9MidiOptions,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
     { "Yamaha DX100", "dx100", false, false, true, true },
     { "Yamaha MU-50", "mu50", false, false, true, true },
-    { "Yamaha MU-2000", "mu2000", false, false, true, true, false, nullptr, nullptr, 0, &mu2000MidiOptions },
-    { "Yamaha PSR-11", "psr11", false, false, false, false, true, "midiin" },
+    { "Yamaha MU-2000", "mu2000", false, false, true, true, false, nullptr, nullptr, 0, &mu2000MidiOptions,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha PSR-11", "psr11", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
     { "Yamaha PSR-70", "psr70", false, false, true },
-    { "Yamaha PSR-75", "psr75", false, false, false, false, true, "midiin" },
-    { "Yamaha PSR-76", "psr76", false, false, false, false, true, "midiin" },
-    { "Yamaha PSR-110", "psr110", false, false, false, false, true, "midiin" },
-    { "Yamaha PSR-150", "psr150", false, false, false, false, true, "midiin" },
-    { "Yamaha PSR-180", "psr180", false, false, false, false, true, "midiin" },
+    { "Yamaha PSR-75", "psr75", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha PSR-76", "psr76", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha PSR-110", "psr110", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha PSR-150", "psr150", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha PSR-180", "psr180", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
     { "Yamaha PSR-60", "psr60", false, false, true, true },
-    { "Yamaha PSS-6", "pss6", false, false, false, false, true, "midiin" },
-    { "Yamaha PSS-11", "pss11", false, false, false, false, true, "midiin" },
-    { "Yamaha PSS-12", "pss12", false, false, false, false, true, "midiin" },
-    { "Yamaha PSS-21", "pss21", false, false, false, false, true, "midiin" },
-    { "Yamaha PSS-31", "pss31", false, false, false, false, true, "midiin" },
+    { "Yamaha PSS-6", "pss6", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha PSS-11", "pss11", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha PSS-12", "pss12", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha PSS-21", "pss21", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
+    { "Yamaha PSS-31", "pss31", false, false, false, false, true, "midiin", nullptr, 0, nullptr,
+      true, EmbeddedMachineProfile::SaveStateSupport::Experimental },
     { "Ensoniq SD-1 32 Voice", "sd132", false, false, true, true, false, nullptr, ensoniqFloppyMediaDevices, static_cast<int> (std::size (ensoniqFloppyMediaDevices)) },
 };
 
@@ -1315,7 +1403,7 @@ VintageEmulatorStudioProcessor::~VintageEmulatorStudioProcessor()
 {
     logLifecycleEvent ("DESTRUCTOR", "~VintageEmulatorStudioProcessor", "processor_destroyed");
     stopTimer();
-    saveStandaloneFb01AutosaveOnShutdown();
+    saveStandaloneAutosaveOnShutdown();
     stopEngine ("~VintageEmulatorStudioProcessor", "processor_destructor");
 }
 
@@ -1420,20 +1508,7 @@ bool VintageEmulatorStudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 
 void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    const auto blockStartSample = hostAudioSamplePosition;
-    const auto blockIndex = hostAudioBlockIndex++;
     const auto samples = buffer.getNumSamples();
-    hostAudioSamplePosition += static_cast<uint64_t> (juce::jmax (samples, 0));
-
-    if (midiAudioLatencyResetRequested.exchange (false, std::memory_order_acq_rel))
-    {
-        midiAudioLatencyPendingHead = 0;
-        midiAudioLatencyPendingTail = 0;
-        midiAudioLatencyCompletedCount.store (0, std::memory_order_release);
-        midiAudioLatencyAudioWasAboveThreshold = false;
-    }
-
-    expireMidiAudioLatencyEvent (blockStartSample, steadyNowNs());
 
     buffer.clear();
 
@@ -1442,8 +1517,6 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
         return;
 
     updateBootState();
-    localEngine->diagnostics().juce_process_block_count.fetch_add (1, std::memory_order_relaxed);
-    localEngine->diagnostics().juce_block_size.store (static_cast<uint64_t> (juce::jmax (buffer.getNumSamples(), 0)), std::memory_order_relaxed);
 
     const bool ready = state.load (std::memory_order_relaxed) == static_cast<int> (EmbeddedEngineState::Ready);
     if (experimentalStateRestoreInProgress.load (std::memory_order_acquire))
@@ -1468,107 +1541,27 @@ void VintageEmulatorStudioProcessor::processBlock (juce::AudioBuffer<float>& buf
         if (size <= 0)
             continue;
 
-        const auto midiTimestampNs = steadyNowNs();
-        if (message.isNoteOn() && ready
-            && midiAudioLatencyCompletedCount.load (std::memory_order_relaxed) < midiAudioLatencyMeasurementCount)
-        {
-            const auto eventOffset = juce::jlimit (0, samples, metadata.samplePosition);
-            enqueueMidiAudioLatencyEvent ({
-                midiAudioLatencySessionRevision.load (std::memory_order_acquire),
-                blockStartSample + static_cast<uint64_t> (eventOffset),
-                blockIndex,
-                midiTimestampNs,
-                static_cast<uint8_t> (message.getNoteNumber()),
-                static_cast<uint8_t> (message.getVelocity())
-            });
-        }
-
-        const auto midiNow = nowMs();
-        if (juceMidiFirstReceivedMs.load (std::memory_order_relaxed) == 0)
-            juceMidiFirstReceivedMs.store (midiNow, std::memory_order_relaxed);
-        juceMidiLastReceivedMs.store (midiNow, std::memory_order_relaxed);
-        midiMessagesReceived.fetch_add (1, std::memory_order_relaxed);
-
         if (! ready)
-        {
-            midiDroppedBeforeReady.fetch_add (1, std::memory_order_relaxed);
             continue;
-        }
 
-        lastMidiSentToEngineMs.store (midiNow, std::memory_order_relaxed);
-        waitingForMidiAudioOnset.store (true, std::memory_order_relaxed);
+        trackHostMidiMessage (message);
         localEngine->sendMidiBytes (message.getRawData(), static_cast<std::size_t> (size));
     }
 
     if (! ready)
         return;
 
-    auto& rateDiagnostics = localEngine->diagnostics();
-    const auto requestedFrames = static_cast<uint64_t> (juce::jmax (samples, 0));
-    const auto hostBlockFrames = requestedFrames;
-    rateDiagnostics.audio_rate_host_requested_frames.fetch_add (requestedFrames, std::memory_order_relaxed);
-    rateDiagnostics.audio_rate_host_callback_count.fetch_add (1, std::memory_order_relaxed);
-    rateDiagnostics.audio_rate_host_latest_block.store (requestedFrames, std::memory_order_relaxed);
-    auto hostMinimum = rateDiagnostics.audio_rate_host_window_min_block.load (std::memory_order_relaxed);
-    while (requestedFrames < hostMinimum
-           && ! rateDiagnostics.audio_rate_host_window_min_block.compare_exchange_weak (
-               hostMinimum, requestedFrames, std::memory_order_relaxed, std::memory_order_relaxed)) {}
-    auto hostMaximum = rateDiagnostics.audio_rate_host_window_max_block.load (std::memory_order_relaxed);
-    while (requestedFrames > hostMaximum
-           && ! rateDiagnostics.audio_rate_host_window_max_block.compare_exchange_weak (
-               hostMaximum, requestedFrames, std::memory_order_relaxed, std::memory_order_relaxed)) {}
-
     const auto channels = buffer.getNumChannels();
     auto* const leftChannel = channels > 0 ? buffer.getWritePointer (0) : nullptr;
     auto* const rightChannel = channels > 1 ? buffer.getWritePointer (1) : nullptr;
-    auto queuedFrames = static_cast<uint64_t> (localEngine->queuedAudioFrames());
-    rateDiagnostics.audio_rate_queue_depth_total.fetch_add (queuedFrames, std::memory_order_relaxed);
-    rateDiagnostics.audio_rate_queue_depth_count.fetch_add (1, std::memory_order_relaxed);
-    if (queuedFrames < hostBlockFrames)
-        rateDiagnostics.audio_rate_queue_below_host_block.fetch_add (1, std::memory_order_relaxed);
-    auto minimumQueueDepth = rateDiagnostics.audio_rate_queue_window_min.load (std::memory_order_relaxed);
-    while (queuedFrames < minimumQueueDepth
-           && ! rateDiagnostics.audio_rate_queue_window_min.compare_exchange_weak (
-               minimumQueueDepth, queuedFrames, std::memory_order_relaxed))
-    {
-    }
-    auto maximumQueueDepth = rateDiagnostics.audio_rate_queue_window_max.load (std::memory_order_relaxed);
-    while (queuedFrames > maximumQueueDepth
-           && ! rateDiagnostics.audio_rate_queue_window_max.compare_exchange_weak (
-               maximumQueueDepth, queuedFrames, std::memory_order_relaxed))
-    {
-    }
     int offset = 0;
     while (offset < samples)
     {
         const auto request = static_cast<std::size_t> (juce::jmin (samples - offset, static_cast<int> (audioScratch.size())));
         const auto read = localEngine->readAudioFrames (audioScratch.data(), request);
-        audioFramesReadByPlugin.fetch_add (read, std::memory_order_relaxed);
-
         for (std::size_t i = 0; i < read; ++i)
         {
             const auto targetSample = offset + static_cast<int> (i);
-            const auto audioIsAboveThreshold = std::abs (audioScratch[i].left) > midiAudioLatencyThreshold
-                || std::abs (audioScratch[i].right) > midiAudioLatencyThreshold;
-            if (audioIsAboveThreshold && ! midiAudioLatencyAudioWasAboveThreshold)
-                completeMidiAudioLatencyEvent (blockStartSample + static_cast<uint64_t> (targetSample),
-                                               blockIndex,
-                                               steadyNowNs());
-            midiAudioLatencyAudioWasAboveThreshold = audioIsAboveThreshold;
-
-            if (waitingForMidiAudioOnset.load (std::memory_order_relaxed)
-                && (std::abs (audioScratch[i].left) > 0.0001f || std::abs (audioScratch[i].right) > 0.0001f))
-            {
-                const auto onsetNow = nowMs();
-                const auto midiSent = lastMidiSentToEngineMs.load (std::memory_order_relaxed);
-                auto& diag = localEngine->diagnostics();
-                if (diag.midi_first_audio_onset_ms.load (std::memory_order_relaxed) == 0)
-                    diag.midi_first_audio_onset_ms.store (onsetNow, std::memory_order_relaxed);
-                if (midiSent != 0 && onsetNow >= midiSent)
-                    diag.midi_to_audio_onset_ms.store (onsetNow - midiSent, std::memory_order_relaxed);
-                waitingForMidiAudioOnset.store (false, std::memory_order_relaxed);
-            }
-
             if (leftChannel != nullptr)
                 leftChannel[targetSample] = audioScratch[i].left;
             if (rightChannel != nullptr)
@@ -1626,21 +1619,28 @@ void VintageEmulatorStudioProcessor::getStateInformation (juce::MemoryBlock& des
         copyXmlToBinary (*xml, xmlState);
 
     std::shared_ptr<const std::vector<std::uint8_t>> cachedSnapshot;
+    juce::String cachedDriver;
+    ves::HeldMidiNotes cachedHeldMidiNotes {};
     uint64_t cachedAtMs = 0;
-    if (isDawPluginWrapper() && getSelectedMachineDriverName() == "fb01")
+    if (isDawPluginWrapper() && selectedMachineSupportsSaveState())
     {
         const juce::ScopedLock lock (dawStateLock);
         const auto generation = videoEngineGeneration.load (std::memory_order_acquire);
-        if (dawCachedSnapshot != nullptr && ! dawCachedSnapshot->empty()
-            && dawCachedSnapshotEngineGeneration == generation)
+        const auto selectedDriver = getSelectedMachineDriverName();
+        if (dawCachedSnapshot.blob != nullptr && ! dawCachedSnapshot.blob->empty()
+            && dawCachedSnapshot.driver == selectedDriver
+            && dawCachedSnapshot.engineGeneration == generation
+            && dawCachedSnapshot.compatibilityRevision == experimentalStateFormatVersion)
         {
-            cachedSnapshot = dawCachedSnapshot;
-            cachedAtMs = dawCachedSnapshotAtMs;
+            cachedSnapshot = dawCachedSnapshot.blob;
+            cachedDriver = dawCachedSnapshot.driver;
+            cachedHeldMidiNotes = dawCachedSnapshot.heldMidiNotes;
+            cachedAtMs = dawCachedSnapshot.capturedAtMs;
         }
     }
 
     if (cachedSnapshot != nullptr)
-        writeDawStatePayload (destData, xmlState, *cachedSnapshot);
+        writeDawStatePayload (destData, xmlState, cachedDriver, *cachedSnapshot, cachedHeldMidiNotes);
     else
         destData = xmlState;
 
@@ -1664,6 +1664,9 @@ void VintageEmulatorStudioProcessor::setStateInformation (const void* data, int 
     {
         const juce::ScopedLock lock (dawStateLock);
         dawPendingRestoreSnapshot.clear();
+        dawPendingRestoreDriver.clear();
+        dawPendingRestoreCompatibilityRevision = 0;
+        dawPendingRestoreHeldMidiNotes.fill (0);
         dawPendingRestoreArmed = false;
     }
 
@@ -1792,19 +1795,28 @@ void VintageEmulatorStudioProcessor::setStateInformation (const void* data, int 
                 const juce::ScopedLock lock (machineSelectionLock);
                 selectedMachineDriverName = restoredDriver;
             }
-            const bool armDawRestore = isDawPluginWrapper() && restoredDriver == "fb01"
-                && dawPayload.snapshotAccepted;
+            const auto* restoredProfile = findMachineProfileByDriverName (restoredDriver);
+            const bool saveStatePermitted = restoredProfile != nullptr
+                && restoredProfile->saveStateSupport != EmbeddedMachineProfile::SaveStateSupport::Unsupported;
+            const bool armDawRestore = isDawPluginWrapper() && saveStatePermitted
+                && dawPayload.snapshotAccepted && dawPayload.driver == restoredDriver;
             if (armDawRestore)
             {
                 const juce::ScopedLock lock (dawStateLock);
                 dawPendingRestoreSnapshot = std::move (dawPayload.snapshot);
+                dawPendingRestoreDriver = dawPayload.driver;
+                dawPendingRestoreCompatibilityRevision = dawPayload.compatibilityRevision;
+                dawPendingRestoreHeldMidiNotes = dawPayload.heldMidiNotes;
                 dawPendingRestoreArmed = true;
-                experimentalStateStatus = "FB-01 DAW session state accepted; waiting for normal boot";
+                experimentalStateStatus = "DAW session state accepted; waiting for normal boot";
             }
             else if (dawPayload.containerFound && isDawPluginWrapper())
             {
-                experimentalStateStatus = "FB-01 DAW session state ignored: " + dawPayload.validationResult;
+                experimentalStateStatus = "DAW session state ignored: "
+                    + (dawPayload.snapshotAccepted && dawPayload.driver != restoredDriver
+                        ? juce::String ("rejected: metadata/XML driver mismatch") : dawPayload.validationResult);
             }
+            pluginStateSetBlobAccepted.store (armDawRestore, std::memory_order_relaxed);
             pluginStateSetRestoreArmed.store (armDawRestore, std::memory_order_relaxed);
             if (changed)
             {
@@ -2037,7 +2049,8 @@ void VintageEmulatorStudioProcessor::startEngineIfNeeded (double sampleRate, con
         nativeMidiOutputOption,
         profile.retrofitMidiInputOptionName != nullptr ? profile.retrofitMidiInputOptionName : "",
         std::move (startupMediaOptions),
-        engineGeneration
+        engineGeneration,
+        profile.saveStateSupport != EmbeddedMachineProfile::SaveStateSupport::Unsupported
     });
 
     appendLifecycleLog ("[VES lifecycle] instance=" + juce::String (static_cast<juce::int64> (lifecycleInstanceId))
@@ -2483,6 +2496,80 @@ void VintageEmulatorStudioProcessor::handleReadyTransition (ves::EmbeddedEmulato
     diag.audio_overflows.store (0, std::memory_order_relaxed);
     waitingForMidiAudioOnset.store (false, std::memory_order_relaxed);
     clearStartupDiagnostic();
+    sendMidiPanic ("startup", &localEngine);
+}
+
+void VintageEmulatorStudioProcessor::sendMidiPanic()
+{
+    sendMidiPanic ("user");
+}
+
+void VintageEmulatorStudioProcessor::sendMidiPanic (const char* source,
+                                                     ves::EmbeddedEmulatorEngine* readyEngine,
+                                                     const ves::HeldMidiNotes* snapshotHeldNotes)
+{
+    auto localEngine = std::atomic_load (&engine);
+    if (localEngine == nullptr
+        || (getEngineState() != EmbeddedEngineState::Ready && localEngine.get() != readyEngine))
+        return;
+
+    midiAudioLatencySessionRevision.fetch_add (1, std::memory_order_release);
+    midiAudioLatencyResetRequested.store (true, std::memory_order_release);
+    waitingForMidiAudioOnset.store (false, std::memory_order_release);
+    lastMidiSentToEngineMs.store (0, std::memory_order_release);
+    const auto heldNotes = snapshotHeldNotes != nullptr ? *snapshotHeldNotes : captureActiveMidiNotes();
+    clearActiveMidiNotes();
+    localEngine->sendMidiPanic (heldNotes);
+    appendLifecycleLog ("[MIDI panic] source=" + juce::String (source)
+        + " driver=" + getSelectedMachineDriverName()
+        + " released_notes=" + juce::String (countHeldMidiNotes (heldNotes)));
+}
+
+void VintageEmulatorStudioProcessor::trackHostMidiMessage (const juce::MidiMessage& message)
+{
+    const auto* data = message.getRawData();
+    if (data == nullptr || message.getRawDataSize() < 3)
+        return;
+    const auto status = data[0] & 0xf0;
+    if (status != 0x80 && status != 0x90)
+        return;
+    const auto channel = data[0] & 0x0f;
+    const auto note = data[1] & 0x7f;
+    const auto index = static_cast<std::size_t> (channel) * 2 + (note >> 6);
+    const auto mask = std::uint64_t { 1 } << (note & 63);
+    if (status == 0x90 && data[2] != 0)
+        activeHostMidiNotes[index].fetch_or (mask, std::memory_order_release);
+    else
+        activeHostMidiNotes[index].fetch_and (~mask, std::memory_order_release);
+}
+
+ves::HeldMidiNotes VintageEmulatorStudioProcessor::captureActiveMidiNotes() const
+{
+    ves::HeldMidiNotes notes {};
+    for (std::size_t i = 0; i < notes.size(); ++i)
+        notes[i] = activeHostMidiNotes[i].load (std::memory_order_acquire);
+    return notes;
+}
+
+void VintageEmulatorStudioProcessor::clearActiveMidiNotes()
+{
+    for (auto& word : activeHostMidiNotes)
+        word.store (0, std::memory_order_release);
+}
+
+int VintageEmulatorStudioProcessor::countHeldMidiNotes (const ves::HeldMidiNotes& notes)
+{
+    int count = 0;
+    for (const auto word : notes)
+    {
+        auto remaining = word;
+        while (remaining != 0)
+        {
+            remaining &= remaining - 1;
+            ++count;
+        }
+    }
+    return count;
 }
 
 void VintageEmulatorStudioProcessor::trimAudioBacklog (ves::EmbeddedEmulatorEngine& localEngine)
@@ -2828,6 +2915,31 @@ bool VintageEmulatorStudioProcessor::selectMachineByDriverName (const juce::Stri
     if (sameDriver && selectedState == EmbeddedEngineState::Ready)
         return true;
 
+    if (wrapperType == wrapperType_Standalone && selectedState == EmbeddedEngineState::Ready
+        && selectedMachineSupportsStandaloneAutosave()
+        && ! experimentalStatePending.load (std::memory_order_acquire))
+    {
+        auto localEngine = std::atomic_load (&engine);
+        if (localEngine != nullptr)
+        {
+            ves::StateOperationRequest request;
+            request.operation = ves::StateOperation::Save;
+            request.engine_generation = videoEngineGeneration.load (std::memory_order_acquire);
+            request.request_id = experimentalStateRequestId.fetch_add (1, std::memory_order_relaxed) + 1;
+            request.requested_at_ms = nowMs();
+            request.held_midi_notes = captureActiveMidiNotes();
+            if (localEngine->requestStateOperation (request))
+            {
+                pendingStandaloneSwitchDriver = getSelectedMachineDriverName();
+                pendingStandaloneSwitchTarget = driverName;
+                experimentalStateTarget = ExperimentalStateTarget::StandaloneSwitchSave;
+                experimentalStatePending.store (true, std::memory_order_release);
+                experimentalStateStatus = "Saving state before machine switch...";
+                return true;
+            }
+        }
+    }
+
     {
         const juce::ScopedLock lock (machineSelectionLock);
         selectedMachineDriverName = driverName;
@@ -3100,109 +3212,18 @@ bool VintageEmulatorStudioProcessor::processFloppyHotSwapResults()
     return true;
 }
 
-bool VintageEmulatorStudioProcessor::selectedMachineSupportsExperimentalState() const
+bool VintageEmulatorStudioProcessor::selectedMachineSupportsSaveState() const
 {
-    return getSelectedMachineDriverName() == "fb01";
+    const auto* profile = findMachineProfileByDriverName (getSelectedMachineDriverName());
+    return profile != nullptr
+        && profile->saveStateSupport != EmbeddedMachineProfile::SaveStateSupport::Unsupported;
 }
 
-bool VintageEmulatorStudioProcessor::requestExperimentalStateSave()
+bool VintageEmulatorStudioProcessor::selectedMachineSupportsStandaloneAutosave() const
 {
-    if (! selectedMachineSupportsExperimentalState() || getEngineState() != EmbeddedEngineState::Ready)
-        return false;
-    auto localEngine = std::atomic_load (&engine);
-    if (localEngine == nullptr || experimentalStatePending.load (std::memory_order_acquire))
-        return false;
-    ves::StateOperationRequest request;
-    request.operation = ves::StateOperation::Save;
-    request.engine_generation = videoEngineGeneration.load (std::memory_order_acquire);
-    request.request_id = experimentalStateRequestId.fetch_add (1, std::memory_order_relaxed) + 1;
-    request.requested_at_ms = nowMs();
-    if (! localEngine->requestStateOperation (request))
-        return false;
-    experimentalStateTarget = ExperimentalStateTarget::Memory;
-    experimentalStatePending.store (true, std::memory_order_release);
-    experimentalStateStatus = "Saving state...";
-    return true;
-}
-
-bool VintageEmulatorStudioProcessor::requestExperimentalStateLoad()
-{
-    if (! selectedMachineSupportsExperimentalState() || getEngineState() != EmbeddedEngineState::Ready)
-        return false;
-    auto localEngine = std::atomic_load (&engine);
-    if (localEngine == nullptr || experimentalStatePending.load (std::memory_order_acquire))
-        return false;
-    ves::StateOperationRequest request;
-    request.operation = ves::StateOperation::Load;
-    request.engine_generation = videoEngineGeneration.load (std::memory_order_acquire);
-    request.request_id = experimentalStateRequestId.fetch_add (1, std::memory_order_relaxed) + 1;
-    request.requested_at_ms = nowMs();
-    experimentalStateGenerationBeforeRestore = request.engine_generation;
-    experimentalStateGuardStartedMs = request.requested_at_ms;
-    experimentalStateRestoreInProgress.store (true, std::memory_order_release);
-    localEngine->discardQueuedAudio();
-    if (! localEngine->requestStateOperation (request))
-    {
-        experimentalStateRestoreInProgress.store (false, std::memory_order_release);
-        return false;
-    }
-    experimentalStateTarget = ExperimentalStateTarget::Memory;
-    experimentalStatePending.store (true, std::memory_order_release);
-    experimentalStateStatus = "Loading state...";
-    return true;
-}
-
-bool VintageEmulatorStudioProcessor::requestExperimentalStateSaveToFile()
-{
-    if (! selectedMachineSupportsExperimentalState() || getEngineState() != EmbeddedEngineState::Ready)
-        return false;
-    auto localEngine = std::atomic_load (&engine);
-    if (localEngine == nullptr || experimentalStatePending.load (std::memory_order_acquire))
-        return false;
-    ves::StateOperationRequest request;
-    request.operation = ves::StateOperation::Save;
-    request.engine_generation = videoEngineGeneration.load (std::memory_order_acquire);
-    request.request_id = experimentalStateRequestId.fetch_add (1, std::memory_order_relaxed) + 1;
-    request.requested_at_ms = nowMs();
-    if (! localEngine->requestStateOperation (request))
-        return false;
-    experimentalStateTarget = ExperimentalStateTarget::File;
-    experimentalStatePending.store (true, std::memory_order_release);
-    experimentalStateStatus = "Saving state for file...";
-    return true;
-}
-
-bool VintageEmulatorStudioProcessor::requestExperimentalStateLoadFromFile()
-{
-    if (! selectedMachineSupportsExperimentalState() || getEngineState() != EmbeddedEngineState::Ready)
-        return false;
-    auto localEngine = std::atomic_load (&engine);
-    if (localEngine == nullptr || experimentalStatePending.load (std::memory_order_acquire))
-        return false;
-    ves::StateOperationRequest request;
-    request.operation = ves::StateOperation::Load;
-    request.engine_generation = videoEngineGeneration.load (std::memory_order_acquire);
-    request.request_id = experimentalStateRequestId.fetch_add (1, std::memory_order_relaxed) + 1;
-    request.requested_at_ms = nowMs();
-    juce::String error;
-    if (! readExperimentalStateFile (experimentalFb01StateFile(), request.snapshot_blob, error))
-    {
-        experimentalStateStatus = error;
-        return false;
-    }
-    experimentalStateGenerationBeforeRestore = request.engine_generation;
-    experimentalStateGuardStartedMs = request.requested_at_ms;
-    experimentalStateRestoreInProgress.store (true, std::memory_order_release);
-    localEngine->discardQueuedAudio();
-    if (! localEngine->requestStateOperation (request))
-    {
-        experimentalStateRestoreInProgress.store (false, std::memory_order_release);
-        return false;
-    }
-    experimentalStateTarget = ExperimentalStateTarget::File;
-    experimentalStatePending.store (true, std::memory_order_release);
-    experimentalStateStatus = "Loading state from file...";
-    return true;
+    const auto* profile = findMachineProfileByDriverName (getSelectedMachineDriverName());
+    return profile != nullptr
+        && profile->saveStateSupport != EmbeddedMachineProfile::SaveStateSupport::Unsupported;
 }
 
 bool VintageEmulatorStudioProcessor::processExperimentalStateResults()
@@ -3230,8 +3251,46 @@ bool VintageEmulatorStudioProcessor::processExperimentalStateResults()
         experimentalStateSchedulerWaitMs = result.scheduler_wait_ms;
         experimentalStateReadStreamMs = result.stream_duration_ms;
         experimentalStateReadCompletedMs = localEngine->diagnostics().state_restore_read_completed_ms.load (std::memory_order_acquire);
+        if (result.success)
+        {
+            appendLifecycleLog ("[state restore] releasing "
+                + juce::String (countHeldMidiNotes (result.held_midi_notes))
+                + " snapshot-held MIDI notes driver=" + getSelectedMachineDriverName());
+            sendMidiPanic ("restore", nullptr, &result.held_midi_notes);
+        }
     }
     if (result.operation == ves::StateOperation::Save
+        && experimentalStateTarget == ExperimentalStateTarget::StandaloneSwitchSave)
+    {
+        const auto outgoingDriver = pendingStandaloneSwitchDriver;
+        const auto nextDriver = pendingStandaloneSwitchTarget;
+        if (result.success)
+        {
+            juce::String error;
+            const auto file = autosaveFileForDriver (outgoingDriver);
+            if (! writeExperimentalStateFile (file, result.snapshot_blob, outgoingDriver,
+                                               currentSampleRate, currentGeneration,
+                                               result.held_midi_notes, error))
+                appendLifecycleLog ("[VES state autosave] switch save failed driver="
+                    + outgoingDriver + " error=" + error);
+            else
+                appendLifecycleLog ("[VES state autosave] switch save success driver=" + outgoingDriver);
+        }
+        else
+            appendLifecycleLog ("[VES state autosave] switch save failed driver=" + outgoingDriver
+                + " error=" + juce::String (result.error_message));
+
+        pendingStandaloneSwitchDriver.clear();
+        pendingStandaloneSwitchTarget.clear();
+        experimentalStatePending.store (false, std::memory_order_release);
+        {
+            const juce::ScopedLock lock (machineSelectionLock);
+            selectedMachineDriverName = nextDriver;
+        }
+        restartSelectedMachine ("selectMachineByDriverName", "selected_machine_changed_by_user");
+        return true;
+    }
+    else if (result.operation == ves::StateOperation::Save
         && experimentalStateTarget == ExperimentalStateTarget::DawSnapshot)
     {
         if (result.success)
@@ -3239,41 +3298,28 @@ bool VintageEmulatorStudioProcessor::processExperimentalStateResults()
             const auto completedAt = nowMs();
             {
                 const juce::ScopedLock lock (dawStateLock);
-                dawCachedSnapshot = std::make_shared<const std::vector<std::uint8_t>> (std::move (result.snapshot_blob));
-                dawCachedSnapshotAtMs = completedAt;
-                dawCachedSnapshotEngineGeneration = currentGeneration;
+                dawCachedSnapshot.driver = getSelectedMachineDriverName();
+                dawCachedSnapshot.engineGeneration = currentGeneration;
+                dawCachedSnapshot.compatibilityRevision = experimentalStateFormatVersion;
+                dawCachedSnapshot.heldMidiNotes = result.held_midi_notes;
+                dawCachedSnapshot.blob = std::make_shared<const std::vector<std::uint8_t>> (std::move (result.snapshot_blob));
+                dawCachedSnapshot.capturedAtMs = completedAt;
             }
-            experimentalStateStatus = "FB-01 DAW snapshot cache refreshed";
-            appendLifecycleLog ("[VES FB-01 DAW state] snapshot success=yes request_count="
+            experimentalStateStatus = "DAW state snapshot cache refreshed";
+            appendLifecycleLog ("[VES DAW state] snapshot success=yes request_count="
                 + juce::String (static_cast<juce::int64> (dawSnapshotRequestCount))
                 + " cached_blob_size=" + juce::String (static_cast<juce::int64> (result.snapshot_size))
                 + " cached_age_ms=0 engine_generation=" + juce::String (static_cast<juce::int64> (currentGeneration)));
         }
         else
         {
-            experimentalStateStatus = result.error_message.empty() ? "FB-01 DAW snapshot refresh failed"
+            experimentalStateStatus = result.error_message.empty() ? "DAW state snapshot refresh failed"
                                                                     : juce::String (result.error_message);
-            appendLifecycleLog ("[VES FB-01 DAW state] snapshot success=no request_count="
+            appendLifecycleLog ("[VES DAW state] snapshot success=no request_count="
                 + juce::String (static_cast<juce::int64> (dawSnapshotRequestCount))
                 + " engine_generation=" + juce::String (static_cast<juce::int64> (currentGeneration))
                 + " error=" + experimentalStateStatus);
         }
-    }
-    else if (result.success && result.operation == ves::StateOperation::Save
-        && experimentalStateTarget == ExperimentalStateTarget::File)
-    {
-        juce::String error;
-        if (writeExperimentalStateFile (experimentalFb01StateFile(), result.snapshot_blob, currentSampleRate, currentGeneration, error))
-        {
-            const auto file = experimentalFb01StateFile();
-            const auto verified = file.existsAsFile();
-            experimentalStateStatus = "State saved to file: " + file.getFullPathName()
-                + " (exists=" + juce::String (verified ? "yes" : "no") + ", MAME "
-                + juce::String (static_cast<juce::int64> (result.snapshot_size)) + " bytes, total "
-                + juce::String (file.getSize()) + " bytes)";
-        }
-        else
-            experimentalStateStatus = "Save failed: " + error;
     }
     else if (result.success)
         experimentalStateStatus = result.operation == ves::StateOperation::Save
@@ -3285,15 +3331,25 @@ bool VintageEmulatorStudioProcessor::processExperimentalStateResults()
     {
         experimentalStateRestoreInProgress.store (false, std::memory_order_release);
         if (experimentalStateTarget == ExperimentalStateTarget::Autosave)
-            appendLifecycleLog ("[VES FB-01 autosave] restore success=no error=" + experimentalStateStatus
+            appendLifecycleLog ("[VES state autosave] restore success=no error=" + experimentalStateStatus
                 + " total_ms=" + juce::String (static_cast<juce::int64> (experimentalStateGuardStartedMs != 0
                     ? nowMs() - experimentalStateGuardStartedMs : 0)));
         else if (experimentalStateTarget == ExperimentalStateTarget::DawRestore)
-            appendLifecycleLog ("[VES FB-01 DAW state] restore success=no generation_before="
+            appendLifecycleLog ("[VES DAW state] restore success=no generation_before="
                 + juce::String (static_cast<juce::int64> (experimentalStateGenerationBeforeRestore))
                 + " generation_after=" + juce::String (static_cast<juce::int64> (currentGeneration))
                 + " duration_ms=" + juce::String (static_cast<juce::int64> (experimentalStateGuardStartedMs != 0
                     ? nowMs() - experimentalStateGuardStartedMs : 0)) + " error=" + experimentalStateStatus);
+
+        if (result.load_failed_requires_restart)
+        {
+            const bool autosave = experimentalStateTarget == ExperimentalStateTarget::Autosave;
+            const auto failureStatus = experimentalStateStatus + "; clean engine restart required";
+            restartSelectedMachine ("processExperimentalStateResults", "failed_state_load_requires_clean_restart");
+            if (autosave)
+                standaloneAutosaveRestoreAttemptedGeneration = videoEngineGeneration.load (std::memory_order_acquire);
+            experimentalStateStatus = failureStatus;
+        }
     }
     return true;
 }
@@ -3331,9 +3387,9 @@ void VintageEmulatorStudioProcessor::finishExperimentalStateRestoreIfReady()
     experimentalStateGenerationAfterRestore = generation;
     const bool autosave = experimentalStateTarget == ExperimentalStateTarget::Autosave;
     const bool dawRestore = experimentalStateTarget == ExperimentalStateTarget::DawRestore;
-    experimentalStateStatus = juce::String (autosave ? "FB-01 autosave restored"
-                                                     : dawRestore ? "FB-01 DAW session state restored"
-                                                     : experimentalStateTarget == ExperimentalStateTarget::File ? "State loaded from file" : "State restored")
+    const bool fullyRecovered = firstTimesliceMs != 0 && audioMs != 0 && secondAudioMs != 0 && videoMs != 0;
+    experimentalStateStatus = juce::String (autosave ? "Autosave restored"
+                                                     : dawRestore ? "DAW session state restored" : "State restored")
         + " (generation " + juce::String (static_cast<juce::int64> (experimentalStateGenerationBeforeRestore))
         + " -> " + juce::String (static_cast<juce::int64> (generation))
         + (experimentalStateGenerationBeforeRestore == generation ? ", unchanged" : ", CHANGED")
@@ -3344,14 +3400,16 @@ void VintageEmulatorStudioProcessor::finishExperimentalStateRestoreIfReady()
         + " ms, audio-ready " + juce::String (static_cast<juce::int64> (audioReadyMs))
         + " ms, video-ready " + juce::String (static_cast<juce::int64> (videoReadyMs))
         + " ms, guarded " + juce::String (static_cast<juce::int64> (guardedMs)) + " ms, " + cacheText
-        + (timedOut ? ", guard timeout" : "") + ")";
+        + (fullyRecovered ? ", fully recovered" : ", recovery timed out/degraded") + ")";
     if (autosave)
-        appendLifecycleLog ("[VES FB-01 autosave] restore success=yes path=" + experimentalFb01AutosaveFile().getFullPathName()
+        appendLifecycleLog ("[VES state autosave] restore success=" + juce::String (fullyRecovered ? "yes" : "degraded")
+            + " path=" + autosaveFileForDriver (getSelectedMachineDriverName()).getFullPathName()
             + " generation_before=" + juce::String (static_cast<juce::int64> (experimentalStateGenerationBeforeRestore))
             + " generation_after=" + juce::String (static_cast<juce::int64> (generation))
             + " total_ms=" + juce::String (static_cast<juce::int64> (guardedMs)));
     else if (dawRestore)
-        appendLifecycleLog ("[VES FB-01 DAW state] restore success=yes generation_before="
+        appendLifecycleLog ("[VES DAW state] restore success=" + juce::String (fullyRecovered ? "yes" : "degraded")
+            + " generation_before="
             + juce::String (static_cast<juce::int64> (experimentalStateGenerationBeforeRestore))
             + " generation_after=" + juce::String (static_cast<juce::int64> (generation))
             + " duration_ms=" + juce::String (static_cast<juce::int64> (guardedMs))
@@ -3368,10 +3426,10 @@ bool VintageEmulatorStudioProcessor::isDawPluginWrapper() const
     return wrapperType == wrapperType_AudioUnit || wrapperType == wrapperType_VST3;
 }
 
-void VintageEmulatorStudioProcessor::tryDawFb01SnapshotRefresh()
+void VintageEmulatorStudioProcessor::tryDawSnapshotRefresh()
 {
     if (! isDawPluginWrapper() || getEngineState() != EmbeddedEngineState::Ready
-        || ! selectedMachineSupportsExperimentalState()
+        || ! selectedMachineSupportsSaveState()
         || experimentalStatePending.load (std::memory_order_acquire))
         return;
 
@@ -3392,6 +3450,7 @@ void VintageEmulatorStudioProcessor::tryDawFb01SnapshotRefresh()
     request.engine_generation = videoEngineGeneration.load (std::memory_order_acquire);
     request.request_id = experimentalStateRequestId.fetch_add (1, std::memory_order_relaxed) + 1;
     request.requested_at_ms = requestedAt;
+    request.held_midi_notes = captureActiveMidiNotes();
     if (! localEngine->requestStateOperation (request))
         return;
 
@@ -3402,36 +3461,41 @@ void VintageEmulatorStudioProcessor::tryDawFb01SnapshotRefresh()
     uint64_t cachedSize = 0, cachedAge = 0;
     {
         const juce::ScopedLock lock (dawStateLock);
-        cachedSize = dawCachedSnapshot != nullptr ? dawCachedSnapshot->size() : 0;
-        cachedAge = dawCachedSnapshotAtMs != 0 && requestedAt >= dawCachedSnapshotAtMs
-            ? requestedAt - dawCachedSnapshotAtMs : 0;
+        cachedSize = dawCachedSnapshot.blob != nullptr ? dawCachedSnapshot.blob->size() : 0;
+        cachedAge = dawCachedSnapshot.capturedAtMs != 0 && requestedAt >= dawCachedSnapshot.capturedAtMs
+            ? requestedAt - dawCachedSnapshot.capturedAtMs : 0;
     }
-    appendLifecycleLog ("[VES FB-01 DAW state] snapshot requested=yes request_count="
+    appendLifecycleLog ("[VES DAW state] snapshot requested=yes request_count="
         + juce::String (static_cast<juce::int64> (dawSnapshotRequestCount))
         + " cached_blob_size=" + juce::String (static_cast<juce::int64> (cachedSize))
         + " cached_age_ms=" + juce::String (static_cast<juce::int64> (cachedAge))
         + " engine_generation=" + juce::String (static_cast<juce::int64> (request.engine_generation)));
 }
 
-void VintageEmulatorStudioProcessor::tryDawFb01PendingRestore()
+void VintageEmulatorStudioProcessor::tryDawPendingRestore()
 {
     if (! isDawPluginWrapper() || getEngineState() != EmbeddedEngineState::Ready
-        || ! selectedMachineSupportsExperimentalState()
+        || ! selectedMachineSupportsSaveState()
         || experimentalStatePending.load (std::memory_order_acquire))
+        return;
+
+    auto localEngine = std::atomic_load (&engine);
+    if (localEngine == nullptr || juce::String (localEngine->driverName()) != getSelectedMachineDriverName())
         return;
 
     ves::StateOperationRequest request;
     {
         const juce::ScopedLock lock (dawStateLock);
-        if (! dawPendingRestoreArmed || dawPendingRestoreSnapshot.empty())
+        const auto selectedDriver = getSelectedMachineDriverName();
+        if (! dawPendingRestoreArmed || dawPendingRestoreSnapshot.empty()
+            || dawPendingRestoreDriver != selectedDriver
+            || dawPendingRestoreCompatibilityRevision != experimentalStateFormatVersion)
             return;
         request.snapshot_blob = std::move (dawPendingRestoreSnapshot);
+        request.held_midi_notes = dawPendingRestoreHeldMidiNotes;
         dawPendingRestoreArmed = false;
     }
 
-    auto localEngine = std::atomic_load (&engine);
-    if (localEngine == nullptr)
-        return;
     request.operation = ves::StateOperation::Load;
     request.engine_generation = videoEngineGeneration.load (std::memory_order_acquire);
     request.request_id = experimentalStateRequestId.fetch_add (1, std::memory_order_relaxed) + 1;
@@ -3444,6 +3508,7 @@ void VintageEmulatorStudioProcessor::tryDawFb01PendingRestore()
     {
         const juce::ScopedLock lock (dawStateLock);
         dawPendingRestoreSnapshot = std::move (request.snapshot_blob);
+        dawPendingRestoreHeldMidiNotes = request.held_midi_notes;
         dawPendingRestoreArmed = true;
         experimentalStateRestoreInProgress.store (false, std::memory_order_release);
         return;
@@ -3451,34 +3516,37 @@ void VintageEmulatorStudioProcessor::tryDawFb01PendingRestore()
     {
         const juce::ScopedLock lock (dawStateLock);
         dawPendingRestoreSnapshot.clear();
+        dawPendingRestoreDriver.clear();
+        dawPendingRestoreCompatibilityRevision = 0;
+        dawPendingRestoreHeldMidiNotes.fill (0);
     }
     experimentalStateTarget = ExperimentalStateTarget::DawRestore;
     experimentalStatePending.store (true, std::memory_order_release);
-    experimentalStateStatus = "Restoring FB-01 DAW session state...";
-    appendLifecycleLog ("[VES FB-01 DAW state] restore requested=yes generation_before="
+    experimentalStateStatus = "Restoring DAW session state...";
+    appendLifecycleLog ("[VES DAW state] restore requested=yes generation_before="
         + juce::String (static_cast<juce::int64> (request.engine_generation)));
 }
 
 void VintageEmulatorStudioProcessor::flushPluginStateDiagnostics()
 {
     if (pluginStateGetDiagnosticPending.exchange (false, std::memory_order_acq_rel))
-        appendLifecycleLog ("[VES FB-01 DAW state] getStateInformation cached_blob_included="
+        appendLifecycleLog ("[VES DAW state] getStateInformation cached_blob_included="
             + juce::String (pluginStateGetIncludedBlob.load (std::memory_order_relaxed) ? "yes" : "no")
             + " blob_size=" + juce::String (static_cast<juce::int64> (pluginStateGetBlobSize.load (std::memory_order_relaxed)))
             + " snapshot_age_ms=" + juce::String (static_cast<juce::int64> (pluginStateGetSnapshotAgeMs.load (std::memory_order_relaxed)))
             + " total_plugin_state_size=" + juce::String (static_cast<juce::int64> (pluginStateGetTotalSize.load (std::memory_order_relaxed))));
 
     if (pluginStateSetDiagnosticPending.exchange (false, std::memory_order_acq_rel))
-        appendLifecycleLog ("[VES FB-01 DAW state] setStateInformation embedded_blob_found="
+        appendLifecycleLog ("[VES DAW state] setStateInformation embedded_blob_found="
             + juce::String (pluginStateSetBlobFound.load (std::memory_order_relaxed) ? "yes" : "no")
             + " validation=" + juce::String (pluginStateSetBlobAccepted.load (std::memory_order_relaxed) ? "accepted" : "rejected_or_absent")
             + " pending_restore_armed=" + juce::String (pluginStateSetRestoreArmed.load (std::memory_order_relaxed) ? "yes" : "no"));
 }
 
-void VintageEmulatorStudioProcessor::tryStandaloneFb01AutosaveRestore()
+void VintageEmulatorStudioProcessor::tryStandaloneAutosaveRestore()
 {
     if (wrapperType != wrapperType_Standalone || getEngineState() != EmbeddedEngineState::Ready
-        || ! selectedMachineSupportsExperimentalState())
+        || ! selectedMachineSupportsStandaloneAutosave())
         return;
 
     const auto generation = videoEngineGeneration.load (std::memory_order_acquire);
@@ -3490,13 +3558,14 @@ void VintageEmulatorStudioProcessor::tryStandaloneFb01AutosaveRestore()
         return;
     standaloneAutosaveRestoreAttemptedGeneration = generation;
 
-    const auto file = experimentalFb01AutosaveFile();
+    const auto driver = getSelectedMachineDriverName();
+    const auto file = autosaveFileForDriver (driver);
     const bool found = file.existsAsFile();
-    appendLifecycleLog ("[VES FB-01 autosave] startup path=" + file.getFullPathName()
+    appendLifecycleLog ("[VES state autosave] startup path=" + file.getFullPathName()
         + " found=" + juce::String (found ? "yes" : "no"));
     if (! found)
     {
-        experimentalStateStatus = "FB-01 autosave not found; normal boot retained";
+        experimentalStateStatus = "Autosave not found; normal boot retained";
         return;
     }
 
@@ -3506,14 +3575,14 @@ void VintageEmulatorStudioProcessor::tryStandaloneFb01AutosaveRestore()
     request.request_id = experimentalStateRequestId.fetch_add (1, std::memory_order_relaxed) + 1;
     request.requested_at_ms = nowMs();
     juce::String error;
-    if (! readExperimentalStateFile (file, request.snapshot_blob, error))
+    if (! readExperimentalStateFile (file, driver, request.snapshot_blob, request.held_midi_notes, error))
     {
-        experimentalStateStatus = "FB-01 autosave ignored: " + error;
-        appendLifecycleLog ("[VES FB-01 autosave] compatibility=rejected error=" + error);
+        experimentalStateStatus = "Autosave ignored: " + error;
+        appendLifecycleLog ("[VES state autosave] compatibility=rejected error=" + error);
         return;
     }
 
-    appendLifecycleLog ("[VES FB-01 autosave] compatibility=accepted restore_requested=yes generation="
+    appendLifecycleLog ("[VES state autosave] compatibility=accepted restore_requested=yes generation="
         + juce::String (static_cast<juce::int64> (generation)));
     experimentalStateGenerationBeforeRestore = generation;
     experimentalStateGuardStartedMs = request.requested_at_ms;
@@ -3522,28 +3591,29 @@ void VintageEmulatorStudioProcessor::tryStandaloneFb01AutosaveRestore()
     if (! localEngine->requestStateOperation (request))
     {
         experimentalStateRestoreInProgress.store (false, std::memory_order_release);
-        experimentalStateStatus = "FB-01 autosave restore request failed; normal boot retained";
-        appendLifecycleLog ("[VES FB-01 autosave] restore_requested=no total_ms="
+        experimentalStateStatus = "Autosave restore request failed; normal boot retained";
+        appendLifecycleLog ("[VES state autosave] restore_requested=no total_ms="
             + juce::String (static_cast<juce::int64> (nowMs() - request.requested_at_ms)));
         return;
     }
     experimentalStateTarget = ExperimentalStateTarget::Autosave;
     experimentalStatePending.store (true, std::memory_order_release);
-    experimentalStateStatus = "Restoring FB-01 autosave...";
+    experimentalStateStatus = "Restoring autosave...";
 }
 
-void VintageEmulatorStudioProcessor::saveStandaloneFb01AutosaveOnShutdown()
+void VintageEmulatorStudioProcessor::saveStandaloneAutosaveOnShutdown()
 {
     if (wrapperType != wrapperType_Standalone || getEngineState() != EmbeddedEngineState::Ready
-        || ! selectedMachineSupportsExperimentalState())
+        || ! selectedMachineSupportsStandaloneAutosave())
         return;
 
-    const auto file = experimentalFb01AutosaveFile();
+    const auto driver = getSelectedMachineDriverName();
+    const auto file = autosaveFileForDriver (driver);
     const auto started = nowMs();
     auto localEngine = std::atomic_load (&engine);
     if (localEngine == nullptr || experimentalStatePending.load (std::memory_order_acquire))
     {
-        appendLifecycleLog ("[VES FB-01 autosave] close requested=no reason=state_operation_pending path=" + file.getFullPathName());
+        appendLifecycleLog ("[VES state autosave] close requested=no reason=state_operation_pending path=" + file.getFullPathName());
         return;
     }
 
@@ -3552,10 +3622,11 @@ void VintageEmulatorStudioProcessor::saveStandaloneFb01AutosaveOnShutdown()
     request.engine_generation = videoEngineGeneration.load (std::memory_order_acquire);
     request.request_id = experimentalStateRequestId.fetch_add (1, std::memory_order_relaxed) + 1;
     request.requested_at_ms = started;
-    appendLifecycleLog ("[VES FB-01 autosave] close requested=yes path=" + file.getFullPathName());
+    request.held_midi_notes = captureActiveMidiNotes();
+    appendLifecycleLog ("[VES state autosave] close requested=yes path=" + file.getFullPathName());
     if (! localEngine->requestStateOperation (request))
     {
-        appendLifecycleLog ("[VES FB-01 autosave] close save_success=no error=request_rejected path=" + file.getFullPathName());
+        appendLifecycleLog ("[VES state autosave] close save_success=no error=request_rejected path=" + file.getFullPathName());
         return;
     }
 
@@ -3577,7 +3648,7 @@ void VintageEmulatorStudioProcessor::saveStandaloneFb01AutosaveOnShutdown()
 
     if (! completed || ! result.success)
     {
-        appendLifecycleLog ("[VES FB-01 autosave] close save_success=no error="
+        appendLifecycleLog ("[VES state autosave] close save_success=no error="
             + juce::String (! completed ? "timeout" : result.error_message)
             + " duration_ms=" + juce::String (static_cast<juce::int64> (nowMs() - started))
             + " path=" + file.getFullPathName());
@@ -3585,9 +3656,9 @@ void VintageEmulatorStudioProcessor::saveStandaloneFb01AutosaveOnShutdown()
     }
 
     juce::String error;
-    const bool written = writeExperimentalStateFile (file, result.snapshot_blob, currentSampleRate,
-        request.engine_generation, error);
-    appendLifecycleLog ("[VES FB-01 autosave] close blob_size="
+    const bool written = writeExperimentalStateFile (file, result.snapshot_blob, driver, currentSampleRate,
+        request.engine_generation, result.held_midi_notes, error);
+    appendLifecycleLog ("[VES state autosave] close blob_size="
         + juce::String (static_cast<juce::int64> (result.snapshot_size))
         + " save_duration_ms=" + juce::String (static_cast<juce::int64> (nowMs() - started))
         + " path=" + file.getFullPathName()
@@ -3736,13 +3807,9 @@ void VintageEmulatorStudioProcessor::timerCallback()
     processFloppyHotSwapResults();
     processExperimentalStateResults();
     finishExperimentalStateRestoreIfReady();
-    tryStandaloneFb01AutosaveRestore();
-    tryDawFb01PendingRestore();
-    tryDawFb01SnapshotRefresh();
+    tryStandaloneAutosaveRestore();
+    tryDawPendingRestore();
     flushPluginStateDiagnostics();
-    flushMidiAudioLatencyResults();
-    recordVideoRuntimeDiagnostics();
-    recordAudioRateDiagnostics();
 }
 
 void VintageEmulatorStudioProcessor::recordAudioRateDiagnostics()

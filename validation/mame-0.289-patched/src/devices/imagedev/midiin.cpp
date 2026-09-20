@@ -95,6 +95,18 @@ void midiin_device::device_reset()
 	set_tra_rate(31250);
 }
 
+void midiin_device::reset_transport_after_state_load()
+{
+	// Do not call device_reset(): this is a post-load transport cleanup, not a
+	// device/lifecycle reset.  The attached MIDI input remains open and its
+	// polling timer is untouched.
+	m_xmit_read = m_xmit_write = 0;
+	m_tx_busy = false;
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rcv_rate(0);
+	set_tra_rate(attotime::from_hz(31250));
+}
+
 /*-------------------------------------------------
     midi_update
 -------------------------------------------------*/

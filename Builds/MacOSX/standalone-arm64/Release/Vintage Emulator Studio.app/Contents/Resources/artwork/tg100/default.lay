@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<mamelayout version="2">
+
+    <element name="panel">
+        <image file="tg100.png"/>
+    </element>
+
+    <!-- Slight dark olive overlay -->
+    <element name="lcd_tint">
+        <rect>
+            <color red="0.44" green="0.10" blue="0.44" alpha="0.45"/>
+        </rect>
+    </element>
+
+    <view name="Front Panel">
+        <bounds x="0" y="0" width="1692" height="340"/>
+
+        <element ref="panel">
+            <bounds x="0" y="0" width="1692" height="340"/>
+        </element>
+
+        <!-- Multiplicative colour: darkens green while keeping text contrast -->
+        <screen index="0">
+            <bounds x="285" y="117" width="412" height="80"/>
+            <color red="0.48" green="0.53" blue="0.20" alpha="1.0"/>
+        </screen>
+
+        <!-- Additional subtle darkening -->
+        <element ref="lcd_tint">
+            <bounds x="285" y="117" width="412" height="80"/>
+        </element>
+
+    </view>
+
+</mamelayout>

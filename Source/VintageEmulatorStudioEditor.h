@@ -154,11 +154,7 @@ private:
     EmbeddedMissingRomLookAndFeel lookAndFeel;
     EmbeddedEmulatorDisplayComponent mameDisplay;
     juce::TextButton optionsButton { "Settings" };
-    juce::TextButton saveStateButton { "Save State" };
-    juce::TextButton loadStateButton { "Load State" };
-    juce::TextButton saveStateFileButton { "Save State to File" };
-    juce::TextButton loadStateFileButton { "Load State from File" };
-    juce::Label stateStatusLabel;
+    juce::TextButton midiPanicButton { "MIDI PANIC" };
     juce::Label versionLabel;
 #if JucePlugin_Build_Standalone
     juce::Label volumeLabel;

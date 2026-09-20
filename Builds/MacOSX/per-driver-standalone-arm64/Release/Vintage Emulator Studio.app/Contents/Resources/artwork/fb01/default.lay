@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+Custom FB-01 artwork layout aligned to fb01.png (1515x1038).
+-->
+<mamelayout version="2">
+
+    <!-- Full-panel background image -->
+    <element name="panel">
+        <image file="fb01.png" />
+    </element>
+
+    <!-- Invisible button + blue highlight when pressed -->
+<element name="button" defstate="0">
+
+   <!-- Shadow -->
+<rect>
+    <bounds x="4" y="5" width="202" height="70" />
+    <color red="0.0" green="0.0" blue="0.0" alpha="0.15" />
+</rect>
+
+<!-- Normal state (white) -->
+<rect state="0">
+    <bounds x="0" y="0" width="202" height="70" />
+    <color red="1.0" green="1.0" blue="1.0" alpha="0.10" />
+</rect>
+
+<!-- Pressed (blue) -->
+<rect state="1">
+    <bounds x="0" y="0" width="202" height="70" />
+    <color red="0.15" green="0.45" blue="1.00" alpha="0.35" />
+</rect>
+
+</element>
+
+    <view name="Front Panel">
+         <bounds x="0" y="0" width="2048" height="699"/>
+
+        <!-- Background first, so all live elements are drawn over it -->
+       <element ref="panel">
+          <bounds x="0" y="0" width="2048" height="699"/>
+        </element>
+
+        <!-- FB-01 LCD, aligned to the recessed display in fb01.png -->
+        <screen index="0">
+            <bounds x="170" y="360" width="700" height="100" />
+        </screen>
+
+        <!-- Top row -->
+        <element ref="button" inputtag="PANEL" inputmask="0x01">
+            <bounds x="1015" y="285" width="210" height="40" />
+        </element>
+
+        <element ref="button" inputtag="PANEL" inputmask="0x02">
+            <bounds x="1264" y="285" width="210" height="40" />
+        </element>
+
+        <element ref="button" inputtag="PANEL" inputmask="0x40">
+            <bounds x="1513" y="285" width="210" height="40" />
+        </element>
+
+        <element ref="button" inputtag="PANEL" inputmask="0x80">
+            <bounds x="1762" y="285" width="210" height="40" />
+        </element>
+
+        <!-- Bottom row -->
+        <element ref="button" inputtag="PANEL" inputmask="0x04">
+            <bounds x="1015" y="500" width="210" height="40" />
+        </element>
+
+        <element ref="button" inputtag="PANEL" inputmask="0x08">
+            <bounds x="1264" y="500" width="210" height="40" />
+        </element>
+
+        <element ref="button" inputtag="PANEL" inputmask="0x10">
+            <bounds x="1513" y="500" width="210" height="40" />
+        </element>
+
+        <element ref="button" inputtag="PANEL" inputmask="0x20">
+            <bounds x="1762" y="500" width="210" height="40" />
+        </element>
+
+    </view>
+</mamelayout>

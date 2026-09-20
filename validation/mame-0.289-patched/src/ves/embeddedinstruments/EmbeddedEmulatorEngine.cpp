@@ -22,6 +22,7 @@
 #include "frontend/mame/pluginopts.h"
 
 #include "bus/midi/midi.h"
+#include "imagedev/midiin.h"
 
 #include <algorithm>
 #include <array>
@@ -511,7 +512,7 @@ public:
 			if (diag.state_restore_first_video_ms.compare_exchange_strong(expected, timestamp, std::memory_order_release, std::memory_order_relaxed))
 			{
 				diag.state_restore_first_video_generation.store(generation, std::memory_order_release);
-				osd_printf_verbose("[VES FB-01 restore] first post-load video generation=%llu\n", static_cast<unsigned long long>(generation));
+				osd_printf_verbose("[VES state restore] first post-load video generation=%llu\n", static_cast<unsigned long long>(generation));
 			}
 		}
 	}
@@ -612,16 +613,6 @@ void min_store(std::atomic<std::uint64_t> &target, std::uint64_t value)
 	}
 }
 
-void record_video_duration(std::atomic<std::uint64_t> &total,
-	std::atomic<std::uint64_t> &maximum,
-	std::atomic<std::uint64_t> &count,
-	std::uint64_t duration_us)
-{
-	total.fetch_add(duration_us, std::memory_order_relaxed);
-	count.fetch_add(1, std::memory_order_relaxed);
-	max_store(maximum, duration_us);
-}
-
 void update_audio_queue_diagnostics(EngineDiagnostics &diag, std::size_t queued)
 {
 	const auto queued64 = static_cast<std::uint64_t>(queued);
@@ -701,6 +692,9 @@ public:
 	embedded_osd(osd_options &options, midi_byte_queue &midi, audio_frame_queue &audio, mouse_event_queue &mouse,
 		floppy_request_queue &floppy_requests, floppy_result_queue &floppy_results,
 		state_request_queue &state_requests, state_result_queue &state_results,
+		std::atomic<bool> &midi_panic_requested,
+		std::array<std::atomic<std::uint64_t>, 32> &midi_panic_held_notes,
+		std::array<std::atomic<std::uint64_t>, 32> &active_host_midi_notes,
 		embedded_video_bridge &video, EngineDiagnostics &diag)
 		: osd_common_t(options)
 		, m_options(options)
@@ -711,6 +705,9 @@ public:
 		, m_floppy_results(floppy_results)
 		, m_state_requests(state_requests)
 		, m_state_results(state_results)
+		, m_midi_panic_requested(midi_panic_requested)
+		, m_midi_panic_held_notes(midi_panic_held_notes)
+		, m_active_host_midi_notes(active_host_midi_notes)
 		, m_video_bridge(video)
 		, m_diag(diag)
 	{
@@ -756,20 +753,6 @@ public:
 
 	void sound_manager_update() override
 	{
-		const auto now_us = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
-			std::chrono::steady_clock::now().time_since_epoch()).count());
-		const auto previous_us = m_scheduler_last_update_us.exchange(now_us, std::memory_order_relaxed);
-		m_diag.audio_rate_scheduler_update_count.fetch_add(1, std::memory_order_relaxed);
-		if (previous_us != 0 && now_us >= previous_us)
-		{
-			const auto gap_us = now_us - previous_us;
-			m_diag.audio_rate_scheduler_gap_total_us.fetch_add(gap_us, std::memory_order_relaxed);
-			m_diag.audio_rate_scheduler_gap_count.fetch_add(1, std::memory_order_relaxed);
-			max_store(m_diag.audio_rate_scheduler_window_max_gap_us, gap_us);
-			if (gap_us > 7500) m_diag.audio_rate_scheduler_gap_gt_7500.fetch_add(1, std::memory_order_relaxed);
-			if (gap_us > 10000) m_diag.audio_rate_scheduler_gap_gt_10000.fetch_add(1, std::memory_order_relaxed);
-			if (gap_us > 15000) m_diag.audio_rate_scheduler_gap_gt_15000.fetch_add(1, std::memory_order_relaxed);
-		}
 	}
 
 	void update(bool skip_redraw) override
@@ -816,6 +799,7 @@ public:
 			m_diag.video_capture_requested.fetch_add(1, std::memory_order_release);
 		}
 		process_state_requests();
+		process_midi_panic_request();
 	}
 
 	struct static_layout_run
@@ -1058,11 +1042,9 @@ public:
 				m_diag.video_capture_in_progress.store(false, std::memory_order_release);
 				continue;
 			}
-			const auto render_start = std::chrono::steady_clock::now();
 			try
 			{
 				std::vector<std::uint32_t> pixels(static_cast<std::size_t>(job->width) * job->height, 0xff000000U);
-				const auto raster_start = std::chrono::steady_clock::now();
 				if (m_worker_cache_token != job->token || m_worker_cache_width != job->width
 					|| m_worker_cache_height != job->height || m_worker_static_runs.size() != job->runs.size())
 				{
@@ -1072,7 +1054,6 @@ public:
 					m_worker_cache_width = job->width;
 					m_worker_cache_height = job->height;
 				}
-				std::uint64_t static_composite_us = 0;
 				for (std::size_t index = 0; index < job->runs.size(); ++index)
 				{
 					auto &run = job->runs[index];
@@ -1081,10 +1062,7 @@ public:
 						auto &cached = m_worker_static_runs[index];
 						if (cached.signature != run.signature || cached.pixels.empty())
 							cached = build_worker_static_run(run, job->width, job->height);
-						const auto composite_start = std::chrono::steady_clock::now();
 						composite_worker_static_run(pixels.data(), job->width, cached);
-						static_composite_us += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
-							std::chrono::steady_clock::now() - composite_start).count());
 					}
 					else
 					{
@@ -1096,13 +1074,6 @@ public:
 						}
 					}
 				}
-				const auto raster_us = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
-					std::chrono::steady_clock::now() - raster_start).count());
-				m_diag.video_worker_raster_us.store(raster_us, std::memory_order_relaxed);
-				m_diag.video_worker_static_composite_us.store(static_composite_us, std::memory_order_relaxed);
-				m_diag.video_rasterization_duration_us.store(raster_us, std::memory_order_relaxed);
-				m_diag.video_rasterization_total_us.fetch_add(raster_us, std::memory_order_relaxed);
-				max_store(m_diag.video_rasterization_max_us, raster_us);
 
 				if (job->token != m_video_job_token.load(std::memory_order_acquire))
 				{
@@ -1129,13 +1100,6 @@ public:
 				}
 				m_video_bridge.publishWrittenBuffer(m_diag, job->token);
 				m_diag.video_capture_queue_depth_after.store(m_audio_queue.size(), std::memory_order_relaxed);
-				const auto total_us = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
-					std::chrono::steady_clock::now() - render_start).count());
-				m_diag.video_worker_total_us.store(total_us, std::memory_order_relaxed);
-				max_store(m_diag.video_worker_max_us, total_us);
-				m_diag.video_capture_total_us.fetch_add(total_us, std::memory_order_relaxed);
-				max_store(m_diag.video_capture_max_us, total_us);
-				m_diag.video_capture_timing_count.fetch_add(1, std::memory_order_relaxed);
 				m_diag.video_jobs_completed.fetch_add(1, std::memory_order_relaxed);
 				m_diag.video_capture_completed.fetch_add(1, std::memory_order_relaxed);
 				m_diag.video_capture_in_progress.store(false, std::memory_order_release);
@@ -1745,33 +1709,9 @@ public:
 
 	void sound_stream_sink_update(std::uint32_t, const std::int16_t *buffer, int samples_this_frame) override
 	{
-		const auto reset_generation = m_diag.audio_sink_statistics_reset_generation.load(std::memory_order_acquire);
-		if (reset_generation != m_audio_sink_statistics_reset_generation)
-		{
-			m_audio_sink_statistics_reset_generation = reset_generation;
-			m_audio_sink_recent_window_count = 0;
-			m_audio_sink_recent_max_block_frames = 0;
-		}
-		const auto callback_us = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
-			std::chrono::steady_clock::now().time_since_epoch()).count());
-		const auto previous_callback_us = m_diag.audio_sink_last_callback_us.exchange(callback_us, std::memory_order_relaxed);
-		if (previous_callback_us != 0 && callback_us >= previous_callback_us)
-		{
-			const auto gap_us = callback_us - previous_callback_us;
-			m_diag.audio_sink_latest_interarrival_us.store(gap_us, std::memory_order_relaxed);
-			max_store(m_diag.audio_sink_max_interarrival_us, gap_us);
-			m_diag.audio_rate_sink_gap_total_us.fetch_add(gap_us, std::memory_order_relaxed);
-			m_diag.audio_rate_sink_gap_count.fetch_add(1, std::memory_order_relaxed);
-			max_store(m_diag.audio_rate_sink_window_max_gap_us, gap_us);
-			if (gap_us > 7500) m_diag.audio_rate_sink_gap_gt_7500.fetch_add(1, std::memory_order_relaxed);
-			if (gap_us > 10000) m_diag.audio_rate_sink_gap_gt_10000.fetch_add(1, std::memory_order_relaxed);
-			if (gap_us > 15000) m_diag.audio_rate_sink_gap_gt_15000.fetch_add(1, std::memory_order_relaxed);
-		}
-		const auto callback_ms = steadyMs();
-		m_diag.stream_updates.fetch_add(1, std::memory_order_relaxed);
-		m_diag.mame_audio_callback_count.fetch_add(1, std::memory_order_relaxed);
 		if (m_diag.state_restore_first_timeslice_completed_ms.load(std::memory_order_acquire) != 0)
 		{
+			const auto callback_ms = steadyMs();
 			const auto first = m_diag.state_restore_first_audio_ms.load(std::memory_order_acquire);
 			if (first == 0)
 			{
@@ -1791,46 +1731,6 @@ public:
 				m_diag.state_restore_second_audio_ms.store(0, std::memory_order_release);
 			}
 		}
-		const auto block_frames = static_cast<std::uint64_t>(std::max(samples_this_frame, 0));
-		m_diag.mame_audio_callback_block_size.store(block_frames, std::memory_order_relaxed);
-		m_diag.audio_sink_latest_block_frames.store(block_frames, std::memory_order_relaxed);
-		if (block_frames != 0)
-		{
-			m_diag.audio_rate_producer_frames.fetch_add(block_frames, std::memory_order_relaxed);
-			min_store(m_diag.audio_rate_sink_window_min_block, block_frames);
-			max_store(m_diag.audio_rate_sink_window_max_block, block_frames);
-			if (block_frames <= 256)
-				m_diag.audio_rate_sink_hist_le_256.fetch_add(1, std::memory_order_relaxed);
-			else if (block_frames <= 512)
-				m_diag.audio_rate_sink_hist_257_512.fetch_add(1, std::memory_order_relaxed);
-			else if (block_frames <= 768)
-				m_diag.audio_rate_sink_hist_513_768.fetch_add(1, std::memory_order_relaxed);
-			else if (block_frames <= 1024)
-				m_diag.audio_rate_sink_hist_769_1024.fetch_add(1, std::memory_order_relaxed);
-			else
-				m_diag.audio_rate_sink_hist_gt_1024.fetch_add(1, std::memory_order_relaxed);
-			min_store(m_diag.audio_sink_min_block_frames, block_frames);
-			max_store(m_diag.audio_sink_max_block_frames, block_frames);
-			m_audio_sink_recent_max_block_frames = std::max(m_audio_sink_recent_max_block_frames, block_frames);
-			m_diag.audio_sink_recent_max_block_frames.store(m_audio_sink_recent_max_block_frames, std::memory_order_release);
-			if (++m_audio_sink_recent_window_count >= 64)
-			{
-				m_audio_sink_recent_window_count = 0;
-				m_audio_sink_recent_max_block_frames = 0;
-			}
-
-			if (block_frames >= 120 && block_frames < 360)
-				m_diag.audio_sink_blocks_approx_240.fetch_add(1, std::memory_order_relaxed);
-			else if (block_frames >= 360 && block_frames < 600)
-				m_diag.audio_sink_blocks_approx_480.fetch_add(1, std::memory_order_relaxed);
-			else if (block_frames >= 600 && block_frames < 840)
-				m_diag.audio_sink_blocks_approx_720.fetch_add(1, std::memory_order_relaxed);
-			else if (block_frames >= 960)
-				m_diag.audio_sink_blocks_960_plus.fetch_add(1, std::memory_order_relaxed);
-			else
-				m_diag.audio_sink_blocks_other.fetch_add(1, std::memory_order_relaxed);
-		}
-
 		if (samples_this_frame <= 0)
 			return;
 
@@ -1931,6 +1831,7 @@ private:
 
 	void process_state_requests()
 	{
+		constexpr std::uint64_t state_scheduler_wait_timeout_ms = 2000;
 		if (!m_pending_state_request)
 		{
 			if (!m_state_requests.pop(m_current_state_request))
@@ -1945,23 +1846,41 @@ private:
 			}
 		}
 		if (machine().phase() != machine_phase::RUNNING || !machine().scheduler().can_save())
+		{
+			const auto waited_ms = steadyMs() - m_state_scheduler_wait_started_ms;
+			if (waited_ms < state_scheduler_wait_timeout_ms)
+				return;
+
+			StateOperationResult timeout_result;
+			timeout_result.operation = m_current_state_request.operation;
+			timeout_result.engine_generation = m_current_state_request.engine_generation;
+			timeout_result.request_id = m_current_state_request.request_id;
+			timeout_result.scheduler_wait_ms = waited_ms;
+			timeout_result.total_duration_ms = waited_ms;
+			timeout_result.error_message = "Timed out waiting for a safe scheduler save-state boundary";
+			const bool save = timeout_result.operation == StateOperation::Save;
+			(save ? m_diag.state_save_failures : m_diag.state_load_failures).fetch_add(1, std::memory_order_relaxed);
+			m_state_results.push(timeout_result);
+			m_pending_state_request = false;
 			return;
+		}
 
 		StateOperationResult result;
 		result.operation = m_current_state_request.operation;
 		result.engine_generation = m_current_state_request.engine_generation;
 		result.request_id = m_current_state_request.request_id;
 		result.scheduler_wait_ms = steadyMs() - m_state_scheduler_wait_started_ms;
-		if (machine().basename() != "fb01")
-			result.error_message = "Experimental state operations are limited to FB-01";
-		else if (result.operation == StateOperation::Save)
+		if (result.operation == StateOperation::Save)
 		{
 			std::ostringstream stream(std::ios::binary);
 			const auto error = machine().save().write_stream(stream);
 			if (error == STATERR_NONE)
 			{
 				m_state_snapshot = stream.str();
+				for (std::size_t i = 0; i < m_state_snapshot_held_notes.size(); ++i)
+					m_state_snapshot_held_notes[i] = m_active_host_midi_notes[i].load(std::memory_order_acquire);
 				result.snapshot_blob.assign(m_state_snapshot.begin(), m_state_snapshot.end());
+				result.held_midi_notes = m_state_snapshot_held_notes;
 				result.success = true;
 				result.snapshot_size = m_state_snapshot.size();
 				m_diag.state_snapshot_bytes.store(result.snapshot_size, std::memory_order_relaxed);
@@ -1970,11 +1889,15 @@ private:
 				result.error_message = state_error_message(error);
 		}
 		else if (m_current_state_request.snapshot_blob.empty() && m_state_snapshot.empty())
-			result.error_message = "No in-memory FB-01 snapshot has been captured";
+			result.error_message = "No in-memory state snapshot has been captured";
 		else
 		{
 			if (!m_current_state_request.snapshot_blob.empty())
+			{
 				m_state_snapshot.assign(m_current_state_request.snapshot_blob.begin(), m_current_state_request.snapshot_blob.end());
+				m_state_snapshot_held_notes = m_current_state_request.held_midi_notes;
+			}
+			result.held_midi_notes = m_state_snapshot_held_notes;
 			std::istringstream stream(m_state_snapshot, std::ios::binary);
 			m_diag.state_restore_read_completed_ms.store(0, std::memory_order_release);
 			m_diag.state_restore_first_timeslice_completed_ms.store(0, std::memory_order_release);
@@ -1998,6 +1921,15 @@ private:
 			if (error == STATERR_NONE)
 			{
 				m_diag.state_restore_read_completed_ms.store(steadyMs(), std::memory_order_release);
+				unsigned midi_transport_resets = 0;
+				for (device_t &device : device_enumerator(machine().root_device()))
+					if (auto *midi_input = dynamic_cast<midiin_device *>(&device))
+					{
+						midi_input->reset_transport_after_state_load();
+						++midi_transport_resets;
+					}
+				if (midi_transport_resets != 0)
+					append_engine_lifecycle_log("[state restore] MIDI transport reset driver=" + std::string(machine().basename()));
 				reset_post_restore_video_and_input();
 				m_restore_waiting_for_clean_timeslice = true;
 				result.success = true;
@@ -2006,7 +1938,10 @@ private:
 				m_midi_queue.clear();
 			}
 			else
+			{
 				result.error_message = state_error_message(error);
+				result.load_failed_requires_restart = true;
+			}
 		}
 		result.total_duration_ms = m_current_state_request.requested_at_ms != 0
 			? steadyMs() - m_current_state_request.requested_at_ms
@@ -2017,6 +1952,51 @@ private:
 		      : (result.success ? m_diag.state_load_successes : m_diag.state_load_failures)).fetch_add(1, std::memory_order_relaxed);
 		m_state_results.push(result);
 		m_pending_state_request = false;
+	}
+
+	void process_midi_panic_request()
+	{
+		if (!m_midi_panic_requested.load(std::memory_order_relaxed))
+			return;
+		if (!m_midi_panic_requested.exchange(false, std::memory_order_acq_rel))
+			return;
+
+		m_midi_queue.clear();
+		const auto now = steadyMs();
+		const auto queue_byte = [this, now](std::uint8_t value)
+		{
+			if (m_midi_queue.push(queued_midi_byte { value, now }))
+				m_diag.midi_bytes_queued.fetch_add(1, std::memory_order_relaxed);
+			else
+				m_diag.midi_queue_overflow.fetch_add(1, std::memory_order_relaxed);
+		};
+		for (std::uint8_t channel = 0; channel < 16; ++channel)
+		{
+			for (std::uint8_t note = 0; note < 128; ++note)
+			{
+				const auto index = static_cast<std::size_t>(channel) * 2 + (note >> 6);
+				if (!BIT(m_midi_panic_held_notes[index].load(std::memory_order_acquire), note & 63))
+					continue;
+				queue_byte(static_cast<std::uint8_t>(0x80U | channel));
+				queue_byte(note);
+				queue_byte(0);
+			}
+		}
+		for (std::uint8_t channel = 0; channel < 16; ++channel)
+		{
+			for (const std::uint8_t controller : { std::uint8_t(64), std::uint8_t(123),
+				std::uint8_t(120), std::uint8_t(121) })
+			{
+				queue_byte(static_cast<std::uint8_t>(0xb0U | channel));
+				queue_byte(controller);
+				queue_byte(0);
+			}
+			queue_byte(static_cast<std::uint8_t>(0xe0U | channel));
+			queue_byte(0);
+			queue_byte(64);
+		}
+		m_diag.midi_first_queued_ms.store(now, std::memory_order_relaxed);
+		m_diag.midi_last_queued_ms.store(now, std::memory_order_relaxed);
 	}
 
 	void reset_post_restore_video_and_input()
@@ -2050,7 +2030,7 @@ private:
 		}
 		m_diag.state_restore_pointer_reset.store(true, std::memory_order_release);
 		m_video_bridge.invalidatePublishedFrames(m_diag);
-		osd_printf_verbose("[VES FB-01 restore] mouse queue cleared=%llu pointer reset=yes view rebound=%s interactive_items=%llu->%llu\n",
+		osd_printf_verbose("[VES state restore] mouse queue cleared=%llu pointer reset=yes view rebound=%s interactive_items=%llu->%llu\n",
 			static_cast<unsigned long long>(mouse_cleared),
 			m_video_target != nullptr ? "yes" : "no",
 			static_cast<unsigned long long>(m_diag.state_restore_interactive_items_before.load(std::memory_order_relaxed)),
@@ -2167,7 +2147,7 @@ private:
 			{
 				std::uint64_t expected = 0;
 				if (m_diag.state_restore_first_mouse_event_ms.compare_exchange_strong(expected, steadyMs(), std::memory_order_release, std::memory_order_relaxed))
-					osd_printf_verbose("[VES FB-01 restore] first mouse event consumed\n");
+					osd_printf_verbose("[VES state restore] first mouse event consumed\n");
 			}
 			const auto left_down = event.type == EmbeddedMouseEventType::LeftDown;
 			const auto left_up = event.type == EmbeddedMouseEventType::LeftUp;
@@ -2234,7 +2214,7 @@ private:
 				{
 					std::uint64_t expected = 0;
 					if (m_diag.state_restore_first_input_hit_ms.compare_exchange_strong(expected, steadyMs(), std::memory_order_release, std::memory_order_relaxed))
-						osd_printf_verbose("[VES FB-01 restore] first input-field hit\n");
+						osd_printf_verbose("[VES state restore] first input-field hit\n");
 				}
 			}
 			return;
@@ -2364,8 +2344,6 @@ private:
 		m_next_video_deadline_ms += (missed + 1) * interval_ms;
 		m_diag.video_capture_requested.fetch_add(1, std::memory_order_relaxed);
 		m_diag.video_capture_queue_depth_before.store(m_audio_queue.size(), std::memory_order_relaxed);
-		const auto capture_start = std::chrono::steady_clock::now();
-
 		try
 		{
 			if (!ensure_video_target())
@@ -2376,18 +2354,8 @@ private:
 
 			for (screen_device &screen : screen_device_enumerator(machine().root_device()))
 			{
-				const auto partial_start = std::chrono::steady_clock::now();
 				screen.update_partial(screen.visible_area().max_y);
-				record_video_duration(m_diag.video_screen_update_partial_total_us,
-					m_diag.video_screen_update_partial_max_us,
-					m_diag.video_screen_update_partial_count,
-					static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - partial_start).count()));
-				const auto quads_start = std::chrono::steady_clock::now();
 				screen.update_quads();
-				record_video_duration(m_diag.video_screen_update_quads_total_us,
-					m_diag.video_screen_update_quads_max_us,
-					m_diag.video_screen_update_quads_count,
-					static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - quads_start).count()));
 			}
 
 			const auto width = std::clamp(static_cast<s32>(m_diag.video_requested_width.load(std::memory_order_acquire)), 256, 4096);
@@ -2407,7 +2375,6 @@ private:
 			job->width = width;
 			job->height = height;
 			job->token = m_video_job_token.load(std::memory_order_acquire);
-			const auto snapshot_start = std::chrono::steady_clock::now();
 			u32 item_index = 0;
 			u32 static_items = 0;
 			u32 total_items = 0;
@@ -2443,22 +2410,11 @@ private:
 				[] (const auto &run) { return run.is_static; }));
 			job->use_static_cache = static_items >= 3 && static_run_count != 0
 				&& static_run_count <= 32 && static_ratio >= 0.20;
-			const auto snapshot_us = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
-				std::chrono::steady_clock::now() - snapshot_start).count());
-			m_diag.video_snapshot_total_us.fetch_add(snapshot_us, std::memory_order_relaxed);
-			max_store(m_diag.video_snapshot_max_us, snapshot_us);
-			m_diag.video_snapshot_bytes.store(job->snapshot_bytes, std::memory_order_relaxed);
-			record_video_duration(m_diag.video_primitive_build_total_us,
-				m_diag.video_primitive_build_max_us, m_diag.video_primitive_build_count, snapshot_us);
 			m_diag.video_capture_started.fetch_add(1, std::memory_order_relaxed);
 			m_diag.video_capture_in_progress.store(true, std::memory_order_release);
 			const bool submitted = submit_video_job(std::move(job));
 			if (!submitted)
 				m_diag.video_capture_in_progress.store(false, std::memory_order_release);
-			const auto prepare_us = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
-				std::chrono::steady_clock::now() - capture_start).count());
-			m_diag.video_prepare_total_us.fetch_add(prepare_us, std::memory_order_relaxed);
-			max_store(m_diag.video_prepare_max_us, prepare_us);
 			if (submitted && m_diag.video_capture_single_frame.load(std::memory_order_acquire))
 				m_diag.video_capture_enabled.store(false, std::memory_order_release);
 			if (m_last_video_capture_ms != 0 && now > m_last_video_capture_ms)
@@ -2483,11 +2439,15 @@ private:
 	floppy_result_queue &m_floppy_results;
 	state_request_queue &m_state_requests;
 	state_result_queue &m_state_results;
+	std::atomic<bool> &m_midi_panic_requested;
+	std::array<std::atomic<std::uint64_t>, 32> &m_midi_panic_held_notes;
+	std::array<std::atomic<std::uint64_t>, 32> &m_active_host_midi_notes;
 	StateOperationRequest m_current_state_request;
 	bool m_pending_state_request = false;
 	bool m_restore_waiting_for_clean_timeslice = false;
 	std::uint64_t m_state_scheduler_wait_started_ms = 0;
 	std::string m_state_snapshot;
+	HeldMidiNotes m_state_snapshot_held_notes {};
 	embedded_video_bridge &m_video_bridge;
 	EngineDiagnostics &m_diag;
 	mutable std::mutex m_startup_output_mutex;
@@ -2496,10 +2456,6 @@ private:
 	std::uint64_t m_last_video_capture_ms = 0;
 	std::uint64_t m_next_video_deadline_ms = 0;
 	std::uint32_t m_audio_sink_diagnostics_counter = 0;
-	std::uint32_t m_audio_sink_recent_window_count = 0;
-	std::uint64_t m_audio_sink_recent_max_block_frames = 0;
-	std::uint64_t m_audio_sink_statistics_reset_generation = 0;
-	std::atomic<std::uint64_t> m_scheduler_last_update_us { 0 };
 	int m_failed_video_width = 0;
 	std::thread m_video_worker;
 	std::mutex m_video_worker_mutex;
@@ -2771,6 +2727,9 @@ struct EmbeddedEmulatorEngine::Impl
 		mame_result.store(EMU_ERR_FATALERROR, std::memory_order_relaxed);
 		mame_thread = std::thread([this]
 		{
+#if defined(__APPLE__)
+			pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
+#endif
 			const int result = runMameThread();
 			mame_result.store(result, std::memory_order_relaxed);
 		});
@@ -2807,6 +2766,21 @@ struct EmbeddedEmulatorEngine::Impl
 
 	void sendMidiBytes(const std::uint8_t *data, std::size_t size)
 	{
+		if (data != nullptr && size >= 3)
+		{
+			const auto status = data[0] & 0xf0U;
+			if (status == 0x80U || status == 0x90U)
+			{
+				const auto channel = data[0] & 0x0fU;
+				const auto note = data[1] & 0x7fU;
+				const auto index = static_cast<std::size_t>(channel) * 2 + (note >> 6);
+				const auto mask = std::uint64_t(1) << (note & 63);
+				if (status == 0x90U && data[2] != 0)
+					active_host_midi_notes[index].fetch_or(mask, std::memory_order_release);
+				else
+					active_host_midi_notes[index].fetch_and(~mask, std::memory_order_release);
+			}
+		}
 		const auto now = steadyMs();
 		for (std::size_t i = 0; i < size; ++i)
 		{
@@ -2819,6 +2793,16 @@ struct EmbeddedEmulatorEngine::Impl
 			else
 				diag.midi_queue_overflow.fetch_add(1, std::memory_order_relaxed);
 		}
+	}
+
+	void sendMidiPanic(const HeldMidiNotes &held_notes)
+	{
+		for (std::size_t i = 0; i < held_notes.size(); ++i)
+		{
+			midi_panic_held_notes[i].store(held_notes[i], std::memory_order_release);
+			active_host_midi_notes[i].store(0, std::memory_order_release);
+		}
+		midi_panic_requested.store(true, std::memory_order_release);
 	}
 
 	void resetAudioWindow()
@@ -3096,7 +3080,7 @@ struct EmbeddedEmulatorEngine::Impl
 
 	bool requestStateOperation(const StateOperationRequest &request)
 	{
-		if (settings.driver_name != "fb01"
+		if (!settings.state_operations_allowed
 			|| diag.stop_requested.load(std::memory_order_acquire)
 			|| diag.machine_started.load(std::memory_order_acquire) == 0
 			|| diag.machine_exited.load(std::memory_order_acquire) != 0)
@@ -3134,7 +3118,8 @@ private:
 	{
 		osd_options options;
 		embedded_osd osd(options, midi_queue, audio_queue, mouse_queue, floppy_requests, floppy_results,
-			state_requests, state_results, video_bridge, diag);
+			state_requests, state_results, midi_panic_requested, midi_panic_held_notes,
+			active_host_midi_notes, video_bridge, diag);
 		osd.register_options();
 
 		std::vector<std::string> args {
@@ -3383,6 +3368,9 @@ private:
 	std::atomic<std::uint64_t> mouse_sequence { 0 };
 	std::atomic<bool> floppy_change_pending { false };
 	std::atomic<bool> state_operation_pending { false };
+	std::atomic<bool> midi_panic_requested { false };
+	std::array<std::atomic<std::uint64_t>, 32> midi_panic_held_notes {};
+	std::array<std::atomic<std::uint64_t>, 32> active_host_midi_notes {};
 	std::atomic<int> mame_result { EMU_ERR_FATALERROR };
 };
 
@@ -3419,6 +3407,11 @@ bool EmbeddedEmulatorEngine::stopAndJoin(std::chrono::milliseconds timeout)
 void EmbeddedEmulatorEngine::sendMidiBytes(const std::uint8_t *data, std::size_t size)
 {
 	m_impl->sendMidiBytes(data, size);
+}
+
+void EmbeddedEmulatorEngine::sendMidiPanic(const HeldMidiNotes &held_notes)
+{
+	m_impl->sendMidiPanic(held_notes);
 }
 
 void EmbeddedEmulatorEngine::resetAudioWindow()
