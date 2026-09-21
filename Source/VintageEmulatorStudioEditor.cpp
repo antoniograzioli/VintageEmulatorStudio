@@ -79,7 +79,7 @@ GuiPerformanceMode guiPerformanceModeForMenuId (int menuId)
 
 juce::String vesDisplayVersion()
 {
-    return "v. " + juce::String (JucePlugin_VersionString);
+    return "v. 0.9.289.2";
 }
 
 juce::String compactStatusForStartupError (StartupError category)
