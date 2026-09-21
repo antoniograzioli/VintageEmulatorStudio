@@ -1,0 +1,12 @@
+diff --git a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h
+index 050840b1..e31b72e0 100644
+--- a/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h
++++ b/src/ves/embeddedinstruments/EmbeddedEmulatorEngine.h
+@@ -7,6 +7,7 @@
+ 
+ #pragma once
+ 
++#include <array>
+ #include <atomic>
+ #include <chrono>
+ #include <cstdint>
