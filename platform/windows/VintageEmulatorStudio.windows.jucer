@@ -3,7 +3,7 @@
 <JUCERPROJECT id="msemb1" name="Vintage Emulator Studio" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
               pluginFormats="buildStandalone,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
-              companyWebsite="www.autodafe.net" version="0.9.289" companyName="Autodafe"
+              companyWebsite="www.autodafe.net" version="0.9.289.2" companyName="Autodafe"
               companyEmail="info@autodafe.net" pluginManufacturerCode="AtdF"
               pluginCode="VES1" bundleIdentifier="net.autodafe.VintageEmulatorStudio"
               cppLanguageStandard="20">

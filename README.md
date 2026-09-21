@@ -6,7 +6,7 @@ Vintage Emulator Studio (VES) is an audio plug-in for macOS (Apple Silicon and I
 
 VES brings a curated collection of vintage synthesizers, drum machines, sound modules, and samplers emulated by MAME into a modern, musician-friendly environment.
 
-The current source baseline is VES 0.9.289.1 with an embedded MAME 0.289 source baseline.
+The current source baseline is VES 0.9.289.2 with an embedded MAME 0.289 source baseline.
 
 This repository contains the VES host code, artwork/layout resources, JUCE project files, platform build integration, a patched MAME 0.289 source tree, and a reproducible patch series describing the VES modifications to MAME.
 
@@ -20,7 +20,7 @@ Get the latest VES builds and documentation from Autodafe.net.
 
 ## Status
 
-VES 0.9.289.1 is a source baseline for four validated build configurations:
+VES 0.9.289.2 is a source baseline for four validated build configurations:
 
 - macOS Apple Silicon (`arm64`)
 - macOS Intel (`x86_64`)
