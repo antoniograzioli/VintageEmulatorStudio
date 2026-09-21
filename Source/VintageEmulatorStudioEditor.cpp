@@ -34,7 +34,8 @@ constexpr int optionsButtonWidth = 82;
 constexpr int optionsButtonHeight = 22;
 constexpr int versionLabelWidth = 92;
 constexpr int versionLabelGap = 10;
-constexpr int vesReleaseRevision = 1;
+constexpr int midiPanicButtonWidth = 96;
+constexpr int midiPanicButtonGap = 8;
 #if JucePlugin_Build_Standalone
 constexpr int volumeLabelWidth = 52;
 constexpr int volumeSliderWidth = 128;
@@ -78,7 +79,7 @@ GuiPerformanceMode guiPerformanceModeForMenuId (int menuId)
 
 juce::String vesDisplayVersion()
 {
-    return "v. " + juce::String (JucePlugin_VersionString) + "." + juce::String (vesReleaseRevision);
+    return "v. " + juce::String (JucePlugin_VersionString);
 }
 
 juce::String compactStatusForStartupError (StartupError category)
@@ -1589,7 +1590,6 @@ void VintageEmulatorStudioEditor::resized()
                             optionsBarBounds.getY(),
                             versionLabelWidth,
                             optionsBarHeight);
-    midiPanicButton.setBounds (versionLabel.getRight() + 8, optionsBarBounds.getY() + 3, 96, optionsBarHeight - 6);
 #if JucePlugin_Build_Standalone
     const auto sliderHeight = 22;
     const auto sliderY = optionsBarBounds.getY() + (optionsBarHeight - sliderHeight) / 2;
@@ -1599,6 +1599,15 @@ void VintageEmulatorStudioEditor::resized()
                            optionsBarBounds.getY(),
                            volumeLabelWidth,
                            optionsBarHeight);
+    midiPanicButton.setBounds (volumeLabel.getX() - midiPanicButtonGap - midiPanicButtonWidth,
+                               optionsBarBounds.getY() + 3,
+                               midiPanicButtonWidth,
+                               optionsBarHeight - 6);
+#else
+    midiPanicButton.setBounds (versionLabel.getRight() + midiPanicButtonGap,
+                               optionsBarBounds.getY() + 3,
+                               midiPanicButtonWidth,
+                               optionsBarHeight - 6);
 #endif
 }
 

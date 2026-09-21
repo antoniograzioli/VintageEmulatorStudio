@@ -44,7 +44,7 @@ namespace ProjectInfo
 {
     const char* const  projectName    = "Vintage Emulator Studio";
     const char* const  companyName    = "Autodafe";
-    const char* const  versionString  = "0.9.289";
+    const char* const  versionString  = "0.9.289.2";
     const int          versionNumber  = 0x921;
 }
 #endif

@@ -1,5 +1,10 @@
 # Vintage Emulator Studio Changelog
 
+## VES 0.9.289.2
+
+- Updated release metadata and the on-screen version label.
+- Moved MIDI Panic beside the Standalone volume control.
+
 ## VES 0.9.289.1
 
 ### NEW

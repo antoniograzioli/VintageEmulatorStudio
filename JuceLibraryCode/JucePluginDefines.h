@@ -83,7 +83,7 @@
  #define JucePlugin_VersionCode            0x921
 #endif
 #ifndef  JucePlugin_VersionString
- #define JucePlugin_VersionString          "0.9.289"
+ #define JucePlugin_VersionString          "0.9.289.2"
 #endif
 #ifndef  JucePlugin_VSTUniqueID
  #define JucePlugin_VSTUniqueID            JucePlugin_PluginCode
@@ -155,7 +155,7 @@
  #define JucePlugin_ARAFactoryID           "com.Autodafe.VintageEmulatorStudio.factory"
 #endif
 #ifndef  JucePlugin_ARADocumentArchiveID
- #define JucePlugin_ARADocumentArchiveID   "com.Autodafe.VintageEmulatorStudio.aradocumentarchive.0.9.289"
+ #define JucePlugin_ARADocumentArchiveID   "com.Autodafe.VintageEmulatorStudio.aradocumentarchive.0.9.289.2"
 #endif
 #ifndef  JucePlugin_ARACompatibleArchiveIDs
  #define JucePlugin_ARACompatibleArchiveIDs  ""
