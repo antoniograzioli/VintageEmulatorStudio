@@ -2,8 +2,26 @@
 
 ## VES 0.9.289.2
 
-- Updated release metadata and the on-screen version label.
-- Moved MIDI Panic beside the Standalone volume control.
+### NEW
+- Generalized machine state save/restore support for compatible instruments. Most machines now remeber their settings if you reopen them (AKAIs still don't as they would need floppy, cds, hdds...)
+- Automatic per-machine state recall in Standalone mode.
+- Added support for restoring held MIDI note state more safely after loading a machine state.
+- New performance optimizations for audio and video processing. Mainly reducing redraws and cahing UI static elements that never change
+- New Background Color setting
+Image
+- MIDI Panic Button
+
+
+### FIXED
+- Lowered startup times. Some machines are now initilized almost instantly.
+- Significantly improved audio latency and realtime stability, especially at smaller buffer sizes.
+- Fixed MIDI issues after state restore, including stuck notes and unresponsive MIDI input.
+- Fixed machine restarts caused by host buffer-size changes.
+- Improved video rendering efficiency and reduced unnecessary UI/render workload.
+- Fixed several Windows and Linux build/integration issues.
+- Various stability improvements
+
+
 
 ## VES 0.9.289.1
 
